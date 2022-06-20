@@ -1,0 +1,425 @@
+System /*-trace*/ waste_service
+
+
+Request waste : waste(TYPE,WEIGHT)
+Reply loadAccepted : info(TYPE,WEIGHT,AVAILABLE_WEIGHT)  // Reply loadAccepted : info(ok) 
+Reply loadRejected : info(TYPE,WEIGHT,AVAILABLE_WEIGHT)  // Reply loadRejected : info(rip)
+
+Dispatch goal : dest(DESTX,DESTY,TYPE,WEIGHT) // Dispatch goal : dest(DESTX,DESTY)
+Request hasNext : val(has)
+Reply yesNext : dest(DESTX,DESTY,TYPE,WEIGHT) // Reply yesNext : dest(DESTX,DESTY)
+Reply noNext : dest(no)
+Event pickedUp : info(TYPE,WEIGHT)
+
+
+
+
+Context ctx_waste_service_monolitic ip [ host="localhost" port=8080]
+
+QActor waste_truck_mock context ctx_waste_service_monolitic {
+	
+	State s0 initial {
+		println("		WASTE_TRUCK GENERATOR | STARTED")
+		
+	}
+	Goto iter_1_V_2
+	
+	
+	// formato item_Sequence_Number_Vetro/Plastica_Peso
+	State iter_1_V_2 {
+		
+		request waste_service -m waste : waste(Glass,2)
+		
+	}
+	Transition t0 whenReply loadAccepted -> iter_1_accept
+				  whenReply loadRejected -> not_as_planned
+					
+	
+	State iter_1_accept {
+		
+		println("		WASTE_TRUCK GENERATOR | 1 ACCEPTED")
+		
+	}
+	Transition t1 whenEvent pickedUp -> iter_1_leaving_indoor
+	
+	
+	State iter_1_leaving_indoor {
+		
+		printCurrentMessage
+		
+		println("		WASTE_TRUCK GENERATOR | 1 LEAVING")
+	}
+	
+	Goto iter_2_V_3
+	
+	
+	State iter_2_V_3 {
+		
+		request waste_service -m waste : waste(Glass,3)
+	}
+	Transition t0 whenReply loadAccepted -> iter_2_accept
+				  whenReply loadRejected -> not_as_planned
+	
+	
+	
+	State iter_2_accept {
+		
+		println("		WASTE_TRUCK GENERATOR | 2 ACCEPTED")
+		
+	}
+	Transition t1 whenEvent pickedUp -> iter_2_leaving_indoor
+	
+	State iter_2_leaving_indoor {
+		
+		printCurrentMessage
+		
+		println("		WASTE_TRUCK GENERATOR | 2 LEAVING")
+	}
+	
+	Goto iter_3_V_2
+	
+	
+	State iter_3_V_2 {
+		
+		delay 4000
+		request waste_service -m waste : waste(Glass,2)
+	}
+	Transition t0 whenReply loadAccepted -> iter_3_accept
+				  whenReply loadRejected -> not_as_planned
+	
+	
+	State iter_3_accept {
+		
+		println("		WASTE_TRUCK GENERATOR | 3 ACCEPTED")
+		
+	}
+	Transition t1 whenEvent pickedUp -> iter_3_leaving_indoor
+	
+	State iter_3_leaving_indoor {
+		
+		printCurrentMessage
+		
+		println("		WASTE_TRUCK GENERATOR | 3 LEAVING")
+	}
+	Goto iter_4_V_5
+	
+	
+	State iter_4_V_5 {
+		
+		request waste_service -m waste : waste(Glass,5)
+	}
+	Transition t0 whenReply loadRejected -> iter_4_notaccept
+				  whenReply loadAccepted -> not_as_planned
+	
+	
+	
+	State iter_4_notaccept {
+		
+		println("		WASTE_TRUCK GENERATOR | 4 NOT ACCEPTED")
+		
+	}
+	Goto iter_4_leaving_indoor
+	
+	State iter_4_leaving_indoor {
+		
+		printCurrentMessage
+		
+		println("		WASTE_TRUCK GENERATOR | 4 LEAVING")
+	}
+	
+	Goto iter_5_P_3
+	
+	
+	State iter_5_P_3 {
+		
+		request waste_service -m waste : waste(Plastic,3)
+	}
+	Transition t0 whenReply loadAccepted -> iter_5_accept
+				  whenReply loadRejected -> not_as_planned
+	
+	
+	
+	State iter_5_accept {
+		
+		println("		WASTE_TRUCK GENERATOR | 5 ACCEPTED")
+		
+	}
+	Transition t1 whenEvent pickedUp -> iter_5_leaving_indoor
+	
+	State iter_5_leaving_indoor {
+		
+		printCurrentMessage
+		
+		println("		WASTE_TRUCK GENERATOR | 5 LEAVING")
+	}
+	
+	Goto iter_6_V_2
+	
+	
+	State iter_6_V_2 {
+		
+		request waste_service -m waste : waste(Glass,2)
+	}
+	Transition t0 whenReply loadAccepted -> iter_6_accept
+				  whenReply loadRejected -> not_as_planned
+	
+	
+	
+	
+	State iter_6_accept {
+		
+		println("		WASTE_TRUCK GENERATOR | 6 ACCEPTED")
+		
+	}
+	Transition t1 whenEvent pickedUp -> iter_6_leaving_indoor
+	
+	State iter_6_leaving_indoor {
+		
+		printCurrentMessage
+		
+		println("		WASTE_TRUCK GENERATOR | 6 LEAVING")
+	}
+	
+	
+	
+	
+	State not_as_planned {
+		
+		printCurrentMessage 
+		
+		println("	ERROR	 ")
+	} 
+	
+}
+
+
+QActor waste_service context ctx_waste_service_monolitic {
+	
+	[#
+	var Glass_container_space = 10
+	var Plastic_container_space = 10
+	var RequestedType  = ""
+	var RequestedWeight = 0
+	var AvailableWeight = 0
+	var Available = true 
+	var TrolleyIdle = true
+	#]
+	
+	
+	State s0 initial {
+		println("WASTE_SERVICE | STARTED")
+	}
+	Goto accept_trolley_idle
+	
+	State accept_trolley_idle {
+		printCurrentMessage
+		onMsg ( hasNext : val(has) ) { 
+			[# TrolleyIdle = true #]
+			replyTo hasNext with noNext : dest(no)
+		}
+		println("WASTE_SERVICE | ACCEPTING, TROLLEY IDLE $TrolleyIdle")	
+	}
+	Transition t1  whenRequest waste -> check_availability 
+	
+	State check_availability {
+		printCurrentMessage
+		println("WASTE_SERVICE | CHECK AVAILABILITY")	
+		onMsg ( waste : waste(TYPE,WEIGHT) ) {
+			[#
+				RequestedType = payloadArg(0)
+				RequestedWeight = payloadArg(1).toInt()
+
+					if (RequestedType == "Glass"){
+													AvailableWeight = Glass_container_space
+													Available = RequestedWeight <= Glass_container_space
+												}
+												else if (RequestedType == "Plastic"){
+													AvailableWeight = Plastic_container_space
+
+													Available = RequestedWeight <= Plastic_container_space
+												}
+				else 
+					{
+						AvailableWeight = 0	
+						println("WASTE_SERVICE | WRONG TYPE")
+						Available = false
+					}
+			#]
+			
+			if [# (Available)#] {
+			replyTo waste with  loadAccepted : info(TYPE,WEIGHT,AVAILABLE_WEIGHT)
+			}
+			else {
+			replyTo waste with  loadRejected : info(TYPE,WEIGHT,AVAILABLE_WEIGHT)
+			}			
+		}
+	} 
+	Goto issue_trolley if [# Available#] else  accept_trolley_idle
+	
+	State issue_trolley {
+		println("WASTE_SERVICE | ISSUEING TROLLEY")
+		[#
+		if (RequestedType.equals("Glass")) {
+			#]
+			forward trolley -m goal : dest(10,10,$RequestedType,$RequestedWeight)
+			[#
+		}else {
+			#]
+			forward trolley -m goal : dest(10,0,$RequestedType,$RequestedWeight)
+			[#
+		}	
+		#]
+	}
+	Transition t2 whenEvent pickedUp -> update_weight
+	
+	State update_weight {
+		println("WASTE_SERVICE | UPDATE WEIGHT")
+		[# 
+			TrolleyIdle = false
+			if (RequestedType.equals("Glass"))
+				Glass_container_space -=  RequestedWeight 
+			else 
+				Plastic_container_space -=  RequestedWeight 
+		#]
+	}
+	Goto accept_trolley_busy
+	
+	State accept_trolley_busy {
+		println("WASTE_SERVICE | TROLLEY IDLE = $TrolleyIdle")
+	}
+	Transition t3 whenRequest hasNext -> accept_trolley_idle
+				  whenRequest waste -> check_availability_busy
+				  
+				  
+
+	State check_availability_busy {
+		printCurrentMessage
+		println("WASTE_SERVICE | CHECK AVAILABILITY BUSY")	
+		onMsg ( waste : waste(TYPE,WEIGHT) ) {
+			[#
+				RequestedType = payloadArg(0)
+				RequestedWeight = payloadArg(1).toInt()
+				if (RequestedType == "Glass"){
+													AvailableWeight = Glass_container_space
+													Available = RequestedWeight <= Glass_container_space
+												}
+												else if (RequestedType == "Plastic"){
+													AvailableWeight = Plastic_container_space
+
+													Available = RequestedWeight <= Plastic_container_space
+												}
+				else 
+					{
+						AvailableWeight = 0	
+						println("WASTE_SERVICE | WRONG TYPE")
+						Available = false
+					}
+			#]
+			if [# (Available)#] {
+			replyTo waste with  loadAccepted : info(TYPE,WEIGHT,AVAILABLE_WEIGHT)
+			}
+			else {
+			replyTo waste with  loadRejected : info(TYPE,WEIGHT,AVAILABLE_WEIGHT)
+			}			
+		}
+	}
+	Goto  wait_trolley if [#Available #] else accept_trolley_busy
+	
+	
+	State wait_trolley{
+		println("WASTE_SERVICE | WAITING TROLLEY")	
+	}
+	Transition t4 whenRequest hasNext -> reply_yes
+	
+	State reply_yes {
+		println("WASTE_SERVICE | REPLY YES")
+		printCurrentMessage 
+		onMsg ( 	hasNext :  val(has) ) {
+			[#
+		if (RequestedType.equals("Glass")) {
+			#]
+			replyTo hasNext with yesNext : dest(10,10,$RequestedType,$RequestedWeight)
+			[#
+		}else {
+			#]
+			replyTo hasNext with yesNext : dest(10,0,$RequestedType,$RequestedWeight)
+			[#
+		}	
+		#]
+		}
+	}
+	Transition t2 whenEvent pickedUp -> update_weight
+}
+
+QActor trolley context ctx_waste_service_monolitic {
+	
+	[#
+		var Weight = 0
+	 	var Type = ""
+	 	var DestX = 0
+	 	var DestY = 0
+		var IndoorDelay = 2000L
+		var ContainerDelay = 2000L
+		var HomeDelay = 2000L
+	#]
+	
+	
+	State s0 initial {
+		println("	TROLLEY | STARTED")
+	}
+	Goto idle_home 
+	
+	State idle_home {	
+		println("	TROLLEY | HOME")
+	}
+	
+	Transition t1 whenMsg goal -> going_indoor
+	
+	State going_indoor {
+		println("	TROLLEY | MOVING TO INDOOR")
+		printCurrentMessage
+		onMsg ( goal : dest(DESTX,DESTY,TYPE,WEIGHT) ) {
+			[#
+			DestX = payloadArg(0).toInt()
+			DestY = payloadArg(1).toInt()
+			Type = payloadArg(2)
+			Weight = payloadArg(3).toInt()
+			#]
+		}
+		onMsg ( yesNext : dest(DESTX,DESTY,TYPE,WEIGHT) ) {
+			[#
+			DestX = payloadArg(0).toInt()
+			DestY = payloadArg(1).toInt()
+			Type = payloadArg(2)
+			Weight = payloadArg(3).toInt()
+			#]
+		}
+		delayVar IndoorDelay
+	}
+	Goto pickup_waste
+	
+	State pickup_waste {
+		println("	TROLLEY | PICKUP_WASTE")
+		emit pickedUp : info($Type,$Weight)
+	}
+	Goto going_container
+	
+	State going_container {
+		println("	TROLLEY | MOVING TO CONTAINER")
+		delayVar ContainerDelay
+	}
+	Goto work_done
+	
+	State work_done {
+		println("	TROLLEY | WORK DONE")
+		request waste_service -m hasNext : val(has) 
+	}
+	Transition t1  whenReply yesNext -> going_indoor 
+					whenReply noNext -> going_home
+					
+	State going_home {
+		println("	TROLLEY | GOING HOME")
+		delayVar HomeDelay
+	}
+	Goto idle_home
+}
