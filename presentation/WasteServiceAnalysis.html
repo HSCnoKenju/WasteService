@@ -1,0 +1,544 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+
+<link rel="stylesheet" href="css/basic.css">
+
+<style type="text/css">
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+	font-size: 93%;
+}
+
+a:hover {
+    background-color: #cccccc;
+}
+
+
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+
+h1, h2, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+	border-radius: 10px;
+	padding: 5px;
+}
+
+top {
+	width: 100%;
+}
+
+
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 90%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #abe876;
+    color: #1632cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 90%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+ks{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #0000CD	;
+	font-size: 90%;
+}
+kc{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #008000	;
+	font-size: 90%;
+}
+pre{
+	font-family: "Consolas";
+	font-size: 85%;
+	background-color: #f5f5f5;
+	border: 1.5px solid silver;
+	padding: 5px;
+}
+m{
+	font-family: "Helvetica";
+	line-height: 100%;
+ 	font-size: 75%;
+}
+div.body{
+	 
+    font-size: 18px;
+}
+k{
+    color: #990000;
+	font-weight: bold;
+	font-size: 90%;
+}
+h1 {
+    font-size: 150%;
+    background-color: #b2c0ff;
+	padding: 10px;
+}
+
+h2 {
+    background-color: #9ed8ff;
+    font-size: 130%;
+}
+
+h3 {
+	background-color: #e6ccff;
+    font-size: 100%;
+}
+h4 {
+    background-color: #ccffcc;
+    font-size: 100%;
+	width: 95%;
+	border-radius: 5px;
+	padding: 2px;
+}
+h5 {
+    background-color: #d5ffb0;
+    font-size: 100%;
+    color: #1c34a0;
+
+}
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}
+div.remark{
+	background-color: #E3F2FD;
+    border: 1.5px solid #d5f2ed;
+    padding: 15px;
+    margin: 10px;
+	border-radius: 25px;
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+ol, ul, li {
+  margin: 0;
+  margin-left: 10px;
+  padding: 0;
+  padding-bottom: 5px;
+}
+
+table, th, td {
+	border: 1px solid black;
+}
+
+img {
+	border: 1.5px solid #d5f2ed
+
+}
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+
+div.wrapdesc{
+	width: 90%;
+	margin: auto;
+}
+
+div.imagedesc{
+	width: 85%;
+	margin: auto;
+}
+</style>
+    
+<head>
+   
+<title>Waste Service: Analisi di progetto</title></head>
+    
+<body>
+<div id="top">
+<h1>LABORATORIO DI INGEGNERIA DEI SISTEMI SOFTWARE <font size="5"></font> </h1>
+</div>  
+
+<div class="body"> 
+<h2>Introduction</h2>
+ 
+<p>Tema finale corso di studio <b>Ingegneria dei sistemi software</b>, Laurea Magistrale Università di Bologna </p> 
+
+<h2>Requirements</h2>
+
+ 
+<div class="remark">
+    
+        <p>A company intends to build a <span class="blue">WasteService</span> for the <em>separate collection of waste</em>,  composed of a set of elements:</p>
+        <ol class="arabic">
+        <li><p>a service area (rectangular, flat) that includes:</p>
+        <ul class="simple">
+        <li><p>an <span class="blue">INDOOR</span> port, to enter waste material</p></li>
+        <li><p>a <span class="blue">PlasticBox</span> container, devoted to store objects made of plastic, upto <strong>MAXPB</strong> kg of material.</p></li>
+        <li><p>a <span class="blue">GlassBox</span> container, devoted to store objects made of glass, upto <strong>MAXGB</strong> kg of material.</p></li>
+        </ul>
+        <p>The service area is free from internal obstacles, as shown in the following picture:</p>
+        <blockquote>
+        <div><a class="reference internal image-reference" href="img/WasteServiceRoom.PNG"><img alt="img/WasteServiceRoom.PNG" class="align-center" src="img/WasteServiceRoom.PNG" style="width: 60%;" /></a>
+        </div></blockquote>
+        </li>
+        <li><p>a DDR robot working as a <span class="blue">transport trolley</span>, that is intially situated in its <span class="blue">HOME</span> location.
+        The transport trolley has  the form of a square of side length <strong>RD</strong>.</p>
+        <p>The <cite>transport trolley</cite> is used to performa a <span class="blue">deposit action</span> that consists in the following phases:</p>
+        <ol class="arabic simple">
+        <li><p>pick up a waste-load from a <span class="blue">Waste truck</span> located on the <cite>INDOOR</cite></p></li>
+        <li><p>go from the <cite>INDOOR</cite> to the proper waste container</p></li>
+        <li><p>deposit the waste-load in the container</p></li>
+        </ol>
+        </li>
+        <li><p>a <span class="blue">Service-manager</span> (an human being) which supervises the state of the service-area by using a
+        <span class="blue">WasteServiceStatusGUI</span>.</p></li>
+        <li><p>a <span class="blue">Sonar</span> and a <span class="blue">Led</span> connected to a RaspnerryPi. The <cite>Led</cite> is used as a <em>warning devices</em>,
+        according to the following scheme:</p>
+        <ul class="simple">
+        <li><p>the <cite>Led</cite> is <strong>off</strong> when the  <cite>transport trolley</cite> is at <cite>HOME</cite></p></li>
+        <li><p>the <cite>Led</cite> <strong>blinks</strong> while the <cite>transport trolley</cite> is moving</p></li>
+        <li><p>the <cite>Led</cite> is <strong>on</strong> when <cite>transport trolley</cite> is stopped.</p></li>
+        </ul>
+        <p>The <cite>Sonar</cite> is used as an ‘alarm device’: when it measures a distance less that a prefixed value <strong>DLIMT</strong>,
+        the <cite>transport trolley</cite> must be stopped.
+        It will be resumed when <cite>Sonar</cite> detects again a distance higher than  <strong>DLIMT</strong>.</p>
+        </li>
+        </ol>
+        <section id="tfrequirements">
+        <h2>TFRequirements</h2>
+        <p>The main goal of the <span class="blue">WasteService</span> software is to allow a <span class="blue">Waste truck</span> to deposit its load of
+        <strong>TruckLoad</strong> kg plastic or glass in the proper container.</p>
+        <p>The global story can be described as follows:</p>
+        <ol class="arabic simple">
+        <li><p>The <cite>Waste truck</cite> driver approaches the <cite>INDOOR</cite> and sends (using a smart device) a request to store the load,
+        by specifyng the <cite>type of  the material</cite> (plastic or glass) and its <cite>TruckLoad</cite>.</p></li>
+        <li><p>The <cite>WasteService</cite> sends the answer <em>loadaccept</em> if the final content of proper container will not surpass the
+        maximum value allowed (<em>MAXPB</em> or <em>MAXGB</em>). Otherwise, it sends the answer <em>loadrejecetd</em> and the  <cite>Waste truck</cite>
+        leaves the <cite>INDOOR</cite> area.</p></li>
+        <li><p>When the load is accepted, the <cite>transport trolley</cite> reaches the <cite>INDOOR</cite>, picks up the material, goes to the
+        proper container and settles the material. During this activity, the <cite>WasteService</cite> <strong>blinks</strong> the <cite>Led</cite></p></li>
+        <li><p>When the deposit action is terminated, the <cite>transport trolley</cite>  excutes another deposit command (if any)
+        or returns to its <cite>HOME</cite>.</p></li>
+        </ol>
+        <p>The <cite>WasteService</cite> must create a <span class="blue">WasteServiceStatusGUI</span> that shows to the <em>Service-manager</em>:</p>
+        <ul>
+        <li><p>the current state of the <cite>transport trolley</cite> and it position in the room</p></li>
+        <li><p>the current weigth of the material stored in the two waste-containers</p></li>
+        <li><p>the current state of the <cite>Led</cite></p></li>
+        </ul>
+        </section>
+        
+</div>
+
+ 
+
+<h2>Requirement analysis</h2>
+<div class="remark">
+
+ <p>Dopo una prima analisi del testo dei requisiti, sono emersi alcuni punti non chiari 
+    dei quali è stato richiesto chiarimenti verso il committente. <br> Riportando in seguito 
+ </p>
+<ol>
+
+   <li>Possono più WASTE_TRUCK arrivare nello stesso momento all'interno del sistema? oppure entra uno solo quando quello precedente ha liberato INDOOR? 
+    <ul>
+
+        <li> r1: I truck possono arrivare uno solo alla volta e con loro anche i messaggi di richiesta.</li>
+        <li> r2: Però un messaggio di richiesta potrebbe arrivare mentre il Trolley sta scaricando</li>
+    </ul>
+    </li> 
+   
+    
+   <li>In caso di load_accepted il WASTE_TRUCK libera INDOOR subito dopo che il TROLLEY ha prelevato il carico? 
+   
+   <ul>
+    <li>Si, per cui vale la r2
+    </li>
+   </ul>
+</li>
+    <li>La WAIT-SERVICE considera il volume dei contenitori attualmente disponibili oppure è impossibile che il TROLLEY non compia il suo carico, quindi in caso di TROLLEY in transito, assieme al volume dei contenitori viene considerato anche il peso del carico in transito? 
+    
+    <ul>
+
+        <li>
+            Per rispondere positivamente a una richiesta di deposito mentre il trolley sta scaricando, deve essere considerato anche il carico in transito,  come se fosse già stato depositato
+   
+        </li>
+    </ul>
+</li>
+    
+   <li>LED che è accesso quando il TROLLEY È STOPPED : inteso quando fermato a causa del sonar? oppure anche davanti ai contenitori per scaricare il carico? 
+    
+   <ul>
+
+    <li>
+        Solo a causa del sonar
+    </li>
+</ul>
+</li>
+   
+   
+<li>
+    Se il trolley è in posizione HOME e il sonar rileva una distanza minore di DLIMIT, in che stato vuole che sia il LED?
+    <ul>
+        <li>
+            Il Led deve essere off. Deve diventare on se il Trolley deve muoversi ma il sonar rileva una distanza < DLIMT
+        </li>
+    </ul>
+</li>
+
+</ol>
+
+
+<p>Tramite la seguente tabella identifico in che stato deve essere il led </p>
+
+<table>
+    <thead>
+      <tr>
+        <th>TROLLEY \ SONAR</th>
+        <th>MINORE DLIMIT</th>
+        <th>MAGGIORE DLIMIT</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>HOME</td>
+        <td>LED OFF</td>
+        <td>LED OFF</td>
+      </tr>
+      <tr>
+        <td>WORKING</td>
+        <td>LED ON</td>
+        <td>LED BLINK</td>
+      </tr>
+    </tbody>
+    </table>
+
+
+    <p>Posso dividere il problema proposto in 3 requisiti funzionali distinti</p>
+    <h5>base functionality</h5>
+    <p>ad Waste_Service viene comunicato il carico arrivato, a sua discrezione accetta o meno il carico ed incarica il TROLLEY. Il TROLLEY comunica al WASTE_TRUCK e al Waste_Service dopo che ha prelevato il carico; Dopo che ha scaricato il carico, chiede al Waste_Service se c'è un altro incarico</p>
+    <ul>
+
+        <li> risposta positiva : si sposta direttamente ad INDOOR
+            </li>
+        <li>risposta negativa : si sposta ad HOME</li>    
+        </ul>
+
+    <h5>stop-resume-notify</h5>
+
+    <p>l TROLLEY si ferma quando il SONAR rileva una distanza minore di DLIMIT, e riprende l'esecuzione quando viene rilevata una distanza maggiore.
+        <br>
+        Il LED codifica lo stato del TROLLEY
+       </p>
+
+    <ul>
+
+        <li>
+             
+        acceso, bloccato dal sonar
+        </li>
+
+        <li>spento, home
+            
+            </li>
+        <li>lampeggiante, in operazione</li>
+    </ul>   
+
+
+    <h5>gui tracker</h5>
+
+    <p>disporre di una GUI che mostra</p>
+
+    <ul>
+        <li>
+            stato del trolley</li>
+        <li>peso corrente nei containers
+            </li>
+        <li>stato del led</li>
+    </ul>
+
+</div>
+
+<h2>Problem analysis</h2>
+<div class="remark">
+
+    <p>Per ognuno dei requisiti funzionali mostro l'architettura logica separata, in modo da raggruppare semanticamente le interazioni</p>
+
+    <h5>base functionality</h5>
+
+    <img src="img/arc_base.jpg" alt="img">
+    <h5>stop-resume-notify</h5>
+    <img src="img/arc_notify.jpg" alt="">
+    <h5>gui tracker</h5>
+    <img src="img/arc_gui_tracker.jpg" alt="">
+   
+
+
+    <h3>Contesti</h3>
+
+    <ul>
+
+        <li> <b>servizio</b> : Waste_Service, Trolley</li>
+        <li><b>sensori</b> : Led, Sonar </li>
+        <li> <b>esterno_1</b> : Gui</li>
+        <li> <b>esterno_2</b> : Waste_Truck</li>
+        <li> <b>esterno_3</b> : Wenv / robot fisico</li>
+    </ul>
+
+    <h4>Responsabilità di Waste Service</h4>
+
+    <p>Notiamo che l'entità ora denominata Waste_Service ha <b>molteplici responsabilità</b> </p>
+
+    <ul>
+        <li>Riferimento per tutti i Waste_Truck che interagiscono con il sistema</li>
+        <li>Possedere (e notificare) informazioni riguardante alla capacità dei due containers</li>
+        <li>Interpretare gli eventi del <b>sonar</b> , e a sua discrezione emettere a sua volta eventi</li>
+        <li>Interpretare gli eventi del <b>trolley</b> , e a sua discrezione emettere a sua volta eventi</li>
+        <li>Unico riferimento per il trolley</li>
+    </ul>
+
+    <h3> <b> Suggerimenti per progettazione</b></h3>
+
+    <p>Il Waste_Service sarebbe conveniente se venisse separato in più componenti interagenti tra loro, ciascuno avente una o più responsabilità di quelle sopra citate </p>
+    <p>Il Trolley si individuano anche in esso più responsabilità </p>
+    <ul>
+        <li> ricerca del percorso</li>
+        <li> interazione con il sistema in progettazione</li>
+        <li> interazione con il robot virtuale / reale</li>
+    </ul>
+
+
+    <h2>Architettura Logica: modello eseguibile</h2>
+    <h5>base functionality</h5>
+    <ul>
+        <li><a href="../src/test_1.qak" >download</a></li>
+        <li>path : src/test_1.qak</li>
+        <li>fsm trolley</li>
+        <li> <img src="img/fsm_trolley.jpg" alt=""></li>
+        <li>fsm waste service</li>
+        <li> <img src="img/fsm_w_serv.jpg" alt=""></li>
+        
+    </ul>
+</div>
+
+ 
+
+<h2>Test plans</h2> 
+<h5>base functionality</h5>
+
+<table>
+    <tr>
+        <th>TRUCK REQUEST</th>
+        <th></th>
+        <th>EXPECTED</th>
+    </tr>
+    <tr>
+        <td>1. VETRO 2</td>
+        <td>---&gt;</td>
+        <td>ACCETTATO</td>
+    </tr>
+    <tr>
+        <td>2. VETRO,3  subito dopo carico</td>
+        <td>---&gt;</td>
+        <td>ACCETTATO, TROLLEY NON PASSA DA HOME</td>
+    </tr>
+    <tr>
+        <td>3. VETRO,2  aspetta un po'</td>
+        <td>---&gt;</td>
+        <td>ACCETTATO, TROLLEY RIMANE PER UN PO' DA HOME</td>
+    </tr>
+    <tr>
+        <td>4. VETRO, 5 ininfluente</td>
+        <td>---&gt;</td>
+        <td>NON ACCETTATO</td>
+    </tr>
+    <tr>
+        <td>5. PLASTICA, 3 ininfluente</td>
+        <td>---&gt;</td>
+        <td>ACCETTATO</td>
+    </tr>
+    <tr>
+        <td>6. VETRO, 2  ininfluente</td>
+        <td>---&gt;</td>
+        <td>ACCETTATO</td>
+    </tr>
+</table>
+
+
+<h2>Project</h2> 
+<div class="remark">
+    <h5>gui tracker</h5>
+
+    <p>La notifica pensata per agenti esterni (GUI che necessita di peso dei containers, stato del trolley e stato del led), si può pensare a sfruttare gli attori come COAP resources</p>
+</div>
+
+<h2>Testing</h2> 
+ 
+
+<h2>Deployment</h2> 
+
+ 
+<h2>Maintenance</h2> 
+ 
+<!-- USEFUL
+<table style="width:100%" border="1">
+<tr>
+<td style="width:50%">
+</td>
+<td></td>
+</tr>
+</table>
+-->
+	      	
+<br/><br/> 	
+</div>  
+
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+By studentName email: student@studio.unibo.it  
+<img src="./img/emiglio.png" alt="mbot" width="15%" height="15%">
+</div> 
+</body>
+</html>
