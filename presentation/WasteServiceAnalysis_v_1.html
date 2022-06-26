@@ -1,0 +1,714 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+
+<link rel="stylesheet" href="css/basic.css">
+
+<style type="text/css">
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+	font-size: 93%;
+}
+
+a:hover {
+    background-color: #cccccc;
+}
+
+
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+
+h1, h1, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+	border-radius: 10px;
+	padding: 5px;
+}
+
+top {
+	width: 100%;
+}
+
+
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 90%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #abe876;
+    color: #1632cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 90%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+ks{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #0000CD	;
+	font-size: 90%;
+}
+kc{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #008000	;
+	font-size: 90%;
+}
+pre{
+	font-family: "Consolas";
+	font-size: 85%;
+	background-color: #f5f5f5;
+	border: 1.5px solid silver;
+	padding: 5px;
+}
+m{
+	font-family: "Helvetica";
+	line-height: 100%;
+ 	font-size: 75%;
+}
+div.body{
+	 
+    font-size: 18px;
+}
+k{
+    color: #990000;
+	font-weight: bold;
+	font-size: 90%;
+}
+h1 {
+    font-size: 180%;
+    background-color: #b2c0ff;
+	padding: 10px;
+}
+
+h1 {
+    background-color: #9ed8ff;
+    font-size: 150%;
+}
+
+h3 {
+	background-color: #e6ccff;
+    font-size: 130%;
+}
+h4 {
+    background-color: #ccffcc;
+    font-size: 120%;
+	width: 95%;
+	border-radius: 5px;
+	padding: 2px;
+}
+h5 {
+    background-color: #d5ffb0;
+    font-size: 100%;
+    color: #1c34a0;
+
+}
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}
+div.remark{
+	background-color: #E3F2FD;
+    border: 1.5px solid #d5f2ed;
+    padding: 15px;
+    margin: 10px;
+	border-radius: 25px;
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+ol, ul, li {
+  margin: 0;
+  margin-left: 10px;
+  padding: 0;
+  padding-bottom: 5px;
+}
+
+table, th, td {
+	border: 1px solid black;
+}
+
+img {
+	border: 1.5px solid #d5f2ed
+
+}
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+
+.blue {
+
+    color: #0000CD;
+}
+
+.red {
+
+    color: #990000;
+}
+
+.green {
+
+    color: #008000;
+}
+
+div.wrapdesc{
+	width: 90%;
+	margin: auto;
+}
+
+div.imagedesc{
+	width: 85%;
+	margin: auto;
+}
+</style>
+    
+<head>
+   
+<title>Waste Service: Analisi di progetto</title></head>
+    
+<body>
+<div id="top">
+<h1>LABORATORIO DI INGEGNERIA DEI SISTEMI SOFTWARE <font size="5"></font> </h1>
+</div>  
+
+<div class="body"> 
+<h1>Introduction</h1>
+<div class="remark">
+<p>Tema finale corso di studio <b>Ingegneria dei sistemi software</b>, Laurea Magistrale Università di Bologna </p> 
+
+<p>OLD VERSIONS</p>
+
+<p><a href="WasteServiceAnalysis_v_0.html">version 0.1</a> </p>
+
+<p> <a href="#Q1">new changes</a> </p>
+
+</div>
+<h1>Requirements</h1>
+
+ 
+<div class="remark">
+    
+        <p>A company intends to build a <span class="blue">WasteService</span> for the <em>separate collection of waste</em>,  composed of a set of elements:</p>
+        <ol class="arabic">
+        <li><p>a service area (rectangular, flat) that includes:</p>
+        <ul class="simple">
+        <li><p>an <span class="blue">INDOOR</span> port, to enter waste material</p></li>
+        <li><p>a <span class="blue">PlasticBox</span> container, devoted to store objects made of plastic, upto <strong>MAXPB</strong> kg of material.</p></li>
+        <li><p>a <span class="blue">GlassBox</span> container, devoted to store objects made of glass, upto <strong>MAXGB</strong> kg of material.</p></li>
+        </ul>
+        <p>The service area is free from internal obstacles, as shown in the following picture:</p>
+        <blockquote>
+        <div><a class="reference internal image-reference" href="img/WasteServiceRoom.PNG"><img alt="img/WasteServiceRoom.PNG" class="align-center" src="img/WasteServiceRoom.PNG" style="width: 60%;" /></a>
+        </div></blockquote>
+        </li>
+        <li><p>a DDR robot working as a <span class="blue">transport trolley</span>, that is intially situated in its <span class="blue">HOME</span> location.
+        The transport trolley has  the form of a square of side length <strong>RD</strong>.</p>
+        <p>The <cite>transport trolley</cite> is used to performa a <span class="blue">deposit action</span> that consists in the following phases:</p>
+        <ol class="arabic simple">
+        <li><p>pick up a waste-load from a <span class="blue">Waste truck</span> located on the <cite>INDOOR</cite></p></li>
+        <li><p>go from the <cite>INDOOR</cite> to the proper waste container</p></li>
+        <li><p>deposit the waste-load in the container</p></li>
+        </ol>
+        </li>
+        <li><p>a <span class="blue">Service-manager</span> (an human being) which supervises the state of the service-area by using a
+        <span class="blue">WasteServiceStatusGUI</span>.</p></li>
+        <li><p>a <span class="blue">Sonar</span> and a <span class="blue">Led</span> connected to a RaspnerryPi. The <cite>Led</cite> is used as a <em>warning devices</em>,
+        according to the following scheme:</p>
+        <ul class="simple">
+        <li><p>the <cite>Led</cite> is <strong>off</strong> when the  <cite>transport trolley</cite> is at <cite>HOME</cite></p></li>
+        <li><p>the <cite>Led</cite> <strong>blinks</strong> while the <cite>transport trolley</cite> is moving</p></li>
+        <li><p>the <cite>Led</cite> is <strong>on</strong> when <cite>transport trolley</cite> is stopped.</p></li>
+        </ul>
+        <p>The <cite>Sonar</cite> is used as an ‘alarm device’: when it measures a distance less that a prefixed value <strong>DLIMT</strong>,
+        the <cite>transport trolley</cite> must be stopped.
+        It will be resumed when <cite>Sonar</cite> detects again a distance higher than  <strong>DLIMT</strong>.</p>
+        </li>
+        </ol>
+        <section id="tfrequirements">
+        <h1>TFRequirements</h1>
+        <p>The main goal of the  <span class="blue">  WasteService </span> software is to allow a <span class="blue">Waste truck</span> to deposit its load of
+        <strong>TruckLoad</strong> kg plastic or glass in the proper container.</p>
+        <p>The global story can be described as follows:</p>
+        <ol class="arabic simple">
+            <li><p>The <cite>Waste truck</cite> driver approaches the <cite>INDOOR</cite> and sends (using a smart device) a request to store the load,
+            by specifyng the <cite>type of  the material</cite> (plastic or glass) and its <cite>TruckLoad</cite>.</p></li>
+            <li><p>The <cite>WasteService</cite> sends the answer <em>loadaccept</em> if the final content of proper container will not surpass the
+            maximum value allowed (<em>MAXPB</em> or <em>MAXGB</em>). Otherwise, it sends the answer <em>loadrejecetd</em> and the  <cite>Waste truck</cite>
+            leaves the <cite>INDOOR</cite> area.</p></li>
+            <li><p>When the load is accepted, the <cite>transport trolley</cite> reaches the <cite>INDOOR</cite>, picks up the material, goes to the
+            proper container and settles the material. During this activity, the <cite>WasteService</cite> <strong>blinks</strong> the <cite>Led</cite></p> </li>
+            <li><p>When the deposit action is terminated, the <cite>transport trolley</cite>  excutes another deposit command (if any)
+            or returns to its <cite>HOME</cite>.</p></li>
+            </ol>
+        <p>The <cite>WasteService</cite> must create a <span class="blue">WasteServiceStatusGUI</span> that shows to the <em>Service-manager</em>:</p>
+        <ul>
+        <li><p>the current state of the <cite>transport trolley</cite> and it position in the room</p></li>
+        <li><p>the current weigth of the material stored in the two waste-containers</p></li>
+        <li><p>the current state of the <cite>Led</cite></p></li>
+        </ul>
+        </section>
+        
+</div>
+
+ 
+
+<h1>Requirement analysis</h1>
+<div class="remark">    
+
+ <p>Dopo una prima analisi del testo dei requisiti, sono emersi alcuni punti non chiari 
+    dei quali è stato richiesto chiarimenti verso il committente. <br> Riportando in seguito 
+ </p>
+<ol>
+
+   <li id="Q1">Possono più WASTE_TRUCK arrivare nello stesso momento all'interno del sistema? oppure entra uno solo quando quello precedente ha liberato INDOOR? 
+    <ul>
+
+        <li> r1: I truck possono arrivare uno solo alla volta e con loro anche i messaggi di richiesta.</li>
+        <li> r2: Però un messaggio di richiesta potrebbe arrivare mentre il Trolley sta scaricando</li>
+    </ul>
+    </li> 
+   
+    
+   <li id="Q2">In caso di load_accepted il WASTE_TRUCK libera INDOOR subito dopo che il TROLLEY ha prelevato il carico? 
+   
+   <ul>
+    <li>Si, per cui vale la r2
+    </li>
+   </ul>
+</li>
+    <li>La WASTE-SERVICE considera il volume dei contenitori attualmente disponibili oppure è impossibile che il TROLLEY non compia il suo carico, quindi in caso di TROLLEY in transito, assieme al volume dei contenitori viene considerato anche il peso del carico in transito? 
+    
+    <ul>
+
+        <li>
+            Per rispondere positivamente a una richiesta di deposito mentre il trolley sta scaricando, deve essere considerato anche il carico in transito,  come se fosse già stato depositato
+   
+        </li>
+    </ul>
+</li>
+    
+   <li>LED che è accesso quando il TROLLEY È STOPPED : inteso quando fermato a causa del sonar? oppure anche davanti ai contenitori per scaricare il carico? 
+    
+   <ul>
+
+    <li>
+        Solo a causa del sonar
+    </li>
+</ul>
+</li>
+   
+   
+<li>
+    Se il trolley è in posizione HOME e il sonar rileva una distanza minore di DLIMIT, in che stato vuole che sia il LED?
+    <ul>
+        <li>
+            Il Led deve essere off. Deve diventare on se il Trolley deve muoversi ma il sonar rileva una distanza < DLIMT
+        </li>
+    </ul>
+</li>
+
+</ol>
+
+
+<p>Tramite la seguente tabella identifico in che stato deve essere il led </p>
+
+<table>
+    <thead>
+      <tr>
+        <th>TROLLEY \ SONAR</th>
+        <th>MINORE DLIMIT</th>
+        <th>MAGGIORE DLIMIT</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>HOME</td>
+        <td>LED OFF</td>
+        <td>LED OFF</td>
+      </tr>
+      <tr>
+        <td>WORKING</td>
+        <td>LED ON</td>
+        <td>LED BLINK</td>
+      </tr>
+    </tbody>
+    </table>
+
+
+    <h5 id="core-functionality">core-functionality</h5>
+
+
+    <ol class="arabic simple">
+        <li><p>The <b> <cite>Waste truck</cite> </b> driver approaches the <cite>INDOOR</cite> and <b> sends </b> (using a smart device) a <b> request </b> to store the load,
+        <b> by specifyng the <cite>type of  the material</cite> (plastic or glass) and its <cite>TruckLoad</cite> </b>.</p></li>
+        <li id="R2"><p>The <b> <cite>WasteService</cite> sends the answer   <em>loadaccept</em> </b> if the final content of proper container will not surpass the
+        maximum value allowed (<em>MAXPB</em> or <em>MAXGB</em>). <b> Otherwise, it sends the answer <em>loadrejecetd</em> </b> and the  <cite>Waste truck</cite>
+        leaves the <cite>INDOOR</cite> area.</p></li>
+        <ul>
+            <li class="green"> WasteService ha conoscenza di MAXPB e MAXGB, in modo da poter inviare le due risposte</li>
+        </ul>
+        
+        <li><p> <b class="red" > When the load is accepted </b>, the <cite>transport trolley</cite> reaches the <cite>INDOOR</cite>, <b class="red"> picks up the material </b>, goes to the
+        proper container and settles the material. <del> During this activity, the <cite>WasteService</cite> <strong>blinks</strong> the <cite>Led</cite></p> </del> </li>
+            <ul>
+                <li> <b class="red">Problema</b>: innesco procedura proattiva di Transport_trolley <br>(denominato in seguito <b class="red">issue_trolley</b>)</li> 
+                <li><b class="red">Problema</b>: comunicazione da parte del Transport_trolley della fine del prelievo dei materiali, il truck solo dopo il prelievo libera INDOOR ( <a href="#Q2">Q2</a> ) <br> (denominato in seguito <b class="red">pickup</b>)</li>
+            </ul>
+        
+        <li><p> <b class="red"> When the deposit action is terminated </b>, the <cite>transport trolley</cite> <b class="red"> excutes another deposit command  (if any) </b>
+        or returns to its <cite>HOME</cite>.</p></li>
+            <ul>
+
+                <li><b class="red">Problema</b>: comunicazione da parte del Transport_trolley della terminazione del lavoro assegnato<br>(denominato in seguito <b class="red">work_complete</b>)</li>
+                <li><b class="red">Problema</b>: al Transport_trolley devono arrivare informazioni riguardanti l'incarico successivo <br>(denominato in seguito <b class="red">next_work</b>) </li>
+            </ul>
+    </ol>
+   
+
+
+    <h3>Modello dei requisiti</h3>
+
+    <p> I requisti che non portano ad nessun problema (R1, R2) insieme definiscono il seguente modello dei requisiti</p>
+    
+    <ul>
+        <li><a href="../src/modello_requisiti.qak" >download</a></li>
+        <li>path : src/modello_requisti.qak</li>
+        <li> <img src="img/modello_requisiti.jpg" alt=""> </li> 
+    </ul>
+
+
+    <p>WasteService è modellato logicamente come <b> attore </b> perchè lavora intrinsecamente a scambio di messaggi</p>
+        <ul>
+            <li> <b>Reattivo</b> sensibile alle richieste dei Waste_Truck</li>
+            <li> <b>Proattivo</b> Commissionare il Transport_trolley a seguito di valutazioni (riguardante alla capacità disponibile) e rispondere alla richiesta arrivata</li>
+        </ul>
+
+    <p>WasteTruck è un POJO in quanto ente esterno dal sistema in progettazione</p>
+
+    <h5> alarm </h5>
+    
+    <p> YAGNI, non è il centro del problema in questa fase</p>
+
+    <h5> statusGUI</h5>
+    <p> YAGNI, non è il centro del problema in questa fase</p>
+
+   </div>
+
+ 
+
+<h1>Problem Analysis</h1>
+
+<div class="remark">
+
+    <h2 id="issue_trolley_1" > <k> issue_trolley </k></h2>
+
+    <p>La direzione della comunicazione è sicuramente DA Waste_Service VERSO Transport_trolley, Da requisiti R1 R2 Waste_Service ha l'informazione di quando un Waste_Truck invia una richiesta, questo verso garantisce una comunicazione <b>by-need</b>  in modello <b>push</b>. </p>
+
+    <h5> proposta #1: evento</h5>
+
+    <ul>
+
+        <li> <b> PRO </b></li>
+
+            <ul>
+
+                <li> disaccoppiamento totale, Waste_Service non è a conoscenza dell'esistenza del Transport_trolley</li>
+            </ul>
+        <li> <b> CONTRO </b></li>
+
+            <ul>
+                <li> <b class="red"> non è reliable </b>, ogni incarico inviato dal Waste_Service dovrebbe venir gestito dal trolley</li>
+                <li> per questo particolare problema tramite Q1 Q2, individuo che il Transport_trolley deve essere sensibile all'evento per tutto il percorso a parte il tratto da HOME ad INDOOR
+                <li> Una possibile soluzione per forzare reliability potrebbe essere:  <br> inviare (dopo un timeout) una request al trolley per vedere se effettivamente sta effettuando l'incarico, ma in questo caso perdiamo il vantaggio del disacoppiamento totale. (Waste_Service deve conoscere Transport_trolley) </li>
+            </ul>
+
+    </ul>
+    <h5> proposta #2: dispaccio</h5>
+
+    <ul>
+        <li> <b> PRO </b></li>
+        <ul>
+            <li>La connessione è reliable, se il trolley non riceve l'incarico, l'infrastruttura genera una eccezione esplicita.</li>
+            <li>Necessito comunque di un unico messaggio per questo problema.</li>
+        </ul>
+        <li> <b> CONTRO </b></li>
+
+            <ul>
+                <li> Il Waste_Service deve essere a conoscenza del Transport_trolley.</li>
+            </ul>
+    </ul>
+    <h5 id="issue_trolley_3"> proposta #3: request-response</h5>
+    <ul>
+        <li> <b> PRO </b></li>
+        <ul>
+            <li>La connessione è reliable, se il trolley non riceve l'incarico, l'infrastruttura genera una eccezione esplicita.</li>
+            
+        </ul>
+        <li> <b> CONTRO </b></li>
+            <ul>
+                <li>Necessito di <b class="red"> due messaggi </b>(request response) per soddisfare questo problema, inoltre non è chiara la semantica della risposta</li>
+                <li>La semantica della risposta più straight-forward è che risponde subito così il Waste_Service sa che ha ricevuto il messaggio</li>
+            </ul>
+    </ul>
+
+    <img src="img/p_issue_trolley.jpg" alt="">
+
+
+    <h4> <k> informazione posizione containers </k></h4>
+    
+    <p>Sorge il dilemma di quale entità (Waste_Service o Transport_trolley) deve essere a conoscenza dell'associazione NOME_CONTAINER ==> POSIZIONE NELLO SPAZIO</p>
+    <ul>
+        <li>Se questa informazione la possiede <b class="blue"> Waste_Service</b>: <br> il payload del messaggio di <b class="red">issue_trolley</b> sono le coordinate (oppure coppia di coordinate di vertici opposti se delimito un'area rettangolare) del container destinazione  </li>
+        <li>Se questa informazione la possiede <b class="blue"> Transport_trolley</b>:<br> il payload é semplicemente il <b>nome</b> del container destinazione </li>
+    </ul>
+
+    <h2 > <k> pickup </k></h2>
+
+    <p>La direzione della comunicazione è Da Transport_trolley VERSO Waste_Service e Waste_Truck</p>
+    <p>Notiamo subito che la comunicazione tra Transport_trolley verso il Waste_Truck deve essere intermediata da Waste_Service per non avere un ulteriore accoppiamento</p>
+
+    <h4> Trolley to Waste_Service</h4>
+    <h5 id="pickup_1"> proposta #1: evento</h5>
+    <ul>
+        <li> <b> PRO </b></li>
+            <ul>
+                <li>disaccoppiamento, il Transport_trolley non conosce il Waste_Service. <br> Se possibile vorrei mantenere il Transport_trolley indipendente dal resto del sistema</li>
+            </ul>
+
+        <li> <b> CONTRO </b></li>
+
+        <ul>
+            <li> <b class="red">unreliability</b>   <br> ma è fatale che il Waste_Truck liberi INDOOR esattamente quando il Transport_trolley preleva il materiale? potrebbe liberare in un secondo momento?</li>
+        </ul>
+
+    </ul>
+    <h5 id="pickup_2"> proposta #2: dispaccio</h5>
+    <ul>
+        <li> <b> PRO </b></li>
+         <ul>
+            <li> reliable</li>
+         </ul>
+        <li> <b> CONTRO </b></li>
+
+            <ul>
+                <li> dipendenza dal Transport_trolley verso Waste_Service</li>
+            </ul>
+
+    </ul>
+    
+    <h5> proposta #3: request-response standard</h5>
+    <p> È solo una complicazione del dispaccio, stesse considerazioni ma un CONTRO in più</p>
+    
+    <ul>
+        <li> <b> CONTRO </b></li>
+            <ul><li> due messagggi per questo problema</li></ul>
+    </ul>
+
+    <h5 id="pickup_4"> proposta #4: request-response, sfruttando <a href="#issue_trolley_3">proposta #3 di issue_trolley</a>  </h5>
+    
+    <p>La semantica del messaggio di risposta della richiesta goal per issue_trolley è aperta a rivalutazioni; possiamo pensare che il Transport_trolley risponde al termine del prelievo, e WasteService agisce di conseguenza notificando Waste_Truck </p>
+    <ul>
+        <li> <b> PRO </b></li>
+         <ul>
+            <li>sfrutto un messaggio esistente</li>
+            <li>connessione reliable</li>
+            <li>Transport_trolley non ha bisogno di conoscere il Waste_Service, gli basta rispondere al messaggio (goal) arrivato</li>
+         </ul>
+        
+
+        <li> <b> CONTRO </b></li>
+        <p>applicabile solo quando scelgo <a href="#issue_trolley_3">proposta #3 di issue_trolley</a>  </p>
+    </ul>
+    
+    <h4> Waste_Service to Waste_Truck</h4>
+
+    
+    <h5> proposta #1: dispaccio</h5>
+    <h5> proposta #2: request-response, sfruttando <a href="#R2"> R2 loadaccept </a></h5>
+    
+    <p>Il ragionamento è uguale per il confronto di <a href="#pickup_2">proposta #2</a>  e <a href="#pickup_4">proposta #4</a>  di <b> <k>pickup</k> </b>, ma essendo la comunicazione Waste_Truck e Waste_Service request-response  <span class="blue"> definita dai requisiti</span>, la proposta #2, ovvero inviare la reply loadaccept dopo aver ricevuto pickup non ha drawback.   </p>
+
+
+    <h2 > <k> work_complete </k></h2>
+
+    <p>La direzione della comunicazione è Da Transport_trolley VERSO Waste_Service. <br> Le possibili proposte di soluzione e le corrispettive considerazioni sono uguali al <a href="#pickup_1">problema pickup</a>, con la seguente piccola modifica </p>
+
+    <h5 id="complete_4"> proposta #4: request-response, sfruttando <a href="#issue_trolley_3">proposta #3 di issue_trolley</a>  </h5>
+    
+    <p>La semantica del messaggio di risposta della richiesta goal per issue_trolley è aperta a rivalutazioni; possiamo pensare che il Transport_trolley risponde al <b class="blue"> termine del percorso </b>, e WasteService agisce di conseguenza.</p>
+  
+    <p>Ovviamente la <a href="#pickup_4">proposta #4 pickup</a>  e la <a href="#complete_4"> proposta #4 work_complete</a>  sono in <b class="red">conflitto</b> , non è possibile attribuire due semantiche allo stesso messaggio di risposta. </p>
+
+    <p>Se come requisito di correttezza non è richiesto che Waste_Truck debba liberare INDOOR <b class="red"> esattamente</b> nell'istante in cui vengono prelevati i materiali; si può pensare di utilizzare la semantica ad evento per pickup, la semantica response per work_complete (che implicherebbe la semantica request per issue_trolley); work_complete nel caso in cui non sia arrivato l'evento pickup, all'arrivo di work_complete viene inviato loadaccept</p>
+
+
+    <h2> <k> next_work </k></h2>
+
+    <p> Non riesco a stabilire a priori un verso di comunicazione, entrambi i versi possono avere senso (by need e non polling), ma preferisco in caso di accoppiamento di mantenere quelli presenti, quindi DA Waste_Service VERSO Transport_trolley.</p>
+    <p> Per <a href="#Q1">la domanda Q1</a>, so per dominio che mi possono arrivare altre richieste da nuovi Waste_Truck solo dopo che il trolley ha prelevato il carico </p>
+
+
+    <h4>Waste_Service to Trolley</h4>
+    <p> Waste_Service invia senza sapere a che stato si trova il Trolley</p>
+    <p> <b class="blue"> La scelta della soluzione per questo problema deve essere coerente con <a href="#issue_trolley_1">issue_trolley</a>, le due soluzioni devono avere lo stesso tipo di messaggi. </b> </p>
+    <h5> proposta #1: dispaccio</h5>
+    <h5> proposta #2: request-response</h5>
+    <h5> proposta #3: evento</h5>
+    <p> se un attore non è in attesa del evento, questo viene  <b class="red">perso</b>  (non entra nella coda dei messaggi in attesa)</p>
+
+
+
+    <h4> <k> produttore-consumatore? </k></h4>
+    <p> Waste_Service può accodare il nuovo incarico al Transport_trolley? Oppure deve inviarglielo solo quando il trolley sta in effettiva attesa di un nuovo incarico?</p>
+
+    <h4>Trolley to Waste_Service</h4>
+
+    <p>Aggiungo una dipendenza in più tra i componenti, non valuto questa opzione.</p>
+
+
+    <h3>Modello del problema</h3>
+
+    <p>Il modello dei requisiti ci impone una dipendenza tra Waste_Truck e Waste_Service (I Waste_Truck devono conoscere Waste_Service)</p>
+    <p>Il problema <a href="#issue_trolley_1">issue_trolley</a> ci suggerisce che ci può essere una dipendenza da Waste_Service verso Transport_trolley</p>
+    <p>Vogliamo di conseguenza provare ad rendere il Transport_trolley indipendente dagli altri componenti</p>
+    <p>Il seguente modello di problema mostra l'architettura logica completa per i requisiti <a href="#core-functionality">core-functionality </a> </p>
+
+    <table>
+        <thead>
+          <tr>
+            <th>PROBLEMA</th>
+            <th>soluzione adottata</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>issue_trolley </td>
+            <td> request-response</td>
+          </tr>
+          <tr>
+            <td>informazione posizione containers</td>
+            <td>il payload é il nome del container</td>
+          </tr>
+          <tr>
+            <td>pickup : Trolley to Waste_Service</td>
+            <td>evento</td>
+          </tr>
+          <tr>
+            <td>pickup : Waste_Service to Waste_Truck</td>
+            <td> request-response, sfruttando R2 loadaccept </td>
+          </tr>
+          <tr>
+            <td>work_complete </td>
+            <td>request-response, sfruttando proposta response di issue_trolley</td>
+          </tr>
+          <tr>
+            <td>next_work : Waste_Service to Trolley </td>
+            <td>stesso di issue_trolley</td>
+          </tr>
+          <tr>
+            <td>next_work: produttore-consumatore</td>
+            <td>nuove richieste sono messe in coda al Transport_trolley</td>
+          </tr>
+        </tbody>
+        </table>
+
+        <br>
+        <ul>
+            <li><a href="../src/modello_problema.qak" >download</a></li>
+            <li>path : src/modello_problema.qak</li>
+            <li> <img src="img/modello_problema.jpg" alt=""> </li> 
+        </ul>
+</div>
+
+<h1>Test plans</h1> 
+<h5>core-functionality</h5>
+
+<h4>testing requisiti</h4>
+
+<p>Un Truck si presenta con un carico di TruckLoad superiore allo spazio disponibile, Waste_Service deve rispondere con loadrejected</p>
+<p>Un Truck si presenta con un carico di TruckLoad <span class="blue"> inferiore o uguale </span> allo spazio disponibile, Waste_Service deve aggiornare correttamente lo spazio residuo, e rispondere con loadaccept</p>
+
+<h4>testing problemi</h4>
+
+<p>A fronte di un carico di TruckLoad inferiore o uguale allo spazio disponibile del rispettivo container, Il Transport_trolley deve essere chiamato per prelevare il carico e portarlo nel contenitore apposito</p>
+<p>A fronte di un carico di TruckLoad maggiore allo spazio disponibile, il Transport_trolley non deve essere sollecitato</p>
+
+<p>Waste_Service accetta un incarico prima che Transport_trolley termina l'incarico corrente; quando Transport_trolley termina l'incarico corrente, deve dirigersi ad INDOOR</p>
+
+<p>Waste_Service non accetta nessun altro incarico nel mentre che Transport_trolley sta eseguendo l'incarico corrente, al termine il Transport_trolley si dirige in HOME e rimane in attesa una volta arrivato</p>
+<h1>Project</h1> 
+<div class="remark">
+
+</div>
+
+<h1>Testing</h1> 
+ 
+
+<h1>Deployment</h1> 
+
+ 
+<h1>Maintenance</h1> 
+ 
+<!-- USEFUL
+<table style="width:100%" border="1">
+<tr>
+<td style="width:50%">
+</td>
+<td></td>
+</tr>
+</table>
+-->
+	      	
+<br/><br/> 	
+</div>  
+
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+By Antonio Hu email: antonio.hu@studio.unibo.it  
+<img src="./img/emiglio.png" alt="mbot" width="15%" height="15%">
+</div> 
+</body>
+</html>
