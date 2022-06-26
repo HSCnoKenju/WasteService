@@ -1,0 +1,92 @@
+System /*-trace*/ waste_service
+
+Request waste : details(TYPE,TRUCKLOAD) // TYPE: Glass / Plastic
+Reply loadAccept : info(ok)  	// Reply loadAccepted : info(TYPE,WEIGHT,AVAILABLE_WEIGHT)   
+Reply loadRejected : info(rip)   // Reply loadRejected : info(TYPE,WEIGHT,AVAILABLE_WEIGHT)  
+
+Context ctx_waste_service_monolitic ip [ host="localhost" port=8080]
+
+QActor waste_truck_mock context ctx_waste_service_monolitic {
+	
+	State s0 initial {
+		println("		WASTE_TRUCK GENERATOR | STARTED")
+	}
+	Goto newLoad
+	
+	State newLoad{
+			println("		WASTE_TRUCK GENERATOR | NEW REQUEST")
+			//request waste_service -m waste : details(Glass,2)
+			request waste_service -m waste : details(Plastic,11)
+	}
+	Transition t0 whenReply loadAccept -> accepted
+				  whenReply loadRejected -> rejected
+	
+	State accepted{
+		
+		printCurrentMessage
+	}
+	Goto end
+	
+	State rejected{
+		
+		printCurrentMessage
+	}
+	Goto end
+	
+	State end {
+		println("		WASTE_TRUCK GENERATOR | END")
+	}
+	
+}
+
+
+QActor waste_service context ctx_waste_service_monolitic {
+	[#
+		var MAXPB = 10
+		var MAXGB = 5
+		var RequestedType  = ""
+		var RequestedWeight = 0
+		var Available = true 
+	#]
+	
+	State s0 initial {
+			println("WASTE_SERVICE | STARTED")
+	}
+	Goto accepting
+	
+	
+	State accepting {
+			println("WASTE_SERVICE | ACCEPTING")
+		}
+	Transition t0 whenRequest waste -> check_availability
+	
+	State check_availability {
+		printCurrentMessage
+		println("WASTE_SERVICE | CHECK AVAILABILITY")	
+		onMsg ( waste : details(TYPE,TRUCKLOAD) ) {
+			[#
+				RequestedType = payloadArg(0)
+				RequestedWeight = payloadArg(1).toInt()
+
+					if (RequestedType == "Glass"){
+						Available = RequestedWeight <= MAXGB
+					}
+					else if (RequestedType == "Plastic"){
+						Available = RequestedWeight <= MAXPB
+					}
+				else 
+					{	
+						println("WASTE_SERVICE | WRONG TYPE")
+						Available = false
+					}
+			#]
+			
+			if [# (Available)#] {
+			replyTo waste with  loadAccept : info(ok)
+			} else {
+			replyTo waste with  loadRejected : info(rip)
+			}			
+		}
+	}
+	Goto accepting
+}
