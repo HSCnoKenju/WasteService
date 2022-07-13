@@ -18,14 +18,14 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 		
 				var PathStr = StringJoiner(" ")
 				var CurrentType = ""
-				var PositionsMap: Map<String, Pair<Int,Int>>
+				var PositionsMap: Map<String, Pair<Int,Int>> = emptyMap()
 				var CurrentPosition: Pair<Int,Int>
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						println("		TRANSPORT TROLLEY | STARTED")
 					}
-					 transition( edgeName="goto",targetState="accepting", cond=doswitch() )
+					 transition(edgeName="t10",targetState="gotPositions",cond=whenDispatch("all_position"))
 				}	 
 				state("gotPositions") { //this:State
 					action { //it:State
@@ -36,18 +36,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 												PositionsMap = mapOf ("HOME" to Pair(payloadArg(0).toInt(),payloadArg(1).toInt()), "INDOOR" to Pair(payloadArg(2).toInt(),payloadArg(3).toInt()), "PLASTIC" to Pair(payloadArg(4).toInt(),payloadArg(5).toInt()), "GLASS" to Pair(payloadArg(6).toInt(),payloadArg(7).toInt())  )
 												
 						}
-					}
-					 transition(edgeName="t10",targetState="setStart",cond=whenDispatch("start_position"))
-				}	 
-				state("setStart") { //this:State
-					action { //it:State
-						println("$name in ${currentState.stateName} | $currentMsg")
-						if( checkMsgContent( Term.createTerm("coordinates(STARTX,STARTY)"), Term.createTerm("coordinates(STARTX,STARTY)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								
-												CurrentPosition = Pair(payloadArg(0).toInt(),payloadArg(1).toInt())
-													
-						}
+							println("mappa ${PositionsMap.toString()}")  
 					}
 					 transition( edgeName="goto",targetState="accepting", cond=doswitch() )
 				}	 
@@ -57,9 +46,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 						println("$name in ${currentState.stateName} | $currentMsg")
 						println("		TRANSPORT TROLLEY | NEW WORK")
 					}
-					 transition(edgeName="t01",targetState="arriveIndoor",cond=whenRequest("goal"))
+					 transition(edgeName="t01",targetState="goingIndoor",cond=whenRequest("goal"))
 				}	 
-				state("arriveIndoor") { //this:State
+				state("goingIndoor") { //this:State
 					action { //it:State
 						PathStr.add("ACCEPTED") 
 						updateResourceRep("$PathStr" 
@@ -70,29 +59,51 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 											
 											CurrentType = payloadArg(0)
 												
-								PathStr.add("INDOOR") 
-								updateResourceRep("$PathStr" 
-								)
 						}
+						
+								var DestX =  PositionsMap["INDOOR"]?.first
+								var DestY = PositionsMap["INDOOR"]?.second
+						request("destination", "dest($DestX,$DestY)" ,"pathplanner" )  
+					}
+					 transition(edgeName="t12",targetState="arriveIndoor",cond=whenReply("arrived"))
+				}	 
+				state("arriveIndoor") { //this:State
+					action { //it:State
+						PathStr.add("INDOOR") 
+						updateResourceRep("$PathStr" 
+						)
 						emit("pickup", "info($CurrentType)" ) 
 						println("		TRANSPORT TROLLEY | INDOOR")
+						
+								var DestX =  PositionsMap[CurrentType.uppercase(Locale.getDefault())]?.first
+								var DestY = PositionsMap[CurrentType.uppercase(Locale.getDefault())]?.second
+						request("destination", "dest($DestX,$DestY)" ,"pathplanner" )  
 					}
-					 transition( edgeName="goto",targetState="arriveDestination", cond=doswitch() )
+					 transition(edgeName="t13",targetState="arriveContainer",cond=whenReply("arrived"))
 				}	 
-				state("arriveDestination") { //this:State
+				state("arriveContainer") { //this:State
 					action { //it:State
 						PathStr.add("$CurrentType") 
 						updateResourceRep("$PathStr" 
 						)
 						answer("goal", "workdone", "info(done)"   )  
 						println("		TRANSPORT TROLLEY | $CurrentType")
-						stateTimer = TimerActor("timer_arriveDestination", 
-							scope, context!!, "local_tout_transporttrolley_arriveDestination", 10.toLong() )
+						stateTimer = TimerActor("timer_arriveContainer", 
+							scope, context!!, "local_tout_transporttrolley_arriveContainer", 500.toLong() )
 					}
-					 transition(edgeName="t12",targetState="goingHome",cond=whenTimeout("local_tout_transporttrolley_arriveDestination"))   
-					transition(edgeName="t13",targetState="arriveIndoor",cond=whenRequest("goal"))
+					 transition(edgeName="t14",targetState="goingHome",cond=whenTimeout("local_tout_transporttrolley_arriveContainer"))   
+					transition(edgeName="t15",targetState="goingIndoor",cond=whenRequest("goal"))
 				}	 
 				state("goingHome") { //this:State
+					action { //it:State
+						
+								var DestX =  PositionsMap["HOME"]?.first
+								var DestY = PositionsMap["HOME"]?.second
+						request("destination", "dest($DestX,$DestY)" ,"pathplanner" )  
+					}
+					 transition(edgeName="t16",targetState="arriveHome",cond=whenReply("arrived"))
+				}	 
+				state("arriveHome") { //this:State
 					action { //it:State
 						PathStr.add("HOME") 
 						updateResourceRep("$PathStr" 
