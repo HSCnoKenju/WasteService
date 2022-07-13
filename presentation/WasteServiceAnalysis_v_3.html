@@ -713,6 +713,55 @@ div.imagedesc{
         </ul>
 
 
+        <h5>LEGGERE DOPO LA PROGETTAZIONE</h5> 
+
+        <h2> <k> percorso </k></h2>
+
+        <p>La parte proattiva di un robot consiste spesso nell'esecuzione di una sequenza di movimenti che lo portano in una posizione desiderato dello spazio di lavoro (in questo caso lo spazio della stazione di Waste_Service).</p>
+        <p>Questa sequenza può essere: </p>
+
+
+        <ul>
+
+            <li>cablata nel codice</li>
+            <li>generata dinamicamente
+
+                <ul>
+                    <li>prodotta da una macchina a stati finiti</li>
+                    <li>algoritmi denominati di classe Path-Finding</li>
+                </ul>
+            </li>
+        </ul>
+        <p>Se lo spazio di lavoro è <b> immutabile </b> per tutte e le istanze su cui verrà eseguito l'applicazione (ed uguali tra loro), si potrebbe considerare di avere queste sequenze cablate, perchè deducibili a priori del tempo di esecuzione </p>
+
+        <p>Se la logica dei percorsi è chiara e semplice (rispetto alle competenze algoritmiche logiche del programmatore), basta una macchina a stati finiti.</p>
+
+        <p>In casi più complessi, si passano ad algoritmi di Path Finding.</p>
+
+        <h2> <k> mappa iniziale </k></h2>
+
+        <p>Per poter costruire un percorso, la "mente" ha bisogno di informazioni riguardanti lo spazio di lavoro; NON è necessario avere conoscenza <b> totale </b> dello spazio disponibile, se il "corpo" informa la "mente" quando e quale parte del piano che esso ha creato non è andato a buon fine, e la mente aggiorna la sua base di conoscenza riguardante lo spazio circostante;
+        tuttavia non conviene neache partire da zero base di conoscenza dello spazio perchè c'è un tempo iniziale a partire dal momento di esecuzione nella quale la mente deve sbagliare molte volte, è necessaria quindi una fase di "esplorazione parziale" dello spazio circostante. 
+            
+
+        <ul>
+
+            <li>zero conoscenza</li>
+            <li>qualche base di conoscenza  <ul>
+
+                <li>Solo i  bordi </li>
+                <p>È semplice da pensare al percorso (descrivibile tramite macchina a stati finiti con pochi stati) ed permette all'algoritmo poi più complesso di Path-Finding di notificare se la destinazione è fuori dall'area di lavoro con un rapido controllo, non fare tentativi aggiramenti di un muro continuo  </p>
+            </ul> </li>
+
+            <li>conoscenza totale (statica)</li>
+
+        </ul>
+        </p>
+
+
+
+    
+
 </div>
 
 <h1>Test plans</h1> 
@@ -722,17 +771,17 @@ div.imagedesc{
 <h5>core-functionality</h5>
 
 <h4>testing requisiti</h4>
-<p> <b class="red">testLoadAccept</b> :  Un Truck si presenta con un carico di TruckLoad superiore allo spazio disponibile, Waste_Service deve rispondere con loadrejected</p>
-<p> <b class="red">testLoadReject</b> : Un Truck si presenta con un carico di TruckLoad <span class="blue"> inferiore o uguale </span> allo spazio disponibile, Waste_Service deve aggiornare correttamente lo spazio residuo, e rispondere con loadaccept</p>
+<p>Un Truck si presenta con un carico di TruckLoad superiore allo spazio disponibile, Waste_Service deve rispondere con loadrejected</p>
+<p>Un Truck si presenta con un carico di TruckLoad <span class="blue"> inferiore o uguale </span> allo spazio disponibile, Waste_Service deve aggiornare correttamente lo spazio residuo, e rispondere con loadaccept</p>
 <ul>
-    <li><a href="../test/qak/TestCoreRequisiti.java" >TestCoreRequisiti</a></li>
+    <li><a href="../test/qak/TestCoreRequisiti.java" >download</a></li>
     <li>path : test/qak/TestCoreRequisiti.java</li>
 </ul>
 <h4>testing problemi</h4>
-<p> <b class="red">testSingleLoadAccepted</b> :  Waste_Service non accetta nessun altro incarico nel mentre che Transport_trolley sta eseguendo l'incarico corrente, al termine il Transport_trolley si dirige in HOME e rimane in attesa una volta arrivato</p>
-<p> <b class="red">testConsecutiveLoadAccepted</b> : Waste_Service accetta un incarico prima che Transport_trolley termina l'incarico corrente; quando Transport_trolley termina l'incarico corrente, deve dirigersi ad INDOOR, senza passare da HOME</p>
+<p>Waste_Service non accetta nessun altro incarico nel mentre che Transport_trolley sta eseguendo l'incarico corrente, al termine il Transport_trolley si dirige in HOME e rimane in attesa una volta arrivato</p>
+<p>Waste_Service accetta un incarico prima che Transport_trolley termina l'incarico corrente; quando Transport_trolley termina l'incarico corrente, deve dirigersi ad INDOOR, senza passare da HOME</p>
 <ul>
-    <li><a href="../test/qak/TestCoreProblema.java" >TestCoreProblema</a></li>
+    <li><a href="../test/qak/TestCoreProblema.java" >download</a></li>
     <li>path : test/qak/TestCoreProblema.java</li>
 </ul>
 
@@ -741,7 +790,7 @@ div.imagedesc{
 
 <p>Per agevolare i test, Waste_Service è sensibile ad un dispaccio <b>reset</b> che riporta i valori del pesi disponibili a quelli iniziali, questo messaggio non deve essere reso sensibile a deploy time</p>
 <ul>
-    <li><a href="../src/modello_problema_conoscenza.qak" >modello_problema_conoscenza.qak</a></li>
+    <li><a href="../src/modello_problema_conoscenza.qak" >download</a></li>
     <li>path : src/modello_problema_conoscenza.qak</li>
 </ul>
 
@@ -766,6 +815,35 @@ div.imagedesc{
 <h1>Project</h1> 
 <div class="remark">
 
+    <h4>Transport_trolley</h4>
+
+    <p>Identifico diverse responsabilità assegnate all'unità astratta Trolley</p>
+
+    <ul>
+        <li>Trovare i percorsi che nel loro insieme compongono un <b> lavoro di  load </b>
+            <p>Possiamo dividire la mente dal corpo, quindi</p>
+            <ul>
+                <li>entità A : (nome_temp PATH_PLANNER) il quale decide il percorso conoscendo la posizione attuale e la posizione finale</li>
+                <li>entità B : (PATH_EXECUTOR) il quale prende il percorso elaborato dal "cervello" PATH_PLANNER, ed esegue i movimenti in ordine</li>
+            </ul>
+        </li>
+        <li>entità C : (ROBOT_MOVER) Effettivamente muovere il robot fisico/virtuale che si avrà a disposizione</li>
+            <ul>
+                <li> ci sarà un'entità di ROBOT_MOVER per ogni robot supportato, queste entità mascherano le differenze di interazione tra una e l'altra, condividendo la stessa interfaccia/ insime di messaggi a cui possono reagire</li>
+            </ul>
+    </ul>
+
+    <p>All'interno della nostra software house sono già presenti componenti sviluppati che si occupano delle rispettive responsabilità</p>
+
+    <ul>
+        <li>entità A : unibo.robotappl1</li>
+        <li>entità B : unibo.basicrobot22 (QActor: pathexec)</li>
+        <li>entità C : unibo.basicrobot22 (QActor: basicrobot)</li>
+    </ul>
+
+    <p>Analizzando il comportamento del componente esistente che dovrà soddisfare il ruolo di entità A (unibo.robotappl1), ci accorgiamo che conviene / abbiamo necessità di estrarre a sè una fase conoscitiva di <b>almeno i bordi</b> dello spazio della stazione di servizio</p>
+
+    <p><b> GUARDARE ANALISI: PERCORSO E MAPPA INIZIALE</b></p>
 </div>
 
 <h1>Testing</h1> 
