@@ -173,3 +173,9 @@ modules.xml
 build2022.gradle
 *.pl
 /src/it/unibo/*
+
+
+####### PLANNER GENERATION
+
+xxx.*
+yyy.*
