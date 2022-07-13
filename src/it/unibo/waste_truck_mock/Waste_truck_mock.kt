@@ -25,8 +25,8 @@ class Waste_truck_mock ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 						println("		WASTE_TRUCK GENERATOR | NEW REQUEST")
 						request("waste", "details(Glass,2)" ,"waste_service" )  
 					}
-					 transition(edgeName="t04",targetState="accepted",cond=whenReply("loadAccept"))
-					transition(edgeName="t05",targetState="rejected",cond=whenReply("loadRejected"))
+					 transition(edgeName="t07",targetState="accepted",cond=whenReply("loadAccept"))
+					transition(edgeName="t08",targetState="rejected",cond=whenReply("loadRejected"))
 				}	 
 				state("accepted") { //this:State
 					action { //it:State

@@ -28,7 +28,7 @@ class Waste_service ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 					action { //it:State
 						println("WASTE_SERVICE | STARTED")
 					}
-					 transition(edgeName="t16",targetState="getWeights",cond=whenDispatch("init_capacity"))
+					 transition(edgeName="t19",targetState="getWeights",cond=whenDispatch("init_capacity"))
 				}	 
 				state("getWeights") { //this:State
 					action { //it:State
@@ -51,8 +51,8 @@ class Waste_service ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 					action { //it:State
 						println("WASTE_SERVICE | ACCEPTING")
 					}
-					 transition(edgeName="t07",targetState="check_availability",cond=whenRequest("waste"))
-					transition(edgeName="t08",targetState="reset_weights",cond=whenDispatch("reset"))
+					 transition(edgeName="t010",targetState="check_availability",cond=whenRequest("waste"))
+					transition(edgeName="t011",targetState="reset_weights",cond=whenDispatch("reset"))
 				}	 
 				state("reset_weights") { //this:State
 					action { //it:State
@@ -108,8 +108,8 @@ class Waste_service ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						println("WASTE_SERVICE | ISSUE TROLLEY")
 						request("goal", "destination($RequestedType)" ,"transporttrolley" )  
 					}
-					 transition(edgeName="t19",targetState="lost_pickup",cond=whenReply("workdone"))
-					transition(edgeName="t110",targetState="updateWeights",cond=whenEvent("pickup"))
+					 transition(edgeName="t112",targetState="lost_pickup",cond=whenReply("workdone"))
+					transition(edgeName="t113",targetState="updateWeights",cond=whenEvent("pickup"))
 				}	 
 				state("lost_pickup") { //this:State
 					action { //it:State
@@ -158,8 +158,8 @@ class Waste_service ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 					action { //it:State
 						println("WASTE_SERVICE | ACCEPTING(BUSY)")
 					}
-					 transition(edgeName="t211",targetState="accepting",cond=whenReply("workdone"))
-					transition(edgeName="t212",targetState="checkWhenBusy",cond=whenRequest("waste"))
+					 transition(edgeName="t214",targetState="accepting",cond=whenReply("workdone"))
+					transition(edgeName="t215",targetState="checkWhenBusy",cond=whenRequest("waste"))
 				}	 
 				state("checkWhenBusy") { //this:State
 					action { //it:State
