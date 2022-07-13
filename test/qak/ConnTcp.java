@@ -1,9 +1,10 @@
 package qak;
 
 
-import unibo.actor22comm.interfaces.Interaction2021;
-import unibo.actor22comm.tcp.TcpClientSupport;
-import unibo.actor22comm.utils.ColorsOut;
+
+import unibo.comm22.interfaces.Interaction2021;
+import unibo.comm22.tcp.TcpClientSupport;
+import unibo.comm22.utils.ColorsOut;
 
 public class ConnTcp implements Interaction2021 {
     private Interaction2021 conn;
@@ -45,25 +46,5 @@ public class ConnTcp implements Interaction2021 {
         conn.close();
     }
 
-
-    @Override
-    public void sendALine(String s) throws Exception {
-    conn.sendALine(s);
-    }
-
-    @Override
-    public void sendALine(String s, boolean b) throws Exception {
-conn.sendALine(s,b);
-    }
-
-    @Override
-    public String receiveALine() throws Exception {
-        return conn.receiveALine();
-    }
-
-    @Override
-    public void closeConnection() throws Exception {
-conn.closeConnection();
-    }
 }
 

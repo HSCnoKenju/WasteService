@@ -78,10 +78,12 @@ dependencies {
     /* UNIBO *************************************************************************************************************** */
     implementation name: 'uniboInterfaces'
     implementation name: '2p301'
-    implementation name: 'it.unibo.qakactor-2.7'
-    implementation name: 'unibonoawtsupports'  //required by the old infrastructure
-	implementation name: 'unibo.actor22-1.1'
-    implementation name: 'it.unibo.comm2022-2.0'
+    implementation name: 'unibo.qakactor22-2.8'
+    implementation name: 'unibo.comm22-1.1'
+    // implementation name: 'it.unibo.qakactor-2.7'
+    // implementation name: 'unibonoawtsupports'  //required by the old infrastructure
+	// implementation name: 'unibo.actor22-1.1'
+    // implementation name: 'it.unibo.comm2022-2.0'
 
     /* AIMA **************************************************************************************************************** */
  	//PLANNER  
@@ -107,7 +109,7 @@ eclipse {
 
 application {
     // Define the main class for the application.
-    mainClass = 'it.unibo.ctxresourcecore.MainCtxresourcecoreKt'
+    mainClass = 'it.unibo.ctxwaste.MainCtxwasteKt'
 }
 
  jar {

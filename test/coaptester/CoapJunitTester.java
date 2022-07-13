@@ -1,19 +1,10 @@
 package coaptester;
 
 
-import static org.junit.Assert.*;
-
-import it.unibo.ctxwaste.MainCtxwasteKt;
-import it.unibo.kactor.*;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapObserveRelation;
 import org.eclipse.californium.core.CoapResponse;
-import org.eclipse.californium.elements.exception.ConnectorException;
-import org.junit.*;
-import unibo.actor22comm.utils.*;
-
-import java.io.IOException;
 
 public class CoapJunitTester {
 

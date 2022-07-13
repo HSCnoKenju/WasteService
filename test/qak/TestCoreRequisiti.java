@@ -7,8 +7,8 @@ import it.unibo.kactor.*;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapObserveRelation;
 import org.junit.*;
-import unibo.actor22comm.utils.*;
-
+import unibo.comm22.utils.ColorsOut;
+import unibo.comm22.utils.CommUtils;
 
 
 public class TestCoreRequisiti {

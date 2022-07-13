@@ -1,5 +1,7 @@
 package qak;
 
+
+
 import it.unibo.ctxwaste.MainCtxwasteKt;
 import it.unibo.kactor.ActorBasic;
 import it.unibo.kactor.QakContext;
@@ -9,8 +11,9 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import unibo.actor22comm.utils.ColorsOut;
-import unibo.actor22comm.utils.CommUtils;
+import unibo.comm22.utils.ColorsOut;
+import unibo.comm22.utils.CommUtils;
+
 
 import static org.junit.Assert.*;
 
@@ -40,9 +43,15 @@ public class TestCoreProblema {
 		trolley_client = new CoapClient("coap://"+ trolley_ipaddr +"/"+ trolley_context +"/"+ trolley_destactor);
 
 		String initContainersStr = CommUtils.buildDispatch("test","init_capacity","values("+MAXGB+","+MAXPB+")","waste_service").toString();
+
+
+		//Dispatch all_position : coordinates(HOMEX,HOMEY,INDOORX,INDOORY,PLASTICX,PLASTICY,GLASSX,GLASSY)
+
+		String initPositionsStr = CommUtils.buildDispatch("test","all_position", "coordinates(0,0,1,4,6,3,5,0)","transporttrolley").toString();
 		try{
 			connTcp = new ConnTcp("localhost", 8033);
 			connTcp.forward(initContainersStr);
+			connTcp.forward(initPositionsStr);
 
 		}catch(Exception e){
 			ColorsOut.outerr("initial ERROR:" + e.getMessage());
@@ -99,6 +108,7 @@ public class TestCoreProblema {
 			while (pathStr.split(" ").length < 4){ 	// controllo che ci siano almeno 4 elementi, amplio
 															// per percorsi futuri
 				pathStr = trolley_client.get().getResponseText();
+				CommUtils.delay(200);
 			}
 
 			ColorsOut.outappl("position " +pathStr, ColorsOut.ANSI_PURPLE );
@@ -125,7 +135,7 @@ public class TestCoreProblema {
 	public void testConsecutiveLoadAccepted() {
 		ColorsOut.outappl("testLoadok_double STARTS" , ColorsOut.BLUE);
 		String truckRequestStr_1 = CommUtils.buildRequest("test","waste","details(Glass,6)","waste_service").toString();
-		String truckRequestStr_2 = CommUtils.buildRequest("test","waste","details(Glass,4)","waste_service").toString();
+		String truckRequestStr_2 = CommUtils.buildRequest("test","waste","details(Plastic,4)","waste_service").toString();
 
 		try {
 
@@ -150,6 +160,7 @@ public class TestCoreProblema {
 			while (pathStr.split(" ").length < 6 /*&& (pathStr.contains("Glass") || pathStr.contains(("Plastic")))*/){ 	// controllo che ci siano almeno 4 elementi, amplio
 				// per percorsi futuri
 				pathStr = trolley_client.get().getResponseText();
+				CommUtils.delay(200);
 			}
 
 			ColorsOut.outappl("position " +pathStr, ColorsOut.ANSI_PURPLE );
@@ -162,16 +173,20 @@ public class TestCoreProblema {
 			assertTrue(pathStr.contains("Glass"));
 			pathStr = pathStr.substring(pathStr.indexOf("Glass"));
 
-			assertFalse(pathStr.contains("HOME"));
+
 
 			assertTrue(pathStr.contains("ACCEPTED"));
+
+			var oldPathStr = pathStr.substring(0,pathStr.indexOf("ACCEPTED"));
+
+			assertFalse(oldPathStr.contains("HOME"));
 			pathStr = pathStr.substring(pathStr.indexOf("ACCEPTED"));
 
 			assertTrue(pathStr.contains("INDOOR"));
 			pathStr = pathStr.substring(pathStr.indexOf("INDOOR"));
 
-			assertTrue(pathStr.contains("Glass"));
-			pathStr = pathStr.substring(pathStr.indexOf("Glass"));
+			assertTrue(pathStr.contains("Plastic"));
+			pathStr = pathStr.substring(pathStr.indexOf("Plastic"));
 
 
 		}
