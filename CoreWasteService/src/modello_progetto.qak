@@ -39,6 +39,7 @@ Reply arrived : info(done)
 
 
 
+
 Context ctxpathplanner   ip [host="127.0.0.1" port=8078]
 
 Context ctxwaste ip [ host="localhost" port=8033]
@@ -53,11 +54,14 @@ ExternalQActor pathplanner context ctxpathplanner
 QActor transporttrolley context ctxwaste {
 	
 	
+	
+	
+	
 	[#
-		var PathStr = StringJoiner(" ")
+		resourceappender.initResource()
 		var CurrentType = ""
 		var PositionsMap: Map<String, Pair<Int,Int>> = emptyMap()
-		var CurrentPosition: Pair<Int,Int>
+		//var CurrentPosition: Pair<Int,Int>
 	#]
 	
 	State s0 initial {
@@ -65,6 +69,7 @@ QActor transporttrolley context ctxwaste {
 	}
 	//Goto accepting
 	Transition t1 whenMsg all_position ->  gotPositions
+	
 	
 	
 	State gotPositions {
@@ -103,7 +108,7 @@ QActor transporttrolley context ctxwaste {
 	
 	State accepting {
 		
-		[# PathStr = StringJoiner(" ")	#]
+		[# resourceappender.initResource()	#]
 		
 		printCurrentMessage
 		println("		TRANSPORT TROLLEY | NEW WORK")	
@@ -113,8 +118,8 @@ QActor transporttrolley context ctxwaste {
 	
 	State goingIndoor {
 		
-		[#PathStr.add("ACCEPTED")#]	
-		updateResource[#"$PathStr"#]
+		[#resourceappender.add("ACCEPTED")#]	
+		updateResource[#"resourceappender.getStr()"#]
 		
 		onMsg ( goal : destination(CONTAINER) ){
 			[#
@@ -138,9 +143,8 @@ QActor transporttrolley context ctxwaste {
 	State arriveIndoor {
 	
 		
-			
-		[#PathStr.add("INDOOR")#]	
-		updateResource[#"$PathStr"#]
+			[#resourceappender.add("INDOOR")#]		
+		updateResource[#"resourceappender.getStr()"#]
 			
 			
 		
@@ -151,8 +155,8 @@ QActor transporttrolley context ctxwaste {
 		// going Container
 		
 		[#
-		var DestX =  PositionsMap[CurrentType.uppercase(Locale.getDefault())]?.first
-		var DestY = PositionsMap[CurrentType.uppercase(Locale.getDefault())]?.second
+		var DestX =  PositionsMap[CurrentType.uppercase()]?.first
+		var DestY = PositionsMap[CurrentType.uppercase()]?.second
 		#
 		]
 		
@@ -165,9 +169,8 @@ QActor transporttrolley context ctxwaste {
 	
 	
 	State arriveContainer {
-		
-		[#PathStr.add("$CurrentType")#]	
-		updateResource[#"$PathStr"#]
+		[#resourceappender.add("$CurrentType")#]
+		updateResource[#"resourceappender.getStr()"#]
 		
 		replyTo goal with workdone : info(done)
 	 	println("		TRANSPORT TROLLEY | $CurrentType")	
@@ -196,8 +199,8 @@ QActor transporttrolley context ctxwaste {
 	
 	
 	State arriveHome{
-			[#PathStr.add("HOME")#]	
-		updateResource[#"$PathStr"#]
+		[#resourceappender.add("HOME")#]
+		updateResource[#"resourceappender.getStr()"#]
 		
 		println("		TRANSPORT TROLLEY | going HOME")	
 		
