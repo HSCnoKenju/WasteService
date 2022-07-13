@@ -43,6 +43,7 @@ ExternalQActor basicrobot context ctxbasicrobot
 
 
 
+
 QActor pathplanner context ctxpathplanner{
 	[# val Inmapname   = "xxx" //"map2019"  
 	   var PathTodo    =  ""  
@@ -53,7 +54,9 @@ QActor pathplanner context ctxpathplanner{
 	#]
 	State activate initial {  
 		
-		[# mapExist = Files.exists(Path.of("$Inmapname.txt"))#]
+		
+		
+		[# mapExist = filechecker.fileExists(Inmapname)#]
 		
 		if [#( mapExist 	) #]{
 			
