@@ -109,7 +109,13 @@ eclipse {
 
 application {
     // Define the main class for the application.
-    mainClass = 'it.unibo'
+    mainClass = 'it.unibo.truck.TruckTUI'
+}
+
+task tui( type: JavaExec ){
+    standardInput = System.in
+    classpath sourceSets.main.runtimeClasspath
+    mainClass = 'it.unibo.truck.TruckTUI'
 }
 
  jar {
