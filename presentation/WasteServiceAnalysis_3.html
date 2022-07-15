@@ -1,0 +1,432 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+
+@Author Antonio Hu
+-->
+<link rel="stylesheet" href="css/basic.css">
+<link rel="stylesheet" href="css/presentation.css">
+    
+<head>
+   
+    <title>Waste Service: Analisi di progetto</title></head>
+        
+    <body>
+    <div id="top">
+    <h1>LABORATORIO DI INGEGNERIA DEI SISTEMI SOFTWARE <font size="5"></font> </h1>
+    </div>  
+    
+    <div class="body"> 
+    <h2>Introduction</h2>
+     
+    <p>Tema finale corso di studio <b>Ingegneria dei sistemi software</b>, Laurea Magistrale Università di Bologna </p> 
+    
+    <p>PRECEDENTI</p>
+    <p><a href="WasteServiceAnalysis_1.html">analisi requisiti</a> </p>
+    <p><a href="WasteServiceAnalysis_2.html">analisi problemi</a> </p>
+
+ 
+ 
+
+    <h2>CHECKPOINT : REQUISITI</h2>
+
+    <div class="remark">
+    
+        <h3>Modello dei requisiti</h3>
+        <ul>
+            <li><a href="../CoreWasteService/src/modello_requisiti.qakt" >modello_requisiti</a></li>
+            <li>path : CoreWasteService/src/modello_requisiti.qakt</li>
+            <li> <img src="img/architettura_requisiti.png" alt=""> </li> 
+        </ul>
+    
+        <p>Per eseguire il modello, rinominare il file in modello_requisiti.qak, eliminare le sorgenti generate e rigenerare il sistema</p>
+    
+    
+    
+        <h5 id="core-functionality">core-functionality - Punti aperti</h5>
+        
+        
+        <ol class="arabic simple">  
+            <li><p> <b class="red" > When the load is accepted </b>, the <cite>transport trolley</cite> reaches the <cite>INDOOR</cite>, <b class="red"> picks up the material </b>, goes to the
+            proper container and settles the material. <del> During this activity, the <cite>WasteService</cite> <strong>blinks</strong> the <cite>Led</cite></p> </del> </li>
+                <ul>
+                    <li> <b class="red">Problema</b>: innesco procedura proattiva di Transport_trolley <br>(denominato in seguito <b class="red">issue_trolley</b>)</li> 
+                    <li><b class="red">Problema</b>: comunicazione da parte del Transport_trolley della fine del prelievo dei materiali, il truck solo dopo il prelievo libera INDOOR ( <a href="#Q2">Q2</a> ) <br> (denominato in seguito <b class="red">pickup</b>)</li>
+                </ul>
+            
+            <li><p> <b class="red"> When the deposit action is terminated </b>, the <cite>transport trolley</cite> <b class="red"> excutes another deposit command  (if any) </b>
+            or returns to its <cite>HOME</cite>.</p></li>
+                <ul>
+    
+                    <li><b class="red">Problema</b>: comunicazione da parte del Transport_trolley della terminazione del lavoro assegnato<br>(denominato in seguito <b class="red">work_complete</b>)</li>
+                    <li><b class="red">Problema</b>: al Transport_trolley devono arrivare informazioni riguardanti l'incarico successivo <br>(denominato in seguito <b class="red">next_work</b>) </li>
+                </ul>
+        </ol>
+    
+    
+        <h5> alarm : non considerato</h5>
+        
+    
+        <h5> statusGUI : non considerato</h5>
+        </div>
+
+        
+        <h2>CHECKPOINT : PROBLEMA</h2>
+<div class="remark">
+<h3>Modello del problema</h3>
+
+<div class="container">
+    <ul>
+        <li><a href="../CoreWasteService/src/modello_problema_conoscenza.qakt" >modello_problema_conoscenza</a></li>
+        <li>path : CoreWasteService/src/modello_problema_conoscenza.qakt</li>
+        <li> <img src="img/architettura_problema.png" alt=""> </li> 
+    </ul>
+
+    <table>
+        <thead>
+          <tr>
+            <th>PROBLEMA</th>
+            <th>soluzione adottata</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>issue_trolley </td>
+            <td> request-response</td>
+          </tr>
+          <tr>
+            <td>informazione posizione containers</td>
+            <td>il payload é il nome del container</td>
+          </tr>
+          <tr>
+            <td>pickup : Trolley to Waste_Service</td>
+            <td>evento</td>
+          </tr>
+          <tr>
+            <td>pickup : Waste_Service to Waste_Truck</td>
+            <td> request-response, sfruttando R2 loadaccept </td>
+          </tr>
+          <tr>
+            <td>work_complete </td>
+            <td>request-response, sfruttando proposta response di issue_trolley</td>
+          </tr>
+          <tr>
+            <td>next_work : Waste_Service to Trolley </td>
+            <td>stesso di issue_trolley</td>
+          </tr>
+          <tr>
+            <td>next_work: produttore-consumatore</td>
+            <td>nuove richieste sono messe in coda al Transport_trolley</td>
+          </tr>
+        </tbody>
+        </table>
+</div>
+
+<h4>Esecuzione automatica dei test</h4>
+    
+<p> In caso si rigenerassero i sorgenti con l'interprete qak, aggiungere alla Classe : CoreWasteService/src/it/unibo/transporttrolley/Transporttrolley.kt il seguente import : </p>
+ <p> <b>import java.util.* </b></p>
+
+<h5>Comandi</h5>
+<p> Build: <b>gradle build -x test </b></p>
+<p> Testing: <b> gradle test </b></p>
+
+<h5>Risultati test</h5>
+<p> <b> ls build/reports/tests/test/ </b></p>
+<p> <b> ls build/test-results/test/ </b> </p>
+
+
+</div>
+
+    
+ 
+
+
+
+<h2>Problem analysis</h2>
+
+ 
+<div class="remark">
+    <h5>LEGGERE DOPO LA PROGETTAZIONE</h5> 
+
+    <h2 id="percorso">  <k> percorso </k></h2>
+
+    <p>La parte proattiva di un robot consiste spesso nell'esecuzione di una sequenza di movimenti che lo portano in una posizione desiderato dello spazio di lavoro (in questo caso lo spazio della stazione di Waste_Service).</p>
+    <p>Questa sequenza può essere: </p>
+
+
+    <ul>
+
+        <li>cablata nel codice</li>
+        <li>generata dinamicamente
+
+            <ul>
+                <li>prodotta da una macchina a stati finiti</li>
+                <li>algoritmi denominati di classe Path-Finding</li>
+            </ul>
+        </li>
+    </ul>
+    <p>Se lo spazio di lavoro è <b> immutabile </b> per tutte e le istanze su cui verrà eseguito l'applicazione (ed uguali tra loro), si potrebbe considerare di avere queste sequenze cablate, perchè deducibili a priori del tempo di esecuzione </p>
+
+    <p>Se la logica dei percorsi è chiara e semplice (rispetto alle competenze algoritmiche logiche del programmatore), basta una macchina a stati finiti.</p>
+
+    <p>In casi più complessi, si passano ad algoritmi di Path Finding.</p>
+
+    <h2 id="mappa"> <k> mappa iniziale </k></h2>
+
+    <p>Per poter costruire un percorso, la "mente" ha bisogno di informazioni riguardanti lo spazio di lavoro; NON è necessario avere conoscenza <b> totale </b> dello spazio disponibile, se il "corpo" informa la "mente" quando e quale parte del piano che esso ha creato non è andato a buon fine, e la mente aggiorna la sua base di conoscenza riguardante lo spazio circostante;
+    tuttavia non conviene neache partire da zero base di conoscenza dello spazio perchè c'è un tempo iniziale a partire dal momento di esecuzione nella quale la mente deve sbagliare molte volte, è necessaria quindi una fase di "esplorazione parziale" dello spazio circostante. 
+        
+
+    <ul>
+
+        <li>zero conoscenza</li>
+        <li>qualche base di conoscenza  <ul>
+
+            <li>Solo i  bordi </li>
+            <p>È semplice da pensare al percorso (descrivibile tramite macchina a stati finiti con pochi stati) ed permette all'algoritmo poi più complesso di Path-Finding di notificare se la destinazione è fuori dall'area di lavoro con un rapido controllo, non fare tentativi aggiramenti di un muro continuo  </p>
+        </ul> </li>
+
+        <li>conoscenza totale iniziale </li>
+
+    </ul>
+    </p>
+
+    <h2> <k> passaggio mappa </k></h2>
+
+    <p>Si possono pensare a 3 modi di scambiare la mappa (un file testuale), con livello incrementale di disaccoppiamento e latenza</p>
+
+    <ul>
+
+        <li>pathname <b> relativo </b> : planner e mapper sono nello stesso progetto</li>
+        <li>pathname <b> assoluto </b> : planner e mapper sono nello stesso nodo fisico</li>
+        <li><b> trasferimento file </b> : planner e mapper possono stare anche su macchine diverse; se sono sulla stessa macchina servono piccoli accorgimenti per non trasferire (input e output) lo stesso file </li>
+    </ul>
+    <h2> <k> coerenza mapper planner </k></h2>
+
+    <p>Il mapper per funzionare deve pilotare un robot che esegue i comandi aril, Il planner per funzionare pilota un pathexecutor che a sua volta pilota un robot. Pathexecutor e robot sono nello stesso contesto perchè sono fortemente accoppiati </p>
+    <p>Se mapper e planner sono distribuiti in contesti distinti, per <b> integrità </b> devo verificare che rispettivamente robot e pathexecutor sono la coppia corretta.</p>
+
+    </div>
+     
+
+
+
+<h2>Project</h2> 
+
+<div class="remark">
+
+    <h4>Transport_trolley</h4>
+
+    <p>Identifico diverse responsabilità assegnate all'unità astratta Trolley</p>
+
+    <ul>
+        <li>Trovare i percorsi che nel loro insieme compongono un <b> lavoro di  load </b>
+            <p>Possiamo dividire la mente dal corpo, quindi</p>
+            <ul>
+                <li>entità A : (nome_temp PATH_PLANNER) il quale decide il percorso conoscendo la posizione attuale e la posizione finale</li>
+                <li>entità B : (PATH_EXECUTOR) il quale prende il percorso elaborato dal "cervello" PATH_PLANNER, ed esegue i movimenti in ordine</li>
+            </ul>
+        </li>
+        <li> Effettivamente muovere il robot fisico/virtuale che si avrà a disposizione</li>
+            <ul>
+                <li>entità C : (ROBOT_MOVER)</li>
+                <li> ci sarà un'entità di ROBOT_MOVER per ogni robot supportato, queste entità mascherano le differenze di interazione tra una e l'altra, condividendo la stessa interfaccia/ insime di messaggi a cui possono reagire</li>
+            </ul>
+        <li>Mantenendo l'interfaccia (insieme di messaggi reagenti) attribuita in fase di analisi</li>
+        
+    </ul>
+
+    <p>All'interno della nostra software house sono già presenti componenti sviluppati che si occupano delle rispettive responsabilità</p>
+
+    <ul>
+        <li>entità A (PATH_PLANNER): unibo.robotappl1</li>
+        <li>entità B (PATH_EXECUTOR): unibo.basicrobot22 (QActor: pathexec)</li>
+        <li>entità C (ROBOT_MOVER): unibo.basicrobot22 (QActor: basicrobot)</li>
+        <li>entità D (TROLLEY_FACADE): CoreWasteService.transporttrolley </li>
+    </ul>
+
+
+    <p><b> GUARDARE ANALISI: <a href="#percorso"><span>PERCORSO</span></a>   E <a href="#mappa"><span>MAPPA INIZIALE</span></a></b></p>
+
+    <p>identifichiamo un una ulteriore entità in supporto all'entità A</p>
+    <ul>
+        <li>entità D (MAPPER): unibo.mapper</li>
+    </ul>
+
+
+    <h4>TROLLEY_FACADE</h4>
+
+    <p>Dipende dalla business logic, mantiene la logica della <b>successione di luoghi da visitare per un dato compito</b>, e pilota il pathplanner.</p>
+
+    <h4>PATH_PLANNER</h4>
+    <p>È un <b> attuatore </b> nei confronti di una qualsiasi <b> richiesta di calcolo di percorso  </b>, mantine ed aggiorna una mappa interna. Nel caso in cui la mappa non è aggiornata (il path calcolato non porta a destinazione), aggiorna le informazioni sulla mappa e calcola un percorso alternativo.</p>
+    
+    <h4>PATH_EXECUTOR</h4>
+    <p>È un <b> attuatore </b> nei confronti di una qualsiasi richiesta di <b>esecuzione </b>di percorso, notificando il percorso rimanente impossibile da eseguire in caso di ostacoli</p>
+
+
+    <h4>ROBOT_MOVER</h4>
+    <p>È un <b> attuatore </b> nei confronti di messaggi definiti dall'interfaccia aril (Abstract Robot Interaction Lanaguage).</p>
+
+    <h4>MAPPER(boundary)</h4>
+
+    <p>È un <b>attuatore</b> che trova il perimetro dello spazio circostante e restituisce la mappa creata. </p>
+    <p><b>GUARDARE ANALISI : PASSAGGIO MAPPA E COERENZA PLANNER-MAPPER </b></p>
+
+
+    <h2>COMMENTI</h2>
+    
+    <p>Si è ragionato su alcuni possibili estensioni del progetto</p>
+    
+    <p>I componenti che sono dipendenti dalla business logic sono WASTE_SERVICE e TROLLEY_FACADE</p>
+    
+    <h5>Modifiche possibili continuando ad usare modello qak</h5>
+    <ul>
+        <li>WASTE_SERVICE: Criterio di accettazione degli incarichi</li>
+        <li>TROLLEY_FACADE: Successione di luoghi intermedi che deve passare il robot per un singolo compito</li>
+        <li>WASTE_SERVICE e TROLLEY_FACADE: Politica di interazione a fronte di nuove richieste mentre il trolley è impegnato</li>
+    </ul>
+    <h5>Modifiche possibili solo al di fuori di qak</h5>
+    
+    <p>Non solo un container per GLASS e PLASTIC, ma dinamicamente aggiungere altri tipi di containers</p>
+    <p>I messaggi di configurazione dovrebbero accettare payload a lunghezza variabile, fuori dalle possibilità di qak</p>
+    <p>Il configuratore ottine per ogni container la posizione, il nome e la capienza, ha anche il compito di controllare l'integrità dei dati, in casi avanzati anche chiedere al mapper se le posizioni configurate sono esistenti nello spazio percorso.</p>
+   
+    <h2>WORKAROUND qak</h2>
+    <p>durante la progettazione alcuni componenti avevano bisogno di <b> importare librerie</b> non comprese nell'autogenerazione, quindi è stato pensato di aggiungere nelle rispettive cartelle <b>resources</b> dei compilati kotlin che racchiudono queste chiamate</p>
+    <h3>Modello del progetto</h3>
+
+    <ul>
+        <li><a href="../CoreWasteService/src/modello_progetto.qak" >modello_progetto : CoreWasteService</a></li>
+        <li>path : CoreWasteService/src/modello_progetto.qak</li>
+        <li><a href="../PathPlanner/src/pathplanner.qak" >modello_progetto : PathPlanner</a></li>
+        <li>path : PathPlanner/src/pathplanner.qak</li>
+        <li><a href="../BasicRobot/src/basicrobot.qak" >modello_progetto : BasicRobot</a></li>
+        <li>path : BasicRobot/src/basicrobot.qak</li>
+        <li> <a href="img/architettura_progetto.png"><img src="img/architettura_progetto.png" alt=""> </li></a>  
+    </ul>
+
+
+</div>
+     
+
+<h2>Testing</h2> 
+
+ 
+<div class="remark">
+    <p>Dopo aver generato con il modello del progetto</p>
+
+    <ul>
+        <li><a href="../CoreWasteService/src/modello_progetto.qak" >modello_progetto : CoreWasteService</a></li>
+        <li><a href="../PathPlanner/src/pathplanner.qak" >modello_progetto : PathPlanner</a></li>
+        <li><a href="../BasicRobot/src/basicrobot.qak" >modello_progetto : BasicRobot</a></li>
+    </ul>
+
+    <p>Il testing può essere fatto nello stesso modo del test plan attivando tutti i componenti.</p>
+
+    <h4>Linux</h4>
+    <p>Creato uno  <a href="../launchall.sh"><span>script</span></a> per aprire 4 terminali con tutti i componenti necessari per il testing  </p>
+
+    
+    <pre>
+        <h4>Workflow Testing</h4>
+    <code>
+        ## In WasteService
+
+        cd BasicRobot ; ./gradlew build
+        cd PathPlanner ; ./gradlew build
+        cd CoreWasteService ; ./gradlew build -x test
+
+        ./launchall.sh
+        firefox http://localhost:8090/
+        cd CoreWasteService ; ./gradlew test        
+    </code>
+    </pre>
+
+</div>
+     
+
+<h2>Deployment</h2> 
+
+ 
+<div class="remark">
+    
+    <p>Creato una <a href="../TruckSimulator/src/it/unibo/truck/TruckTUI.java"> <span>programma console</span></a>  per simulare le richieste di un Waste_Truck.</p>
+
+    
+    <pre>
+        <h4>Workflow utilizzo</h4>
+        <code>
+            ## In WasteService
+
+            ./launchall.sh
+            firefox http://localhost:8090/
+            cd TruckSimulator ; ./gradlew -q tui
+        </code>
+    </pre>
+</div>
+    
+
+<h2>CHECKPOINT: PROGETTAZIONE</h2>
+<div class="remark">
+    <h3>Modello del progetto</h3>
+
+    <ul>
+        <li><a href="../CoreWasteService/src/modello_progetto.qak" >modello_progetto : CoreWasteService</a></li>
+        <li>path : CoreWasteService/src/modello_progetto.qak</li>
+        <li><a href="../PathPlanner/src/pathplanner.qak" >modello_progetto : PathPlanner</a></li>
+        <li>path : PathPlanner/src/pathplanner.qak</li>
+        <li><a href="../BasicRobot/src/basicrobot.qak" >modello_progetto : BasicRobot</a></li>
+        <li>path : BasicRobot/src/basicrobot.qak</li>
+        <li> <a href="img/architettura_progetto.png"><img src="img/architettura_progetto.png" alt=""> </li></a>  
+    </ul>
+
+    <div class="container">
+ <pre>
+     <h4>Workflow Testing</h4>
+ <code>
+## In WasteService
+cd BasicRobot ; ./gradlew build
+cd PathPlanner ; ./gradlew build
+cd CoreWasteService ; ./gradlew build -x test
+./launchall.sh
+firefox http://localhost:8090/
+cd CoreWasteService ; ./gradlew test        
+ </code>
+ </pre>
+
+<pre>
+<h4>Workflow utilizzo</h4>
+<code>
+    ## In WasteService
+    ./launchall.sh
+    firefox http://localhost:8090/
+    cd TruckSimulator ; ./gradlew -q tui
+</code>
+</pre>
+    </div>
+</div>
+ 
+     
+<!-- USEFUL
+<table style="width:100%" border="1">
+<tr>
+@Author Antonio Hu
+<td style="width:50%">
+</td>
+<td></td>
+</tr>
+</table>
+-->
+	
+
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+By student Name Antonio Hu email: antonio.hu@studio.unibo.it  <br>
+github:
+<img src="./img/emiglio.png" alt="mbot" width="15%" height="15%">
+</div> 
+</body>
+</html>
