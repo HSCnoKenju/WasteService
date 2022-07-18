@@ -1,0 +1,222 @@
+
+System alarmrpi
+
+
+
+Dispatch cmdLed : cmd(COMAND)  // turnOn turnOff
+
+Request getState : req(getState) 
+Reply   ledState : ledState(STATE)
+
+
+
+Dispatch cmdSonar : cmd(COMAND) // activate deactivate 
+
+Request isActive : req(isActive)
+Reply sonarActive : sonarActive(STATE)
+
+Event sonar : sonar(DISTANCE)
+
+Event ledtrigger : led(CMD) // on - off - blink
+
+
+
+Context ctxwaste ip [ host="127.0.0.1" port=8033]
+
+Context ctx_rpi ip [ host= "localhost" port= 8099]
+
+
+
+
+
+QActor sonar context ctx_rpi {
+	
+	[#
+		
+		var Active = false
+		
+		var SimDistance = 90
+	
+	#]
+	
+	
+	
+	State s0 initial {
+		
+		
+		
+		println("SONAR | started ")
+	}
+	
+	Goto waitingMessages
+	
+	State waitingMessages{
+		
+		
+		println("SONAR | idle ; waiting")
+	}
+	
+	Transition t3 whenMsg cmdSonar -> parseCmd
+				  whenRequest  isActive -> handleIsActive
+	
+	
+	State handleIsActive {
+		
+		//printCurrentMessage
+		
+		replyTo isActive with sonarActive : sonarActive( $Active )
+		
+	}
+	
+	Goto emitDistance if [# Active #] else waitingMessages
+	
+	State parseCmd {
+		
+		//printCurrentMessage
+		onMsg(cmdSonar : cmd(COMAND)) {
+			
+			[#
+			
+				if (payloadArg(0).equals("activate"))
+					
+					Active = true
+				
+				else if (payloadArg(0).equals("deactivate"))
+					
+					Active = false
+				
+				
+			#]
+		println ("SONAR | EXEC, CURRENT STATE = $Active")
+		}
+	}
+	
+	Goto emitDistance if [# Active #] else waitingMessages
+	
+	
+	State emitDistance {
+		
+		//printCurrentMessage
+		
+		[# if (SimDistance >=0) #]
+		emit sonar : sonar($SimDistance)
+		
+		println ("===============================")
+		println("")
+		println("")
+		println ("SONAR | EMIT an EVENT = $SimDistance")
+
+		[# SimDistance = SimDistance - 5#]
+		
+		
+	}
+	
+	Transition t3 
+				  whenTime 500  -> emitDistance  
+				  whenMsg cmdSonar -> parseCmd
+				  whenRequest  isActive -> handleIsActive
+}
+
+
+QActor led context ctx_rpi {
+	
+	[#
+		var Active = false	
+		
+		var Continus = true
+		
+		 
+		
+		
+	#]
+	
+	State s0 initial {
+		
+		
+		println("LED | START ")
+	
+		
+		
+	}
+	Goto waitingMessages
+	
+	
+	State waitingMessages{
+		
+		
+		println("LED | waiting ")
+	}
+	Transition t1 whenMsg cmdLed ->  parseCmd
+				  whenRequest getState -> handleGetState
+				  whenEvent ledtrigger -> parseTrigger
+	
+	
+	State handleGetState {
+		
+		//printCurrentMessage
+		replyTo getState with ledState : ledState( $Active )
+	}
+	Goto waitingMessages
+	
+	State parseCmd{
+		//printCurrentMessage
+		
+		onMsg(cmdLed : cmd(COMAND)) {
+			
+			[#
+			
+				if (payloadArg(0).equals("turnOn"))
+					
+					Active = true
+					Continus = true
+				
+				else if (payloadArg(0).equals("turnOff"))
+					
+					Active = false
+					Continus = true
+				
+				else
+				{
+					
+				}
+					 
+				
+			#]
+		println ("LED | EXEC, CURRENT STATE = $Active")
+		}
+		
+		
+	}
+	Goto waitingMessages
+	
+	State parseTrigger {
+		
+		onMsg(ledtrigger : led(CMD)){
+			
+			[#
+			
+			if (payloadArg(0).equals("on"))
+					
+					Active = true
+					Continus = true
+				
+				else if (payloadArg(0).equals("off"))
+					
+					Active = false
+					Continus = true
+				
+				else if (payloadArg(0).equals("blink"))
+				{
+					Active = true
+					Continus = false
+				}
+					 
+			
+				
+			#]
+			
+			println ("LED | TRIGGER, CURRENT STATE = $Active CONTINUS = $Continus")
+		}
+	}
+	
+}
