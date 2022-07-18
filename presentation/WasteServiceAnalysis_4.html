@@ -1,0 +1,413 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+
+@Author Antonio Hu
+-->
+<link rel="stylesheet" href="css/basic.css">
+<link rel="stylesheet" href="css/presentation.css">
+    
+<head>
+   
+    <title>Waste Service: Analisi di progetto</title></head>
+        
+    <body>
+    <div id="top">
+    <h1>LABORATORIO DI INGEGNERIA DEI SISTEMI SOFTWARE <font size="5"></font> </h1>
+    </div>  
+    
+    <div class="body"> 
+    <h1>Introduction</h1>
+     
+    <p>Tema finale corso di studio <b>Ingegneria dei sistemi software</b>, Laurea Magistrale Università di Bologna </p> 
+    
+    <p>PRECEDENTI</p>
+    <p><a href="WasteServiceAnalysis_1.html">analisi requisiti</a> </p>
+    <p><a href="WasteServiceAnalysis_2.html">analisi problemi</a> </p>
+
+ 
+ 
+
+    <h2>CHECKPOINT : REQUISITI</h2>
+
+    <div class="remark">
+    
+        <h3>Modello dei requisiti</h3>
+        <ul>
+            <li><a href="../CoreWasteService/src/modello_requisiti.qakt" >modello_requisiti</a></li>
+            <li>path : CoreWasteService/src/modello_requisiti.qakt</li>
+            <li> <img src="img/architettura_requisiti.png" alt=""> </li> 
+        </ul>
+    
+        <p>Per eseguire il modello, rinominare il file in modello_requisiti.qak, eliminare le sorgenti generate e rigenerare il sistema</p>
+    
+    
+    
+        <h5 id="core-functionality">core-functionality - Punti aperti</h5>
+        
+        
+        <ol class="arabic simple">  
+            <li><p> <b class="red" > When the load is accepted </b>, the <cite>transport trolley</cite> reaches the <cite>INDOOR</cite>, <b class="red"> picks up the material </b>, goes to the
+            proper container and settles the material. <del> During this activity, the <cite>WasteService</cite> <strong>blinks</strong> the <cite>Led</cite></p> </del> </li>
+                <ul>
+                    <li> <b class="red">Problema</b>: innesco procedura proattiva di Transport_trolley <br>(denominato in seguito <b class="red">issue_trolley</b>)</li> 
+                    <li><b class="red">Problema</b>: comunicazione da parte del Transport_trolley della fine del prelievo dei materiali, il truck solo dopo il prelievo libera INDOOR ( <a href="#Q2">Q2</a> ) <br> (denominato in seguito <b class="red">pickup</b>)</li>
+                </ul>
+            
+            <li><p> <b class="red"> When the deposit action is terminated </b>, the <cite>transport trolley</cite> <b class="red"> excutes another deposit command  (if any) </b>
+            or returns to its <cite>HOME</cite>.</p></li>
+                <ul>
+    
+                    <li><b class="red">Problema</b>: comunicazione da parte del Transport_trolley della terminazione del lavoro assegnato<br>(denominato in seguito <b class="red">work_complete</b>)</li>
+                    <li><b class="red">Problema</b>: al Transport_trolley devono arrivare informazioni riguardanti l'incarico successivo <br>(denominato in seguito <b class="red">next_work</b>) </li>
+                </ul>
+        </ol>
+    
+    
+        <h5> alarm : non considerato</h5>
+        
+    
+        <h5> statusGUI : non considerato</h5>
+    </div>
+
+        
+    <h2>CHECKPOINT : PROBLEMA</h2>
+<div class="remark">
+<h3>Modello del problema</h3>
+
+<div class="container">
+    <ul>
+        <li><a href="../CoreWasteService/src/modello_problema_conoscenza.qakt" >modello_problema_conoscenza</a></li>
+        <li>path : CoreWasteService/src/modello_problema_conoscenza.qakt</li>
+        <li> <img src="img/architettura_problema.png" alt=""> </li> 
+    </ul>
+
+    <table>
+        <thead>
+          <tr>
+            <th>PROBLEMA</th>
+            <th>soluzione adottata</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>issue_trolley </td>
+            <td> request-response</td>
+          </tr>
+          <tr>
+            <td>informazione posizione containers</td>
+            <td>il payload é il nome del container</td>
+          </tr>
+          <tr>
+            <td>pickup : Trolley to Waste_Service</td>
+            <td>evento</td>
+          </tr>
+          <tr>
+            <td>pickup : Waste_Service to Waste_Truck</td>
+            <td> request-response, sfruttando R2 loadaccept </td>
+          </tr>
+          <tr>
+            <td>work_complete </td>
+            <td>request-response, sfruttando proposta response di issue_trolley</td>
+          </tr>
+          <tr>
+            <td>next_work : Waste_Service to Trolley </td>
+            <td>stesso di issue_trolley</td>
+          </tr>
+          <tr>
+            <td>next_work: produttore-consumatore</td>
+            <td>nuove richieste sono messe in coda al Transport_trolley</td>
+          </tr>
+        </tbody>
+        </table>
+</div>
+
+<h4>Esecuzione automatica dei test</h4>
+    
+<p> In caso si rigenerassero i sorgenti con l'interprete qak, aggiungere alla Classe : CoreWasteService/src/it/unibo/transporttrolley/Transporttrolley.kt il seguente import : </p>
+ <p> <b>import java.util.* </b></p>
+
+<h5>Comandi</h5>
+<p> Build: <b>gradle build -x test </b></p>
+<p> Testing: <b> gradle test </b></p>
+
+<h5>Risultati test</h5>
+<p> <b> ls build/reports/tests/test/ </b></p>
+<p> <b> ls build/test-results/test/ </b> </p>
+
+
+</div>
+
+<h2>CHECKPOINT: PROGETTAZIONE</h2>
+<div class="remark">
+    <h3>Modello del progetto</h3>
+
+    <ul>
+        <li><a href="../CoreWasteService/src/modello_progetto.qak" >modello_progetto : CoreWasteService</a></li>
+        <li>path : CoreWasteService/src/modello_progetto.qak</li>
+        <li><a href="../PathPlanner/src/pathplanner.qak" >modello_progetto : PathPlanner</a></li>
+        <li>path : PathPlanner/src/pathplanner.qak</li>
+        <li><a href="../BasicRobot/src/basicrobot.qak" >modello_progetto : BasicRobot</a></li>
+        <li>path : BasicRobot/src/basicrobot.qak</li>
+        <li> <a href="img/architettura_progetto.png"><img src="img/architettura_progetto.png" alt=""> </li></a>  
+    </ul>
+
+    <div class="container">
+ <pre>
+     <h4>Workflow Testing</h4>
+ <code>
+## In WasteService
+cd BasicRobot ; ./gradlew build
+cd PathPlanner ; ./gradlew build
+cd CoreWasteService ; ./gradlew build -x test
+./launchall.sh
+firefox http://localhost:8090/
+cd CoreWasteService ; ./gradlew test        
+ </code>
+ </pre>
+
+<pre>
+<h4>Workflow utilizzo</h4>
+<code>
+    ## In WasteService
+    ./launchall.sh
+    firefox http://localhost:8090/
+    cd TruckSimulator ; ./gradlew -q tui
+</code>
+</pre>
+    </div>
+</div>
+<h1>Requirement analysis</h1>
+
+ 
+<div class="remark">
+  
+    <h5> alarm </h5>
+    
+    <p>The <cite>Sonar</cite> is used as an ‘alarm device’: when it <b class="red"> measures a distance </b> less that a <b class="red"> prefixed value <strong>DLIMT</strong></b>,
+    the <cite class="green">transport trolley</cite>  must be <b class="red"> stopped.
+    It will be resumed </b> when <cite>Sonar</cite> detects again a distance higher than  <strong>DLIMT</strong>.</p>
+    <ul>
+        <li><b class="red">Problema</b> : Il sonar fa misurazioni continue di distanza e in qualche modo deve arrivare al transport trolley . (denominato in seguito <b class="red">distance</b>).</li>
+        <li> <b class="red">Problema</b>: Il transport trolley non reagisce direttamente ad una distanza misurata, ma se questa è o meno superiore ad una soglia (denominato in seguito <b class="red"> threshold </b>).</li>
+        <li> <b class="red">Problema</b>: Il transport trolley deve avere la capacità di bloccare l'esecuzione e riprendere da dove ha terminato(denominato in seguito <b class="red">interrupt</b>).</li>
+        <li> <b class="green">Problema</b>: Il 'transport trolley' ora sono più componenti, bisogna vedere quale di questi è coinvolto in ogni singolo problema (denominato in seguito <b class="green">abstractTrolley</b>).</li>
+    </ul>
+
+    <p>a <span class="blue">Sonar</span> and a <span class="blue">Led</span>  connected to a RaspnerryPi. The <cite>Led</cite> is used as a <em>warning devices</em>,
+        according to the following scheme:</p>
+        <ul class="simple">
+        <li><p>the <cite>Led</cite> is <strong>off</strong> when the  <cite>transport trolley</cite> is at <cite class="red">HOME</cite></p></li>
+        <li><p>the <cite>Led</cite> <strong>blinks</strong> while the <cite>transport trolley</cite> is <b class="red"> moving </b></p></li>
+        <li><p>the <cite>Led</cite> is <strong>on</strong> when <cite>transport trolley</cite> is <b class="red"> stopped </b>.</p></li>
+        </ul>
+
+        <ul>
+            <li><b class="blue">Requisito</b> : Sonar e Led sono in una macchina separata dal resto del progetto (denominato in seguito <b class="blue">distributed</b>).</li>
+            <li> <b class="green">Problema</b>: Il 'transport trolley' ora sono più componenti, bisogna vedere quale di questi è coinvolto in ogni singolo problema (denominato in seguito <b class="green">abstractTrolley</b>).</li>
+            <li> <b class="red">Problema</b>: le informazioni di home, moving e stopped sono potenzialmente in 3 componenti diversi, coordinazione e concorrenza tra i componenti per la pilotazione del led <b class="red">ledMultipleSources</b>).</li>
+            
+        </ul>
+
+        <h5> core-functionality, parte rimanente</h5>
+            <p> 3. <del>When the load is accepted, the <cite>transport trolley</cite> reaches the <cite>INDOOR</cite>, picks up the material, goes to the
+            proper container and settles the material.</del> During this activity, the <cite>WasteService</cite> <strong>blinks</strong> the <cite>Led</cite></p> </li>
+                 
+             <ul>
+            <li><b class="blue">Requisito</b> : Specifica più in dettaglio cosa significa <b class="red">  moving  </b> nel paragrafo precedente per il led. (denominato in seguito <b class="blue">movingExplain</b>).</li>
+            
+        </ul>
+
+
+        <h3>modello requisiti</h3>
+        <ul>
+            <li><a href="../AlarmRPI/src/alarmrpi_requisiti.qak" >modello_requisiti</a></li>
+            <li>path : AlarmRPI/src/alarmrpi_requisiti.qak</li>
+            <li> <img src="" alt="MISS_alarmrpi_requisiti"> </li> 
+        </ul>
+</div>
+    
+ 
+
+
+
+<h1>Problem analysis</h1>
+<div class="remark">
+
+    <h5> <k> distance </k> </h5>
+
+    <p>Il sonar è un dispositivo di input; l'uso di un dispositivo di input presenta due modalità principali: </p>
+
+    <ul>
+        <li>il componente interessato ai dati prodotti dal dispostivo di input, ne invoca un metodo ‘bloccante’ (ad esempio read()) che fornisce un dato non appena disponibile. <span class="green"> interazione a polling </span>;</li>
+        <li>il componente consumatore dei dati si relaziona con dispostivo di input secondo il <span class="green"> pattern observer</span>.</li>
+    </ul>
+
+    <p>Asseriamo inoltre che il sonar è un dispositivo che, una volta attivato, emette informazioni senza sapere a chi interessino, ha solo il compito che il messaggi venga inviato, ma non accettato dai interessati.</p>
+
+    <p>Di conseguenza a quanto detto sopra, l'interazione principale del sonar sarà ad <b> evento </b>, soddisfando la semantica di NON conoscenza del destinatario.</p>
+
+    <p>Dato che il sonar è una  <b> sorgente continua</b> di dati, a parte per applicazioni particolari mi posso permettere di perdere uno dei eventi generati, visto che quello successivo sarà un dato abbastanza simile.</p>
+
+    <h5> <k> threshold </k> </h5>
+
+    <p>Riconosciamo DLIMIT come un attributo di applicazione modificabile prima dell'esecuzione, e costante durante ogni utilizzo del sistema.</p>
+    <p>La "conversione" tra distanza e l'azione che deve fare il trolley può essere situata in 3 componenti</p>
+    <ul>
+        <li><b> SONAR </b>: mi accoppia il sonar generico ad una interfaccia di comandi specifica per questa applicazione  </li>
+        <li><b> TROLLEY </b>: mi accoppia i componenti del trolley ad una sorgente sonar-like che può fermare l'esecuzione.   </li>
+        <li><b> COMPONENTE STAND-ALONE </b>: mantengo la single responsability, sonar e trolley loose coupled tramite due messaggi distinti  </li>
+    </ul>
+
+    <p> se scegliamo di fare un componente STAND-ALONE, essendo il sistema distribuito devo pensare a dove mettere questo componente</p>
+    <ul>
+        <li>stesso contesto sonar (RPI), così posso "filtrare" le comunicazione prima di inviarle in remoto</li>
+        <li>stesso contesto trolley, il sonar fa un emit remoto ad ogni messaggio, ma l'intero contesto del sonar è indipendente dall'applicazione</li>
+    </ul>
+
+    <p>Sempre nel caso di componente STAND-ALONE, bisogna valutare se dopo la traduzione ogni volta invia il messaggio, oppure adotta determinate politiche; Es. trasmissione solo se il comando è diverso da quello precedente</p>
+
+    <h5> <k> interrupt </k>  && <span class="green"> abstractTrolley</span> && <span class="blue">movingExplain</span> </h5>
+
+    <p>Il trolley è composto dai seguenti 5 componenti, e questi sono i comportamenti se solo uno di loro è sensibile al messaggio di stop-resume (originato dal sonar), <b> quando il robot è già in movimento</b></p>
+
+    <p></p>
+
+    <table>
+        <thead>
+            <tr>
+              <th>COMPONENTE</th>
+              <th>CONSEGUENZA AD INTERRUPT <br> (robot già in movimento)</th>
+            </tr>
+          </thead>
+        <tbody>
+            <tr>
+                <td>WASTE_SERVICE</td>
+                <td>Termino il <b>percorso rimanente arrivando ad Home </b>, finché non ricevo resume non restituisco la risposta loadaccept se non l'ho già inviato prima dell'interruzione</td>
+              </tr>
+          <tr>
+            <td>TROLLEY_FACADE</td>
+            <td> Termino la parte di <b>tragitto corrente </b> (mi troverò in una delle seguenti posizioni: HOME, INDOOR, GLASS, PLASTIC), e attendo il resume prima di procedere al prossimo pezzo di percorso, oppure di rispondere al Waste_Service </td>
+        </tr>
+          <tr>
+            <td>PATH_PLANNER</td>
+            <td> Termino la parte di <b>tragitto corrente </b> (mi troverò in una delle seguenti posizioni: HOME, INDOOR, GLASS, PLASTIC), <b> oppure sono davanti ad un ostacolo</b> ; non ricalcolo il percorso (caso pathfailure) o rispondo al TROLLEY_FACADE (caso pathdone) fino al resume </td>
+          </tr>
+          <tr>
+            <td>MAPPER</td>
+            <td>Termino la <b> singola mossa che sto facendo per mappare  </b> la stanza, finchè non ho resume non rispondo al PATH_PLANNER oppure non eseguo la mossa successiva. Il MAPPER però viene chiamato solo nello startup del sistema, nel caso che PATH_PLANNER non abbia già a disposizione una mappa </td>
+          </tr>
+          <tr>
+            <td><b> PATH_EXECUTOR </b></td>
+            <td>Termino <b> la singola mossa </b>, ovvero quella in cima al path che mi passato il PATH_PLANNER, e aspetto il resume per continuare a decifrare il path, oppure rispondere al planner</td>
+          </tr>
+          <tr>
+            <td> <b> BASICROBOT </b></td>
+            <td>Termino la singola mossa, <b> potenzialmente </b> posso anche bloccare la mossa stessa in esecuzione, e nel resume recuperare la parte di movimento mancante.</td>
+          </tr>
+        </tbody>
+        </table>
+
+        <p>I componenti che hanno più senso di essere sensibili ad stop/resume sono PATH_EXECUTOR oppure basicrobot; l'analista nota che la <b> procedura di recupero </b> per la parte di mossa non terminata può essere arbitrariamente <b> complessa </b> .</p>
+
+
+    <h5> <k> ledMultipleSources </k> </h5>
+
+    <p> <b>Stesse considerazioni fatte dal sonar al core </b> valgono dal core al led, quindi si preferisce fare un componente  a parte che traduce lo stato del trolley in un comando per il led.</p>
+   
+    <p>Il problema è che le informazioni del trolley sono dati da componenti interni diversi</p>
+    <table>
+        <thead>
+          <tr>
+            <th>INFORMAZIONE</th>
+            <th>componente</th>
+            <th>altra possibilità</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>trolley a HOME</td>
+            <td> TROLLEY_FACADE</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>trolley in movimento</td>
+            <td>TROLLEY_FACADE <br> in movimento eccetto quando sono in home (evento one-shot per tutta la durata del percorso)</td>
+            <td>BASICROBOT <br> ogni comando eseguito notifico lo stato (in movimento) (un evento ogni movimento) </td>
+          </tr>
+          <tr>
+            <td>trolley STOPPED</td>
+            <td>PATH_EXECUTOR <br> dipende da come si sceglie di risolvere il problema <b class="red">interrupt </b></td>
+            <td>BASICROBOT <br> dipende da come si sceglie di risolvere il problema <b class="red">interrupt </b></td>
+          </tr>
+        </tbody>
+    </table>
+
+    <p>Essendo i componenti potenzialemente su contesti diversi, devo pensare al problema che l'ordine di arrivo dei messaggi al "translator" non sia l'ordine logico di generazioni di questi messaggi.</p>
+    <p>Es. basicrobot esegue l'ultimo movimento per portare ad HOME, emette l'informazione (in movimento), catena di risposte fino a TROLLEY_FACADE ed emette l'informazione (a home); <b> se (in movimento) arriva erroneamente dopo (a home) </b> il led si comporterà in modo sbagliato.</p>
+    
+    <p>L'argomento in gioco è la coordinazione tra processi interagenti distribuiti; una soluzione possibile consiste nell'addottamento di un ordinamento tramite tempo (fisico o logico); sarebbe che il ricevente (in questo caso il traduttore trolley -> led) si salva il timestamp (o equivalente) dell'ultimo messaggio tradotto, ed ignora i messaggi successivi con timestamp inferiore.</p>
+
+</div>
+     
+
+<h1>Test plans</h1> 
+
+ 
+<div class="remark">
+    Copy here the EXACT text fiven by the customer.
+    </div>
+    
+
+<h1>Project</h1> 
+
+ 
+<div class="remark">
+    Copy here the EXACT text fiven by the customer.
+    </div>
+     
+
+<h1>Testing</h1> 
+
+ 
+<div class="remark">
+    Copy here the EXACT text fiven by the customer.
+    </div>
+     
+
+<h1>Deployment</h1> 
+
+ 
+<div class="remark">
+    Copy here the EXACT text fiven by the customer.
+    </div>
+    
+ 
+<h1>Maintenance</h1> 
+
+ 
+<div class="remark">
+    Copy here the EXACT text fiven by the customer.
+    </div>
+     
+<!-- USEFUL
+<table style="width:100%" border="1">
+<tr>
+@Author Antonio Hu
+<td style="width:50%">
+</td>
+<td></td>
+</tr>
+</table>
+-->
+	
+
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+By student Name Antonio Hu email: antonio.hu@studio.unibo.it  <br>
+github:
+<img src="./img/emiglio.png" alt="mbot" width="15%" height="15%">
+</div> 
+</body>
+</html>

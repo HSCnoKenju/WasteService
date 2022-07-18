@@ -1,0 +1,23 @@
+
+System alarmrpi
+
+Context ctxwaste ip [ host="127.0.0.1" port=8033]
+
+Context ctx_rpi ip [ host= "localhost" port= 8099]
+
+
+QActor sonar_mock context ctx_rpi { 
+	
+	State s0 initial {
+		
+		println("SONAR	 | START")
+	}
+}
+
+QActor led_mock context ctx_rpi { 
+	
+	State s0 initial {
+		
+		println("LED	 | START")
+	}
+}
