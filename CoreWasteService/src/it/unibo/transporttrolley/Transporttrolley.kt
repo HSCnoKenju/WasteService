@@ -7,8 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.util.*
-
+	
 class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
 
 	override fun getInitialState() : String{
@@ -16,10 +15,10 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		
-				var PathStr = StringJoiner(" ")
+				resourceappender.initResource()
 				var CurrentType = ""
 				var PositionsMap: Map<String, Pair<Int,Int>> = emptyMap()
-				var CurrentPosition: Pair<Int,Int>
+				//var CurrentPosition: Pair<Int,Int>
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -42,7 +41,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("accepting") { //this:State
 					action { //it:State
-						 PathStr = StringJoiner(" ")	 
+						 resourceappender.initResource()	 
 						println("$name in ${currentState.stateName} | $currentMsg")
 						println("		TRANSPORT TROLLEY | NEW WORK")
 					}
@@ -50,8 +49,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("goingIndoor") { //this:State
 					action { //it:State
-						PathStr.add("ACCEPTED") 
-						updateResourceRep("$PathStr" 
+						resourceappender.add("ACCEPTED") 
+						updateResourceRep("resourceappender.getStr()" 
 						)
 						if( checkMsgContent( Term.createTerm("destination(CONTAINER)"), Term.createTerm("destination(CONTAINER)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
@@ -69,22 +68,22 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("arriveIndoor") { //this:State
 					action { //it:State
-						PathStr.add("INDOOR") 
-						updateResourceRep("$PathStr" 
+						resourceappender.add("INDOOR") 
+						updateResourceRep("resourceappender.getStr()" 
 						)
 						emit("pickup", "info($CurrentType)" ) 
 						println("		TRANSPORT TROLLEY | INDOOR")
 						
-								var DestX =  PositionsMap[CurrentType.uppercase(Locale.getDefault())]?.first
-								var DestY = PositionsMap[CurrentType.uppercase(Locale.getDefault())]?.second
+								var DestX =  PositionsMap[CurrentType.uppercase()]?.first
+								var DestY = PositionsMap[CurrentType.uppercase()]?.second
 						request("destination", "dest($DestX,$DestY)" ,"pathplanner" )  
 					}
 					 transition(edgeName="t13",targetState="arriveContainer",cond=whenReply("arrived"))
 				}	 
 				state("arriveContainer") { //this:State
 					action { //it:State
-						PathStr.add("$CurrentType") 
-						updateResourceRep("$PathStr" 
+						resourceappender.add("$CurrentType") 
+						updateResourceRep("resourceappender.getStr()" 
 						)
 						answer("goal", "workdone", "info(done)"   )  
 						println("		TRANSPORT TROLLEY | $CurrentType")
@@ -105,8 +104,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("arriveHome") { //this:State
 					action { //it:State
-						PathStr.add("HOME") 
-						updateResourceRep("$PathStr" 
+						resourceappender.add("HOME") 
+						updateResourceRep("resourceappender.getStr()" 
 						)
 						println("		TRANSPORT TROLLEY | going HOME")
 					}

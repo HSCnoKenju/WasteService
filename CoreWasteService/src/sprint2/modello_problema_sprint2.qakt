@@ -36,6 +36,15 @@ Request destination : dest(DESTX, DESTY)
 Reply arrived : info(done)
 
 
+/*===========================	Sprint_2 : RPI	============================ */
+Event sonar : sonar(DISTANCE) 
+Event ledtrigger : led(CMD) // on - off - blink
+Event thrill : thrill(CMD) // stop - resume
+
+// se facessi due eventi distinti, uno per stop uno per resume ?
+
+Event robotState : info(ATHOME,MOVING,STOPPED,TIMESTAMP)
+
 
 
 
@@ -49,9 +58,155 @@ ExternalQActor pathplanner context ctxpathplanner
 
 
 
+QActor trolley_analyzer context ctxwaste {
+	
+	[# 
+		var LastStatusTimestamp = timestamputil.TimestampMin() 
+		
+		var stopped = true
+		var continuos = false
+		
+		#
+	]
+	
+	State s0 initial {
+		println("		TROLLEY_ANALYZER | STARTED")	
+	}
+	
+	State accept {
+		println("		TROLLEY_ANALYZER | ACCPEPTING")	
+	}
+	
+	Transition t0 whenEvent robotState ->  check_stopped
+	
+	
+	State check_stopped {
+		
+		onMsg ( robotState : info(ATHOME,MOVING,STOPPED,TIMESTAMP)) {
+			[#
+				
+				var CurrentTimestamp = payloadArg(3)
+				
+				
+			 	// controllo messaggio più nuovo
+			 	
+			 if	(timestamputil.TimestampBefore(LastStatusTimestamp,CurrentTimestamp)) {
+			 	
+			 	var Ahomeinput = payloadArg(0).toBoolean()
+			 	
+			 	var Movinginput = payloadArg(1).toBoolean()
+			 	var Stoppedinput = payloadArg(2).toBoolean()
+			 	
+			 	
+			 	if (Ahomeinput && !Movinginput  && !Stoppedinput ){
+			 		stopped = false
+			 		continuos = true
+#]
+
+					emit ledtrigger : led(off) // on - off - blink
+[#			 		
+			 	} else if (!Ahomeinput && Movinginput && !Stoppedinput ){
+			 		
+			 		stopped = false 
+			 		continuos = false
+#]
+					emit ledtrigger : led(blink) // on - off - blink
+
+[#
+			 	} else if (!Ahomeinput && !Movinginput && Stoppedinput ) {
+			 		
+			 		stopped = true 
+			 		continuos = false
+			 		
+#]
+
+					emit ledtrigger : led(on) // on - off - blink
+[#
+			 	}
+			 	
+			 	else {
+			 		
+			 		// msg format error
+			 	}
+			 	
+			 	
+			 	LastStatusTimestamp =  CurrentTimestamp
+			 	
+			 	
+			 }else {
+			 	
+			 	// TimeStamp old
+			 }
+				
+			#]
+		}
+		
+	}
+	Transition t0 whenEvent robotState ->  check_stopped
+	
+	
+	
+	
+	
+	
+	
+}
 
 
-QActor transporttrolley context ctxwaste {
+QActor threshold_checker context ctxwaste {
+	
+	
+	[#
+	
+	val DLIMIT = 60
+	
+	var HigherThanLimit = false
+		
+	#]
+	
+	State s0 initial {
+		println("		THRESHOLD_CHECKER | STARTED")	
+	}
+	
+	State accept {
+		
+		println(" THRESHOLD_CHECKER | ACCEPTING")
+	}
+	Transition t0 whenEvent sonar -> check
+	
+	
+	State check{
+		onMsg(sonar : sonar(DISTANCE)){
+			
+			
+			[#
+				
+				var Distance = payloadArg(0).toInt()
+				
+				HigherThanLimit = (Distance >= DLIMIT) 
+				
+				
+			#]
+		}
+	}
+	
+	Goto broadcastResume if [# HigherThanLimit #] else  broadcastStop
+	
+	State broadcastStop{
+		
+		emit thrill : thrill("stop")
+	}
+	Goto accept
+	
+	State broadcastResume{
+		emit thrill : thrill("resume")
+	}
+	Goto accept
+}
+
+
+
+QActor transporttrolley context ctxwaste { // trolley_facade
 	
 	
 	
@@ -201,6 +356,14 @@ QActor transporttrolley context ctxwaste {
 	State arriveHome{
 		[#resourceappender.add("HOME")#]
 		updateResource[#"resourceappender.getStr()"#]
+		
+		[#
+		
+			var CurTimestamp = 	 timestamputil.TimestampNow()
+		#
+		]
+		
+		emit robotState : info("true","false","false",$CurTimestamp)
 		
 		println("		TRANSPORT TROLLEY | going HOME")	
 		

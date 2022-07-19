@@ -15,8 +15,7 @@ Dispatch cmdSonar : cmd(COMAND) // activate deactivate
 Request isActive : req(isActive)
 Reply sonarActive : sonarActive(STATE)
 
-Event sonar : sonar(DISTANCE)
-
+Event sonar : sonar(DISTANCE) 
 Event ledtrigger : led(CMD) // on - off - blink
 
 

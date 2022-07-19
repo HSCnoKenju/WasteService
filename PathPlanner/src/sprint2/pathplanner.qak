@@ -1,0 +1,258 @@
+System pathplanner
+
+
+// mqttBroker "broker.hivemq.com" : 1883 eventTopic "unibo/hu/waste"   //broker.hivemq.com
+
+Request  dopath   : dopath( PATH  )
+Reply dopathdone  : dopathdone( ARG ) 
+Reply dopathfail  : dopathfail( ARG )
+
+Dispatch setMap   : setMap (MapStr ) 
+
+/* ===================   MAPPER     ================================= */
+
+Request buildMap : build(FILEPATH)
+Reply mapCreated : info (FILEPATH)
+
+
+Dispatch cmd       : cmd(MOVE)  
+Request step       : step( TIME )	
+Reply   stepdone   : stepdone(V)  
+Reply   stepfail   : stepfail(DURATION, CAUSE)
+Event alarm        : alarm(X)
+
+/* =============       WASTE SERVICE         ============================= */
+
+Request destination : dest(DESTX, DESTY)
+Reply arrived : info(done)
+
+
+
+
+
+
+
+Context ctxbasicrobot  ip [host="127.0.0.1" port=8020]  
+//Context ctxPathexecutor  ip [host="127.0.0.1" port=8062]
+
+Context ctxpathexec ip [host="127.0.0.1" port=8049]
+Context ctxpathplanner   ip [host="localhost" port=8078]
+
+
+
+
+
+ExternalQActor pathexec context ctxpathexec 
+ExternalQActor basicrobot context ctxbasicrobot
+
+
+
+
+QActor pathplanner context ctxpathplanner{
+	[# val Inmapname   = "xxx" //"map2019"  
+	   var PathTodo    =  ""  
+	   var CurGoalX    = 3
+	   var CurGoalY    = 3 
+	   var mapExist 	= true
+	   var Outmapname = "yyy"
+	#]
+	State activate initial {  
+		
+		
+		
+		[# mapExist = filechecker.fileExists(Inmapname)#]
+		
+		if [#( mapExist 	) #]{
+			
+		}
+		else {
+			
+			request boundarymapbuilder -m buildMap : build($Inmapname)
+			
+			
+		}
+ 	
+	}
+	Goto  readMap if [# mapExist#] else  dummy_wait_build
+				  
+	
+	State dummy_wait_build {
+		
+	}
+	
+	Transition t0 whenReply mapCreated -> readMap
+	
+	State readMap{
+			//run unibo.kotlin.planner22Util.loadRoomMap( Inmapname )	
+ 		run unibo.kotlin.planner22Util.createRoomMapFromTextfile( "$Inmapname.txt" )	  
+   		run unibo.kotlin.planner22Util.initAI() 
+  		run unibo.kotlin.planner22Util.showCurrentRobotState()
+// 		forward pathexec -m setMap :  map( $MapStr )  //no more
+	}
+	Goto accepting
+	   
+	   
+	State accepting {
+		println(" PATH PLANNER | ACCEPTING")
+	}
+	Transition t0 whenRequest destination -> findAPath
+	
+	
+	State findAPath{
+		
+		println("PATH PLANNER | FIND A PATH")
+		
+		
+		onMsg ( destination : dest(DESTX, DESTY) ) { // se mi arriva un destination, è una nuova richiesta e copio i Goal
+			
+			printCurrentMessage
+			[#
+			
+				CurGoalX = payloadArg(0).toInt()
+				CurGoalY = payloadArg(1).toInt()
+				
+			#]
+		}
+		else {
+			
+			println("Keep searching $CurGoalX, $CurGoalY")
+		}
+		
+		
+		qrun userContinue.userEnd(myself)
+		
+		// se non passa, sono qui da pathko, ho aggiornato la mappa con l'ostacolo e posso richiedere alla "mente" un nuovo percorso
+		
+		run unibo.kotlin.planner22Util.setGoal(CurGoalX,CurGoalY)  //---x--->
+		[# PathTodo = unibo.kotlin.planner22Util.doPlan().toString()  //List<aima.core.agent.Action>  [w, w, l, w] 
+			.replace(" ","")
+			.replace(",","")
+			.replace("[","")
+			.replace("]","")
+		#]  
+		println("Azioni pianificate: $PathTodo")
+ 		if [# PathTodo.length == 0 #] {
+ 			println("WARNING: nessuna azione pianificata. Il piano vuoto viene comunque eseguito")
+ 		}
+ 		request pathexec -m dopath : dopath( $PathTodo )  
+		
+	} 
+	Transition t0 whenReply dopathdone -> pathok 
+				  whenReply dopathfail -> pathko
+  	
+	State pathok{ 
+		printCurrentMessage
+		//Aggiorno la mappa con PathToDo
+		run  unibo.kotlin.planner22Util.updateMapWithPath( PathTodo )
+		run  unibo.kotlin.planner22Util.showCurrentRobotState()
+		run unibo.kotlin.planner22Util.saveRoomMap("$Outmapname")
+		
+		replyTo destination with arrived : info(done)
+	}
+	
+	Goto accepting
+	
+	
+    State pathko{
+		printCurrentMessage
+		onMsg ( dopathfail : dopathfail( P ) ){
+			[#  val planStillTodo = payloadArg(0) 
+				var p =""
+				if( planStillTodo=="none"){ //l'ultimo w ha provocato il fail
+					p = PathTodo.dropLast(1)
+				}else{
+					p = PathTodo.dropLast( planStillTodo.length+1 ) //un w ha provocato il fail
+				}
+				println("planStillTodo:$planStillTodo over $PathTodo done: $p")
+			#]
+			run unibo.kotlin.planner22Util.updateMapWithPath( p )
+			run unibo.kotlin.planner22Util.updateMapObstacleOnCurrentDirection()
+		}
+		//run unibo.kotlin.planner22Util.showMap()
+		run unibo.kotlin.planner22Util.showCurrentRobotState()
+		run unibo.kotlin.planner22Util.saveRoomMap("$Outmapname")
+ 		//emit alarm : alarm(obstacle) 		
+ 	}
+ 	Goto findAPath
+//
+//    State end{
+//    	println("BYE")
+//    }
+}
+
+
+/*  
+ * ------------------------------------------------------------------
+ *  cleanerwalker 
+ * ------------------------------------------------------------------
+*/     
+
+QActor boundarymapbuilder context ctxpathplanner{    
+	[# var NumStep   = 0 
+		val StepLength = 350L
+		val DelayLength = 300L
+		
+		
+		var MapFilePath = ""
+		#
+	]
+	State s0 initial{  	
+		println("		MAPPER | START") 
+		[# unibo.kotlin.planner22Util.initAI() #]
+	}		
+	Goto accepting
+	
+	
+	
+	State accepting {
+		
+		println("		MAPPER | ACCEPTING")
+		
+	}
+	Transition t0 whenRequest buildMap -> processRequest
+	
+	State processRequest{
+		
+		onMsg ( buildMap : build(FILEPATH)){
+			
+			[#
+			
+			MapFilePath = payloadArg(0)
+					
+			#]
+			
+			
+		}
+	} Goto doAheadMove
+	
+	State doAheadMove {
+		delayVar DelayLength
+		request basicrobot -m step : step($StepLength)
+	}
+	Transition t0 whenReply stepdone -> continue
+	              whenReply stepfail -> turn
+	
+	State continue{
+		[# unibo.kotlin.planner22Util.updateMap(  "w", "" ) #]
+	}  
+	Goto doAheadMove
+	            
+	State turn {
+		[# NumStep = NumStep + 1 #]
+		forward basicrobot -m cmd : cmd(l)
+		[#  unibo.kotlin.planner22Util.updateMap(  "l", "" ) 
+			unibo.kotlin.planner22Util.showMap()		 
+		#]
+	}
+    Goto doAheadMove if [# NumStep < 4 #]  else endwork
+    
+    State endwork{ 
+ 		[# 	unibo.kotlin.planner22Util.showMap();
+ 			unibo.kotlin.planner22Util.saveRoomMap("$MapFilePath");
+		#]
+		replyTo buildMap with mapCreated : info (MapFilePath)
+		println("		MAPPER | START") 
+ 		terminate 1
+	}  
+	              
+}

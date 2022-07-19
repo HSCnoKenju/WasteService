@@ -1,0 +1,28 @@
+import java.sql.Timestamp
+import java.time.Instant
+
+object timestamputil {
+
+
+    fun TimestampNow() : String{
+
+        return Timestamp.from(Instant.now()).toString()
+    }
+
+    fun TimestampMin() : String {
+        return  Timestamp.from(Instant.MIN).toString()
+    }
+
+    fun TimestampBefore(lefthand:String, argument: String): Boolean{
+        return Timestamp.valueOf(lefthand).before(Timestamp.valueOf(argument));
+
+
+    }
+
+    fun TimestampAfter(lefthand:String, argument: String): Boolean{
+        return Timestamp.valueOf(lefthand).after(Timestamp.valueOf(argument));
+    }
+
+
+
+}

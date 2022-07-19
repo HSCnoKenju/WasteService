@@ -9,6 +9,22 @@ Essendo autogenerato, ogni volta che genera mi cancella gli "import custom"
 
 Workaround: creare kotlin object nelle dir resources che funzionano da wrapper, chiamabili all'interno dei qak senza import
 
+
+> qak ed ordine dei contesti
+
+L'ultimo contesto deve essere quello del localhost, altrimenti non avvia il contesto locale per qualche motivo oscuro
+
+>
+    Context ctxa    ip [host="127.0.0.1" port=8049]
+    Context ctxb    ip [host="localhost" port=8078]
+
+E NON
+
+>
+
+    Context ctxb    ip [host="localhost" port=8078]
+    Context ctxa    ip [host="127.0.0.1" port=8049]
+
 > step e steptime
 
 Se si guarda dentro a BasicRobot/resources/robot.support, si fa uno step lungo (1000), si aspetta steptime e poi si ferma
