@@ -21,7 +21,12 @@ public class PathExecutorMessages {
         public final static String ID_dopath = "dopath";
         public final static String ID_dopathdone = "dopathdone";
         public final static String ID_dopathfail = "dopathfail";
-        public final static String ID_robotState = "robotState";
+
+        public final static String ID_stop = "stop";
+
+        public final static String ID_resume = "resume";
+
+        public final static String ID_robotstate = "robotState";
 
 
 
@@ -34,5 +39,10 @@ public class PathExecutorMessages {
     public static IApplMessage step(String payload, String dest){
 
         return  CommUtils.buildRequest(actorName,ID_step,payload,dest);
+    }
+
+    public static  IApplMessage robotstate(String payload){
+
+        return  CommUtils.buildEvent(actorName,ID_robotstate,payload);
     }
 }

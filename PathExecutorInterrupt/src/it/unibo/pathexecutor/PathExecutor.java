@@ -1,6 +1,7 @@
 package it.unibo.pathexecutor;
 
 import it.unibo.kactor.IApplMessage;
+import unibo.actor22.Qak22Context;
 import unibo.actor22.QakActor22FsmAnnot;
 import unibo.actor22.annotations.*;
 import unibo.actor22comm.utils.CommUtils;
@@ -9,8 +10,8 @@ import alice.tuprolog.Term;
 import alice.tuprolog.Struct;
 import utils.pathut;
 
-import java.nio.file.Path;
-import java.text.Format;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 
 public class PathExecutor extends QakActor22FsmAnnot {
@@ -27,6 +28,8 @@ public class PathExecutor extends QakActor22FsmAnnot {
         super(name);
 
         // registrazione eventi
+        Qak22Context.registerAsEventObserver(name,PathExecutorMessages.ID_stop);
+        Qak22Context.registerAsEventObserver(name,PathExecutorMessages.ID_resume);
 
 
     }
@@ -34,6 +37,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
 
     @State(name ="s0", initial=true)
     @Transition( state = "doThePath",msgId = PathExecutorMessages.ID_dopath)
+    @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void s0(IApplMessage msg) {
         CurMoveToDo = "";
         StepTime = robotSupport.INSTANCE.readStepTime();
@@ -43,6 +47,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
     // dopath( PATH )
     @State(name ="doThePath")
     @Transition(state = "nextMove")
+    @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void doThePath(IApplMessage msg) {
         Struct payloadAsStruct = (Struct) Term.createTerm(msg.msgContent());
         pathut.INSTANCE.setPath(payloadAsStruct.getArg(0).toString());
@@ -54,6 +59,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
     @State(name="nextMove")
     @Transition(state = "endWorkOk", guard = "emptyPathMove")
     @Transition(state = "doMove", guard = "notEmptyPathMove" )
+    @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void nextMove(IApplMessage msg) {
         CurMoveToDo = pathut.INSTANCE.nextMove();
     }
@@ -62,6 +68,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
     @State(name="doMove")
     @Transition(state="doMoveW", guard = "aheadMove")
     @Transition(state = "doMoveTurn", guard = "notAheadMove")
+    @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void doMove(IApplMessage msg) {
         CommUtils.delay(300);
     }
@@ -69,6 +76,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
 
     @State(name="doMoveTurn")
     @Transition(state = "nextMove")
+    @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void doMoveTurn(IApplMessage msg) {
         String payload = String.format("cmd(%s)",CurMoveToDo);
         forward(PathExecutorMessages.cmd(payload,PathExecutorMessages.basicRobotName));
@@ -78,46 +86,48 @@ public class PathExecutor extends QakActor22FsmAnnot {
     @Transition(state="endWorkKo", msgId = PathExecutorMessages.ID_alarm)
     @Transition(state="endWorkKo", msgId = PathExecutorMessages.ID_stepfail)
     @Transition(state="nextMove", msgId = PathExecutorMessages.ID_stepdone)
+    @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void doMoveW(IApplMessage msg) {
-
         String payload = String.format("step(%s)",StepTime);
         request(PathExecutorMessages.step(payload,PathExecutorMessages.basicRobotName));
-
     }
 
     @State(name="endWorkOk")
     @Transition(state="s0")
     protected void endWorkOk(IApplMessage msg) {
-
         System.out.println("endWorkOk: PATH DONE - BYE");
-
         String payload = "dopathdone(ok)";
-
         IApplMessage replyDoPath = CommUtils.buildReply(PathExecutorMessages.actorName,PathExecutorMessages.ID_dopathdone,payload,doPathRequestMsg.msgSender());
-
         sendReply(doPathRequestMsg,replyDoPath);
 
     }
 
     @State(name="endWorkKo")
     @Transition(state="s0")
+    @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void endWorkKo(IApplMessage msg) {
-
         System.out.println(msg);
-
         String PathStillTodo = pathut.INSTANCE.getPathTodo();
-
         System.out.println("PATH FAILURE - SORRY. PathStillTodo="+PathStillTodo);
-
         String payload = String.format("dopathfail(%s)",PathStillTodo);
-
         IApplMessage replyDoPath = CommUtils.buildReply(PathExecutorMessages.actorName,PathExecutorMessages.ID_dopathfail,payload,doPathRequestMsg.msgSender());
-
         sendReply(doPathRequestMsg,replyDoPath);
-
     }
 
+    @State( name = "stopped" )
+    @Transition( state = "resume",  msgId= PathExecutorMessages.ID_resume  )
+    protected void stopped( IApplMessage msg ) {
+        outInfo("" + msg);
+        // Event robotState : info(ATHOME,MOVING,STOPPED,TIMESTAMP)
+        String payload = String.format("info(false,false,true,%s)", Timestamp.from(Instant.now()).toString());
+        emit(PathExecutorMessages.robotstate(payload));
+    }
 
+    @State( name = "resume" )
+    protected void resume( IApplMessage msg ) {
+        outInfo("" + msg);
+        resume();
+    }
 
     //protected void s1(IApplMessage msg) {
 //
