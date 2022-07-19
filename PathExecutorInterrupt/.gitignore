@@ -168,8 +168,3 @@ modules.xml
 **/.settings/org.eclipse.jdt.core.prefs
 
 
-#### QAK GENERATION
-
-build2022.gradle
-*.pl
-/src/it/unibo/*
