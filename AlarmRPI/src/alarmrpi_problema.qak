@@ -1,5 +1,5 @@
 
-System -trace alarmrpi
+System /*-trace*/ alarmrpi
 
 
 
@@ -25,6 +25,22 @@ Context ctx_rpi ip [ host= "localhost" port= 8099]
 
 
 
+QActor sonarlatestart context ctx_rpi {
+	
+	
+	State s0 initial {
+		
+		
+	}
+	Transition t0 whenTime 8000 -> active 
+	
+	
+	State active {
+		
+		forward sonar -m cmdSonar : cmd(activate) 
+	}
+	
+}
 
 
 QActor sonar context ctx_rpi {
@@ -172,16 +188,20 @@ QActor led context ctx_rpi {
 			
 			[#
 			
-				if (payloadArg(0).equals("turnOn"))
+				if (payloadArg(0).equals("turnOn")){
 					
 					Active = true
 					Continus = true
+					
+					}
 				
 				else if (payloadArg(0).equals("turnOff"))
-					
+					{
 					Active = false
 					Continus = true
 				
+				
+				}
 				else
 				{
 					
@@ -203,15 +223,15 @@ QActor led context ctx_rpi {
 			[#
 			
 			if (payloadArg(0).equals("on"))
-					
+				{	
 					Active = true
 					Continus = true
-				
+				}
 				else if (payloadArg(0).equals("off"))
-					
+				{	
 					Active = false
 					Continus = true
-				
+				}
 				else if (payloadArg(0).equals("blink"))
 				{
 					Active = true
@@ -222,8 +242,9 @@ QActor led context ctx_rpi {
 				
 			#]
 			
-			println ("LED | TRIGGER, CURRENT STATE = $Active CONTINUS = $Continus")
+			println ("LED | TRIGGER, CURRENT STATE ACTIVE = $Active CONTINUS = $Continus")
 		}
 	}
+	Goto waitingMessages
 	
 }
