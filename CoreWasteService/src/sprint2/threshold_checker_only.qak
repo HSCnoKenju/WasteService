@@ -1,0 +1,101 @@
+System /*-trace*/ waste_service
+
+// mqttBroker "broker.hivemq.com" : 1883 eventTopic "unibo/hu/waste"   //broker.hivemq.com
+
+/*===========================	Sprint_2 : RPI	============================ */
+Event sonar : sonar(DISTANCE) 
+Event stop : stop(ARGS)
+Event resume : resume(ARGS)
+
+Context ctxwaste ip [ host="localhost" port=8033]
+
+
+
+
+QActor thresholdchecker context ctxwaste {
+	
+	
+	[#
+	
+	val DLIMIT = 15
+	
+	var HigherThanLimit = false
+		
+	#]
+	
+	State s0 initial {
+		println("		THRESHOLD_CHECKER | STARTED")	
+	}
+	Goto accept
+	
+	
+	State accept {
+		
+		println(" THRESHOLD_CHECKER | ACCEPTING")
+	}
+	Transition t0 whenEvent sonar -> check
+	
+	
+	State check{
+		onMsg(sonar : sonar(DISTANCE)){
+			
+			
+			[#
+				
+				var Distance = payloadArg(0).toInt()
+				
+				HigherThanLimit = (Distance >= DLIMIT) 
+			
+				
+			#]
+		}
+	}
+	
+	Goto broadcastResume if [# HigherThanLimit #] else  broadcastStop
+	
+	
+	
+//	Event stop : stop(ARGS)
+//Event resume : resume(ARGS)
+
+	State broadcastStop{
+		
+		emit stop : stop(stop)
+	}
+	Goto accept
+	
+	State broadcastResume{
+		emit resume : resume(resume)
+	}
+	Goto accept
+}
+
+QActor sonarmockalternate context ctxwaste{
+	
+	State high initial {
+		
+		emit sonar : sonar(100)
+	}
+	Transition t0 whenTime 1000 ->low 
+	
+	State low {
+		emit sonar : sonar(5)
+	}
+
+	Transition t0 whenTime 1000 ->high
+	
+}
+
+QActor mocktrolleylistener context ctxwaste {
+	
+	
+	State s0 initial {
+		
+		println("MOCK LED |")
+		printCurrentMessage
+	}
+	Transition t0 whenEvent stop -> s0
+	whenEvent resume -> s0
+	
+	
+}

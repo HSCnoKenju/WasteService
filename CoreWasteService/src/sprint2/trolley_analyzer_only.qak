@@ -1,0 +1,99 @@
+System -trace waste_service
+
+// mqttBroker "broker.hivemq.com" : 1883 eventTopic "unibo/hu/waste"   //broker.hivemq.com
+
+Event ledtrigger : led(CMD)
+Event robotState : info(ATHOME,MOVING,STOPPED,TIMESTAMP)
+
+Context ctxwaste ip [ host="localhost" port=8033]
+
+QActor trolleyanalyzer context ctxwaste {
+	[# 
+		var LastStatusTimestamp = timestamputil.TimestampMin() 
+		var stopped = true
+		var continuos = false
+	#]
+	
+	
+	
+	State s0 initial {
+		println("		TROLLEY_ANALYZER | STARTED")	
+	}
+	Goto accept
+	
+	State accept {
+		println("		TROLLEY_ANALYZER | ACCPEPTING")	
+	}
+	Transition t0 whenEvent robotState ->  check_stopped
+	
+	State check_stopped {
+		println("		TROLLEY_ANALYZER | CHECK_STOPPED")	
+		printCurrentMessage
+		onMsg ( robotState : info(ATHOME,MOVING,STOPPED,TIMESTAMP)) {
+			[#
+				var CurrentTimestamp = payloadArg(3)
+			 	var Ahomeinput = payloadArg(0).toBoolean()
+			 	var Movinginput = payloadArg(1).toBoolean()
+			 	var Stoppedinput = payloadArg(2).toBoolean()
+			 	#]
+			 	println("CurrentTimestamp=$CurrentTimestamp Ahomeinput=$Ahomeinput Movinginput=$Movinginput  Stoppedinput=$Stoppedinput ")
+			 	[#
+			 	if (Ahomeinput && !Movinginput  && !Stoppedinput ){
+			 		stopped = false
+			 		continuos = true
+#]
+					emit ledtrigger : led(off) // on - off - blink
+[#			 		
+			 	} else if (!Ahomeinput && Movinginput && !Stoppedinput ){
+			 		stopped = false 
+			 		continuos = false
+#]
+					emit ledtrigger : led(blink) // on - off - blink
+[#
+			 	} else if (!Ahomeinput && !Movinginput && Stoppedinput ) {
+			 		stopped = true 
+			 		continuos = false
+#]
+					emit ledtrigger : led(on) // on - off - blink
+[#
+			 	}
+			 	else {
+			 		// msg format error
+			 		#]
+			 		println("TROLLEY_ANALYZER	|	MSG FORMAT ERROE")
+			 		[#
+			 	}
+			 	LastStatusTimestamp =  CurrentTimestamp
+			
+			
+			#]
+		}
+	}
+	Transition t0 whenEvent robotState ->  check_stopped
+	}
+	
+	
+	
+QActor trolleymock context ctxwaste{
+	
+	State s0 initial{
+		println("TROLLEY_MOCK | ON")
+	}
+	Goto generate
+	
+	State generate {
+		
+	
+		println("TROLLEY_MOCK | ON")
+		
+        	[#
+		
+			var CurTimestamp = 	 timestamputil.TimestampNow()
+		#
+		]
+		
+		emit robotState : info(false,true,false,$CurTimestamp)
+		
+	}
+	Transition t9 whenTime 1000 -> generate
+}
