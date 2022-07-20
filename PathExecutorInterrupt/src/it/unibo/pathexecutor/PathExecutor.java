@@ -49,10 +49,19 @@ public class PathExecutor extends QakActor22FsmAnnot {
     @Transition(state = "nextMove")
     @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void doThePath(IApplMessage msg) {
-        Struct payloadAsStruct = (Struct) Term.createTerm(msg.msgContent());
-        pathut.INSTANCE.setPath(payloadAsStruct.getArg(0).toString());
 
-        doPathRequestMsg = msg;
+       // if( checkMsgContent( Term.createTerm("step(TIME)"), Term.createTerm("step(T)"),
+       //         currentMsg.msgContent()) ) { //set msgArgList
+
+
+        System.out.println("Content" + msg.msgContent());
+        Struct payloadAsStruct = (Struct) Term.createTerm(msg.msgContent());
+        String path = payloadAsStruct.getArg(0).toString();
+        System.out.println("doThePath | "+ path);
+        if (null != path  && path!="") {
+            pathut.INSTANCE.setPath(path);
+            doPathRequestMsg = msg;
+        }
         System.out.println("pathexec pathTodo = "+pathut.INSTANCE.getPathTodo());
     }
 
@@ -62,6 +71,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
     @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void nextMove(IApplMessage msg) {
         CurMoveToDo = pathut.INSTANCE.nextMove();
+        System.out.println("CurMoveToDo "+ CurMoveToDo + "PathTodo " + pathut.INSTANCE.getPathTodo());
     }
 
 
@@ -70,7 +80,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
     @Transition(state = "doMoveTurn", guard = "notAheadMove")
     @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void doMove(IApplMessage msg) {
-        CommUtils.delay(300);
+        CommUtils.delay(385);
     }
 
 
@@ -80,7 +90,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
     protected void doMoveTurn(IApplMessage msg) {
         String payload = String.format("cmd(%s)",CurMoveToDo);
         forward(PathExecutorMessages.cmd(payload,PathExecutorMessages.basicRobotName));
-        CommUtils.delay(300);
+        CommUtils.delay(385);
     }
     @State(name="doMoveW")
     @Transition(state="endWorkKo", msgId = PathExecutorMessages.ID_alarm)
