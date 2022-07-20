@@ -5,9 +5,10 @@
  https://peppe8o.com/fix-slow-ssh-remote-terminal-issue-in-raspberry-pi-os/
  */  
    
-System   -trace     plainrobot
+System  /*  -trace */     plainrobot
 
 //mqttBroker "broker.hivemq.com" : 1883 eventTopic "unibo/hu/waste"   //broker.hivemq.com
+
 
 
 
@@ -28,6 +29,7 @@ Event alarm        : alarm(X)
 Request  dopath    : dopath( PATH  )
 Reply dopathdone   : dopathdone( ARG )
 Reply dopathfail   : dopathfail( ARG ) 	// 	ARG = PathStillToDo
+
 
 
 Event robotState : info(ATHOME,MOVING,STOPPED,TIMESTAMP)
@@ -92,7 +94,7 @@ QActor basicrobot context ctxbasicrobot{
 		#
 		]
 		
-		emit robotState : info("false","true","false",$CurTimestamp)
+		emit robotState : info(false,true,false,$CurTimestamp)
 		}
 	 }
 	 Goto work  
@@ -134,7 +136,7 @@ QActor basicrobot context ctxbasicrobot{
 		#
 		]
 		
-		emit robotState : info("false","true","false",$CurTimestamp)
+		emit robotState : info(false,true,false,$CurTimestamp)
 	}  
 	Transition t0 
 		whenTimeVar StepTime  -> stepDone  	 
