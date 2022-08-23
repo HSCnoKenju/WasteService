@@ -39,7 +39,7 @@ public class MainPathExecutorInterruptLocalTest {
 
     //Qak22Util.sendAMsg(PathExecutorMessages.dopath("wwwwwwww"));
     Qak22Util.sendAMsg(PathExecutorMessages.dopath("wwwwlwwwwwwlwwwwlwwwwwwl"));
-
+/*
     for (int i = 0; i < 2; i++) {
 
       Qak22Util.emitEvent(PathExecutorMessages.stop());
@@ -48,7 +48,7 @@ public class MainPathExecutorInterruptLocalTest {
       CommUtils.delay(4000);
 
     }
-
+*/
     CommUtils.aboutThreads("At end - ");
   }
 }

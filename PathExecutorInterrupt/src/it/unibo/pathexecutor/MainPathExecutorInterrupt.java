@@ -12,7 +12,7 @@ import unibo.actor22comm.utils.CommUtils;
 
 @Context22(name = "ctxbasicrobot", host = "127.0.0.1", port = "8020")
 @Context22(name = "ctxpathexec",host = "localhost", port = "8049")
-//@Context22(name = "ctxwaste", host = "127.0.0.1", port = "8033")
+@Context22(name = "ctxwaste", host = "127.0.0.1", port = "8033")
 @Actor22(name = PathExecutorMessages.actorName, contextName = "ctxpathexec", implement = PathExecutor.class)
 @Actor22(name=PathExecutorMessages.basicRobotName, contextName = "ctxbasicrobot")
 public class MainPathExecutorInterrupt{
@@ -31,7 +31,7 @@ public class MainPathExecutorInterrupt{
     //EventHandler è un attore: protrebbe avere riterdi nella registrazione
     Qak22Context.showActorNames();
 
-    CommSystemConfig.tracing = false;
+    CommSystemConfig.tracing = true;
   }
 
   public static void main(String[] args) throws Exception {
