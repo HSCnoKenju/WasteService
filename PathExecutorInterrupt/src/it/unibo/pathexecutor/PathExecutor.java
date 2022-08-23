@@ -4,6 +4,7 @@ import it.unibo.kactor.IApplMessage;
 import unibo.actor22.Qak22Context;
 import unibo.actor22.QakActor22FsmAnnot;
 import unibo.actor22.annotations.*;
+import unibo.actor22comm.utils.ColorsOut;
 import unibo.actor22comm.utils.CommUtils;
 import unibo.robot.*;
 import alice.tuprolog.Term;
@@ -28,8 +29,8 @@ public class PathExecutor extends QakActor22FsmAnnot {
         super(name);
 
         // registrazione eventi
-        Qak22Context.registerAsEventObserver(name,PathExecutorMessages.ID_stop);
-        Qak22Context.registerAsEventObserver(name,PathExecutorMessages.ID_resume);
+       // Qak22Context.registerAsEventObserver(name,PathExecutorMessages.ID_stop);
+        // Qak22Context.registerAsEventObserver(name,PathExecutorMessages.ID_resume);
 
 
     }
@@ -54,7 +55,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
        //         currentMsg.msgContent()) ) { //set msgArgList
 
 
-        System.out.println("Content" + msg.msgContent());
+        //System.out.println("Content" + msg.msgContent());
         Struct payloadAsStruct = (Struct) Term.createTerm(msg.msgContent());
         String path = payloadAsStruct.getArg(0).toString();
         System.out.println("doThePath | "+ path);
@@ -62,7 +63,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
             pathut.INSTANCE.setPath(path);
             doPathRequestMsg = msg;
         }
-        System.out.println("pathexec pathTodo = "+pathut.INSTANCE.getPathTodo());
+      //  System.out.println("pathexec pathTodo = "+pathut.INSTANCE.getPathTodo());
     }
 
     @State(name="nextMove")
@@ -71,7 +72,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
     @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void nextMove(IApplMessage msg) {
         CurMoveToDo = pathut.INSTANCE.nextMove();
-        System.out.println("CurMoveToDo "+ CurMoveToDo + "PathTodo " + pathut.INSTANCE.getPathTodo());
+        System.out.println("CurMoveToDo "+ CurMoveToDo + " ; PathTodo " + pathut.INSTANCE.getPathTodo());
     }
 
 
@@ -80,7 +81,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
     @Transition(state = "doMoveTurn", guard = "notAheadMove")
     @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void doMove(IApplMessage msg) {
-        CommUtils.delay(385);
+        CommUtils.delay(300);
     }
 
 
@@ -90,7 +91,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
     protected void doMoveTurn(IApplMessage msg) {
         String payload = String.format("cmd(%s)",CurMoveToDo);
         forward(PathExecutorMessages.cmd(payload,PathExecutorMessages.basicRobotName));
-        CommUtils.delay(385);
+        CommUtils.delay(300);
     }
     @State(name="doMoveW")
     @Transition(state="endWorkKo", msgId = PathExecutorMessages.ID_alarm)
@@ -127,7 +128,8 @@ public class PathExecutor extends QakActor22FsmAnnot {
     @State( name = "stopped" )
     @Transition( state = "resume",  msgId= PathExecutorMessages.ID_resume  )
     protected void stopped( IApplMessage msg ) {
-        outInfo("" + msg);
+
+        ColorsOut.outappl(this.getName() + "/" + "STOPPED" + " | " + msg, ColorsOut.ANSI_PURPLE);
         // Event robotState : info(ATHOME,MOVING,STOPPED,TIMESTAMP)
         String payload = String.format("info(false,false,true,%s)", Timestamp.from(Instant.now()).toString());
         emit(PathExecutorMessages.robotstate(payload));
@@ -135,7 +137,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
 
     @State( name = "resume" )
     protected void resume( IApplMessage msg ) {
-        outInfo("" + msg);
+        ColorsOut.outappl(this.getName() + "/" + "RESUME" + " | " + msg, ColorsOut.ANSI_PURPLE);
         resume();
     }
 

@@ -45,4 +45,19 @@ public class PathExecutorMessages {
 
         return  CommUtils.buildEvent(actorName,ID_robotstate,payload);
     }
+
+
+    public  static  IApplMessage stop(){
+
+        return  CommUtils.buildEvent("main", "stop", "stop(stop)");
+    }
+
+    public  static  IApplMessage resume(){
+
+        return  CommUtils.buildEvent("main", "resume", "resume(resume)");
+    }
+
+    public static IApplMessage dopath(String path){
+        return  CommUtils.buildRequest("main","dopath", "dopath("+path+")",actorName);
+    }
 }

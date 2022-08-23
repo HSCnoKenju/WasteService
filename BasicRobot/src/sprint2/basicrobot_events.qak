@@ -35,7 +35,7 @@ Reply dopathfail   : dopathfail( ARG ) 	// 	ARG = PathStillToDo
 Event robotState : info(ATHOME,MOVING,STOPPED,TIMESTAMP)
 
 
-Context ctxwaste ip [ host="127.0.0.1" port=8033]
+//Context ctxwaste ip [ host="127.0.0.1" port=8033]
  
 Context ctxbasicrobot ip [host="localhost" port=8020]  
 

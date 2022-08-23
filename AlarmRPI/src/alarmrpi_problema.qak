@@ -122,7 +122,7 @@ QActor sonar context ctx_rpi {
 		println("")
 		println ("SONAR | EMIT an EVENT = $SimDistance")
 
-		[# SimDistance = SimDistance - 2#]
+		[# SimDistance = SimDistance - 10#]
 		 	
 		 } 	
 		 else 
@@ -134,7 +134,7 @@ QActor sonar context ctx_rpi {
 	}
 	
 	Transition t3 
-				  whenTime 500  -> emitDistance  
+				  whenTime 5000  -> emitDistance  
 				  whenMsg cmdSonar -> parseCmd
 				  whenRequest  isActive -> handleIsActive
 }
