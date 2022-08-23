@@ -599,6 +599,24 @@ QActor waste_service context ctxwaste {
 	}
 	Transition t2 whenReply workdone -> accepting
 				  whenRequest waste -> checkWhenBusy
+				  whenMsg reset -> reset_weightsBusy
+	
+	
+	State reset_weightsBusy {
+		
+		println("WASTE_SERVICE | (BUSY) SHOULD ONLY BE IN TESTING, RESET WEIGHTS")
+	
+	
+		[#
+		
+		Available_Glass = Init_Glass
+		Available_Plastic = Init_Plastic
+		
+			
+		#]
+		updateResource[# "Glass=$Available_Glass Plastic=$Available_Plastic"#]
+	}
+	Goto acceptBusy
 	
 	
 	

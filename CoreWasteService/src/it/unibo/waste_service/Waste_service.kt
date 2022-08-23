@@ -63,7 +63,7 @@ class Waste_service ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 								Available_Plastic = Init_Plastic
 								
 									
-						updateResourceRep("reset to Glass=$Available_Glass Plastic=$Available_Plastic " 
+						updateResourceRep("Glass=$Available_Glass Plastic=$Available_Plastic " 
 						)
 					}
 					 transition( edgeName="goto",targetState="accepting", cond=doswitch() )
@@ -160,6 +160,21 @@ class Waste_service ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 					}
 					 transition(edgeName="t214",targetState="accepting",cond=whenReply("workdone"))
 					transition(edgeName="t215",targetState="checkWhenBusy",cond=whenRequest("waste"))
+					transition(edgeName="t216",targetState="reset_weightsBusy",cond=whenDispatch("reset"))
+				}	 
+				state("reset_weightsBusy") { //this:State
+					action { //it:State
+						println("WASTE_SERVICE | (BUSY) SHOULD ONLY BE IN TESTING, RESET WEIGHTS")
+						
+								
+								Available_Glass = Init_Glass
+								Available_Plastic = Init_Plastic
+								
+									
+						updateResourceRep( "Glass=$Available_Glass Plastic=$Available_Plastic" 
+						)
+					}
+					 transition( edgeName="goto",targetState="acceptBusy", cond=doswitch() )
 				}	 
 				state("checkWhenBusy") { //this:State
 					action { //it:State

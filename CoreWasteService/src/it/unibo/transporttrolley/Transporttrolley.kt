@@ -50,7 +50,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("goingIndoor") { //this:State
 					action { //it:State
 						resourceappender.add("ACCEPTED") 
-						updateResourceRep("resourceappender.getStr()" 
+						updateResourceRep(resourceappender.getStr() 
 						)
 						if( checkMsgContent( Term.createTerm("destination(CONTAINER)"), Term.createTerm("destination(CONTAINER)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
@@ -69,7 +69,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("arriveIndoor") { //this:State
 					action { //it:State
 						resourceappender.add("INDOOR") 
-						updateResourceRep("resourceappender.getStr()" 
+						updateResourceRep(resourceappender.getStr() 
 						)
 						emit("pickup", "info($CurrentType)" ) 
 						println("		TRANSPORT TROLLEY | INDOOR")
@@ -83,7 +83,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("arriveContainer") { //this:State
 					action { //it:State
 						resourceappender.add("$CurrentType") 
-						updateResourceRep("resourceappender.getStr()" 
+						updateResourceRep(resourceappender.getStr() 
 						)
 						answer("goal", "workdone", "info(done)"   )  
 						println("		TRANSPORT TROLLEY | $CurrentType")
@@ -105,7 +105,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("arriveHome") { //this:State
 					action { //it:State
 						resourceappender.add("HOME") 
-						updateResourceRep("resourceappender.getStr()" 
+						updateResourceRep(resourceappender.getStr() 
 						)
 						println("		TRANSPORT TROLLEY | going HOME")
 					}

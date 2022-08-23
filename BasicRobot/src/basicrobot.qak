@@ -207,7 +207,7 @@ QActor pathexec context ctxbasicrobot{
 	
 	State doMove{
 		//printCurrentMessage
- 		delay 300  //avoid too fast ...
+ 		delay 345  //avoid too fast ...
  	}
 	Goto doMoveW if [# CurMoveTodo == "w" #] else doMoveTurn
 	
@@ -215,7 +215,7 @@ QActor pathexec context ctxbasicrobot{
 		//printCurrentMessage
 		forward basicrobot -m cmd : cmd($CurMoveTodo) //asynch !!!		
 	}
-	Transition t0 whenTime 300 ->  nextMove  //wait for move done ...
+	Transition t0 whenTime 345 ->  nextMove  //wait for move done ...
   
  	State doMoveW{
 		//printCurrentMessage

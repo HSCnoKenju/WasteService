@@ -26,9 +26,12 @@ public class TestCoreRequisiti {
 		waitForApplStarted();
 		client = new CoapClient("coap://"+ipaddr+"/"+context+"/"+destactor);
 		String initContainersStr = CommUtils.buildDispatch("test","init_capacity","values("+MAXGB+","+MAXPB+")","waste_service").toString();
+		String initPositionsStr = CommUtils.buildDispatch("test","all_position", "coordinates(0,0,1,4,6,3,5,0)","transporttrolley").toString();
+
 		try{
 			connTcp = new ConnTcp("localhost", 8033);
 			connTcp.forward(initContainersStr);
+			connTcp.forward(initPositionsStr);
 
 		}catch(Exception e){
 			ColorsOut.outerr("initial ERROR:" + e.getMessage());
@@ -82,7 +85,7 @@ public class TestCoreRequisiti {
 			String reply = connTcp.request(truckRequestStr);
 			assertTrue(reply.contains("loadAccept"));
 
-			String data = client.get().getResponseText();
+			String data = client.get().getResponseText().trim();
 			ColorsOut.outappl("data" +data, ColorsOut.ANSI_PURPLE );
 			assertTrue(data.equals("Glass=14 Plastic=10"));
 		}
@@ -103,11 +106,11 @@ public class TestCoreRequisiti {
 
 			assertTrue(reply.contains("loadRejected"));
 
-			String data = client.get().getResponseText();
+			String data = client.get().getResponseText().trim();
 
 			ColorsOut.outappl("data" +data, ColorsOut.ANSI_PURPLE );
 
-			assertTrue(data.equals("Glass=20 Plastic=10")); // se è stato eseguito come secondo test
+			assertTrue(data.equals("Glass=20 Plastic=10")); // se è stato eseguito come primo test
 		}
 		catch (Exception e){
 			ColorsOut.outerr("testLoadReject ERROR:" + e.getMessage());

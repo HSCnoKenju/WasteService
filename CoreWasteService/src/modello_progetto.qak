@@ -17,8 +17,6 @@ Request goal : destination(CONTAINER) // Glass / Plastic
 Event pickup : info(TYPE) // Glass / Plastic
 Reply workdone : info(done)
 
-
-
 /* =================== MESSAGGI CONFIGURAZIONE ==================== */
 
 Dispatch init_capacity : values(MAXGB,MAXPB)
@@ -119,7 +117,7 @@ QActor transporttrolley context ctxwaste {
 	State goingIndoor {
 		
 		[#resourceappender.add("ACCEPTED")#]	
-		updateResource[#"resourceappender.getStr()"#]
+		updateResource[#resourceappender.getStr()#]
 		
 		onMsg ( goal : destination(CONTAINER) ){
 			[#
@@ -144,7 +142,7 @@ QActor transporttrolley context ctxwaste {
 	
 		
 			[#resourceappender.add("INDOOR")#]		
-		updateResource[#"resourceappender.getStr()"#]
+		updateResource[#resourceappender.getStr()#]
 			
 			
 		
@@ -170,7 +168,7 @@ QActor transporttrolley context ctxwaste {
 	
 	State arriveContainer {
 		[#resourceappender.add("$CurrentType")#]
-		updateResource[#"resourceappender.getStr()"#]
+		updateResource[#resourceappender.getStr()#]
 		
 		replyTo goal with workdone : info(done)
 	 	println("		TRANSPORT TROLLEY | $CurrentType")	
@@ -200,7 +198,7 @@ QActor transporttrolley context ctxwaste {
 	
 	State arriveHome{
 		[#resourceappender.add("HOME")#]
-		updateResource[#"resourceappender.getStr()"#]
+		updateResource[#resourceappender.getStr()#]
 		
 		println("		TRANSPORT TROLLEY | going HOME")	
 		
@@ -306,9 +304,7 @@ QActor waste_service context ctxwaste {
 		
 			
 		#]
-
-
-		updateResource[#"reset to Glass=$Available_Glass Plastic=$Available_Plastic "#]
+		updateResource[#"Glass=$Available_Glass Plastic=$Available_Plastic "#]
 	}
 	Goto accepting
 	
@@ -397,13 +393,31 @@ QActor waste_service context ctxwaste {
 	}
 	Goto acceptBusy
 	
+	
 	State acceptBusy{
 		
 		println("WASTE_SERVICE | ACCEPTING(BUSY)")
 	}
 	Transition t2 whenReply workdone -> accepting
 				  whenRequest waste -> checkWhenBusy
+				  whenMsg reset -> reset_weightsBusy
 	
+	
+	State reset_weightsBusy {
+		
+		println("WASTE_SERVICE | (BUSY) SHOULD ONLY BE IN TESTING, RESET WEIGHTS")
+	
+	
+		[#
+		
+		Available_Glass = Init_Glass
+		Available_Plastic = Init_Plastic
+		
+			
+		#]
+		updateResource[# "Glass=$Available_Glass Plastic=$Available_Plastic"#]
+	}
+	Goto acceptBusy
 	
 	
 	

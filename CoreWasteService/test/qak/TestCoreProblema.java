@@ -69,7 +69,7 @@ public class TestCoreProblema {
 		ActorBasic wasteservice = QakContext.Companion.getActor("waste_service");
 		while( wasteservice == null ){
 			ColorsOut.outappl("TestCoreRequisiti waits for appl ... " , ColorsOut.GREEN);
-			CommUtils.delay(200);
+			CommUtils.delay(400);
 			wasteservice = QakContext.Companion.getActor("waste_service");
 		}
 	}
@@ -108,7 +108,7 @@ public class TestCoreProblema {
 			while (pathStr.split(" ").length < 4){ 	// controllo che ci siano almeno 4 elementi, amplio
 															// per percorsi futuri
 				pathStr = trolley_client.get().getResponseText();
-				CommUtils.delay(200);
+				CommUtils.delay(600);
 			}
 
 			ColorsOut.outappl("position " +pathStr, ColorsOut.ANSI_PURPLE );
@@ -160,7 +160,7 @@ public class TestCoreProblema {
 			while (pathStr.split(" ").length < 6 /*&& (pathStr.contains("Glass") || pathStr.contains(("Plastic")))*/){ 	// controllo che ci siano almeno 4 elementi, amplio
 				// per percorsi futuri
 				pathStr = trolley_client.get().getResponseText();
-				CommUtils.delay(200);
+				CommUtils.delay(600);
 			}
 
 			ColorsOut.outappl("position " +pathStr, ColorsOut.ANSI_PURPLE );
