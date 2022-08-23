@@ -66,6 +66,7 @@ QActor trolleyanalyzer context ctxwaste {
 			 	LastStatusTimestamp =  CurrentTimestamp
 			
 			
+			
 			#]
 		}
 	}

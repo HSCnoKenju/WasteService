@@ -70,6 +70,7 @@ QActor thresholdchecker context ctxwaste {
 	Goto accept
 }
 
+
 QActor sonarmockalternate context ctxwaste{
 	
 	State high initial {

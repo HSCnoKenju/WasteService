@@ -14,7 +14,6 @@ Dispatch setMap   : setMap (MapStr )
 Request buildMap : build(FILEPATH)
 Reply mapCreated : info (FILEPATH)
 
-
 Dispatch cmd       : cmd(MOVE)  
 Request step       : step( TIME )	
 Reply   stepdone   : stepdone(V)  

@@ -12,7 +12,6 @@ System  /*  -trace */     plainrobot
 
 
 
-
 Dispatch cmd       	: cmd(MOVE)     
 Dispatch end       	: end(ARG)  
   

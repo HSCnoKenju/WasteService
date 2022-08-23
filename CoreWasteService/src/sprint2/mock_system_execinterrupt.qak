@@ -14,6 +14,7 @@ Event stop : stop(ARGS)
 Event resume : resume(ARGS)
 
 
+
 Context ctxpathexec ip [host="127.0.0.1" port=8049]
 Context ctxwaste ip [ host="localhost" port=8033]
 
@@ -47,11 +48,12 @@ QActor mocksystem context ctxwaste {
 		emit resume : resume(resume)
 	}
 	Transition t0 whenTime 4000 -> broadcastStop
-	whenReply 	dopathdone -> end
+				whenReply 	dopathdone -> end
 				whenReply dopathfail -> end
 	
 
 	State end {
+		println("		MOCK_SYSTEM | TERMINATED")	
 		terminate 1
 	}
 }

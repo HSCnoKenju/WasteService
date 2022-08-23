@@ -349,7 +349,7 @@ QActor waste_service context ctxwaste {
 				  whenEvent pickup -> updateWeights	
 	
 	State lost_pickup{
-		
+	
 		[#
 			
 			if (RequestedType == "Glass"){
