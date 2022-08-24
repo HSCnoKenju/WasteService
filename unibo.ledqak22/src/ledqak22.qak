@@ -1,32 +1,72 @@
 System /*-trace*/ ledqak22
-mqttBroker "broker.hivemq.com" : 1883  eventTopic "unibo/nat/radar"
+mqttBroker "broker.hivemq.com" : 1883  eventTopic "unibo/hu/waste"
 
-Event  sonardata       : distance( V )   //for the application level
-Event  thrill          : info(CMD)
+// Event  sonardata       : distance( V )   //for the application level
+// Event  thrill          : info(CMD)
+
+
+Event ledtrigger : led(CMD) // on - off - blink
+
+Dispatch ledon : info(on)
+Dispatch ledoff : info(off)
+Dispatch ledblink : info(blink)
 
 Context ctxledqak22 ip [host="localhost" port=8065] 
 
+CodedQActor ledSimulator context ctxledqak22 className "ledSimulator"
+
+CodedQActor ledConcrete context ctxledqak22 className "ledConcrete"
+
 
 QActor ledqak22 context ctxledqak22{
+	
+	[# val simulate = true #]
+	
+	
  	State s0 initial {
 		println("$name STARTS")
 	}
-	Transition t0  whenEvent thrill -> handleThrill
+	Transition t0  whenEvent ledtrigger -> handleTrigger
 	
-	State handleThrill{
-		onMsg( thrill : info(CMD) ){
+	State handleTrigger{
+		onMsg( ledtrigger : led(CMD) ){
 			[# var Cmd = payloadArg(0) #]
 			if [# Cmd=="on" #]{
-				[# unibo.actor22comm.utils.ColorsOut.outappl( 
-					"${name} - on", unibo.actor22comm.utils.ColorsOut.MAGENTA)
-				#]				
-			}else{
-				[# unibo.actor22comm.utils.ColorsOut.outappl( 
-					"${name} - off", unibo.actor22comm.utils.ColorsOut.GREEN)
-				#]
+				
+				/* orribile ma forward accetta solo qactor come parametro*/
+				
+				if [# simulate#] {
+					forward ledSimulator -m ledon : info(on)
+				}else {
+					forward ledConcrete -m ledon : info(on)
+				}
+				 
+								
+			}else {
+			
+			if [# Cmd=="blink"#] {
+					
+				if [# simulate#] {
+					forward ledSimulator -m ledblink : info(blink)
+				}else {
+					forward ledConcrete -m ledblink : info(blink)
+				}
+			
+				
+			} else /*off*/ { 
+						
+				if [# simulate#] {
+					forward ledSimulator -m ledoff : info(off)
+				}else {
+					forward ledConcrete -m ledoff : info(off)
+				}
+			
+					
+				}
 			}
+			
 		}	 
 	}
-	Transition t0 whenEvent thrill -> handleThrill
+	Transition t0 whenEvent ledtrigger -> handleTrigger
 }
 
