@@ -3,7 +3,7 @@ System /*-trace*/ waste_service
 // mqttBroker "broker.hivemq.com" : 1883 eventTopic "unibo/hu/waste"   //broker.hivemq.com
 
 /*===========================	Sprint_2 : RPI	============================ */
-Event sonar : sonar(DISTANCE) 
+Event sonardata : sonardata(DISTANCE) 
 Event stop : stop(ARGS)
 Event resume : resume(ARGS)
 
@@ -33,11 +33,11 @@ QActor thresholdchecker context ctxwaste {
 		
 		println(" THRESHOLD_CHECKER | ACCEPTING")
 	}
-	Transition t0 whenEvent sonar -> check
+	Transition t0 whenEvent sonardata -> check
 	
 	
 	State check{
-		onMsg(sonar : sonar(DISTANCE)){
+		onMsg(sonardata : sonardata(DISTANCE)){
 			
 			
 			[#
@@ -75,12 +75,12 @@ QActor sonarmockalternate context ctxwaste{
 	
 	State high initial {
 		
-		emit sonar : sonar(100)
+		emit sonardata : sonardata(100)
 	}
 	Transition t0 whenTime 1000 ->low 
 	
 	State low {
-		emit sonar : sonar(5)
+		emit sonardata : sonardata(5)
 	}
 
 	Transition t0 whenTime 1000 ->high

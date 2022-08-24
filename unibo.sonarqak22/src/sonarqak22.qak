@@ -43,7 +43,7 @@ QActor sonarqak22 context ctxsonarqak22{
 	
 	State activateTheSonar{
 		printCurrentMessage
-		if[#  `it.unibo`.radarSystem22.domain.utils.DomainSystemConfig.simulation #]{
+		if[#  simulate #]{
 			forward sonarsimulator -m sonaractivate : info(ok) 
 			//run sonarConfig.activateSonarSimulated() //usingDomain
 		}else {

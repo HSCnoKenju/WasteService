@@ -15,7 +15,7 @@ Dispatch cmdSonar : cmd(COMAND) // activate deactivate
 Request isActive : req(isActive)
 Reply sonarActive : sonarActive(STATE)
 
-Event sonar : sonar(DISTANCE) 
+Event sonardata : sonardata(DISTANCE) 
 Event ledtrigger : led(CMD) // on - off - blink
 
 
@@ -37,13 +37,13 @@ QActor sonarlatestart context ctx_rpi {
 	
 	State active {
 		
-		forward sonar -m cmdSonar : cmd(activate) 
+		forward sonardata -m cmdSonar : cmd(activate) 
 	}
 	
 }
 
 
-QActor sonar context ctx_rpi {
+QActor sonardata context ctx_rpi {
 	
 	[#
 		
@@ -115,7 +115,7 @@ QActor sonar context ctx_rpi {
 		 if [#( SimDistance >=0 )#] {
 		 	
 		 	
-		emit sonar : sonar($SimDistance)
+		emit sonardata : sonardata($SimDistance)
 		
 		println ("===============================")
 		println("")

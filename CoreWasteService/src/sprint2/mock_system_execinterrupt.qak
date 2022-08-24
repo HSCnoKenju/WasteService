@@ -9,7 +9,7 @@ Reply dopathfail  : dopathfail( ARG )
 
 
 /*===========================	Sprint_2 : RPI	============================ */
-Event sonar : sonar(DISTANCE) 
+Event sonardata : sonardata(DISTANCE) 
 Event stop : stop(ARGS)
 Event resume : resume(ARGS)
 

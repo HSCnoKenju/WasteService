@@ -39,7 +39,7 @@ Reply arrived : info(done)
 
 
 /*===========================	Sprint_2 : RPI	============================ */
-Event sonar : sonar(DISTANCE) 
+Event sonardata : sonardata(DISTANCE) 
 Event ledtrigger : led(CMD) // on - off - blink
 
 Event stop : stop(ARGS)
@@ -200,11 +200,11 @@ QActor threshold_checker context ctxwaste {
 		
 		println(" THRESHOLD_CHECKER | ACCEPTING")
 	}
-	Transition t0 whenEvent sonar -> check
+	Transition t0 whenEvent sonardata -> check
 	
 	
 	State check{
-		onMsg(sonar : sonar(DISTANCE)){
+		onMsg(sonardata : sonardata(DISTANCE)){
 			
 			
 			[#
