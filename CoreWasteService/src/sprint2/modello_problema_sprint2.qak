@@ -504,7 +504,7 @@ QActor waste_service context ctxwaste {
 		#]
 
 
-		updateResource[#"reset to Glass=$Available_Glass Plastic=$Available_Plastic "#]
+		updateResource[#"Glass=$Available_Glass Plastic=$Available_Plastic "#]
 	}
 	Goto accepting
 	
