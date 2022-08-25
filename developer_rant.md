@@ -64,3 +64,45 @@ gli step di wenv (tramite il robotsupport) funzionano che al comando gli invio u
 Es. step(300) ; step(300); ma in mezzo non c'è delay, magari il primo step fa solo 100 e poi arriva subito quello dopo, quindi un totale di step(400)
 
 Aggiungere un CommUtil.delay adeguatamente lungo 
+
+
+> codedqactor e naming
+
+CodedQactor nel metamodello non ha il check sintattico di solo minuscole, MA a livello di compilazione viene automaticamente fatto un ToLowerCase
+* Caso avvenuto: definire un CodedQactor di nome ledSimulator
+* fare forward a ledSimulator, check xtext non dà errore
+* verificato tramite tracing che viene inviato un messaggio a **ledsimulator** (tutto minuscolo)
+    * non lo riconosce come parte del contesto locale, e lo inoltra al remoto
+
+
+> MQTT ed impossibilità di emit locali
+
+quando un contesto viene collegato ad un MQTT broker, tutti gli emit remoti si trasformano in messaggi MQTT e vengono inviati, non più edge to edge MA edge to broker to multiple edge.
+
+Problema 1:
+* non c'è emit locale come espressività di qak_metamodello, quindi anche eventi interni vengono propagati sul canale.
+
+
+Problema 2:
+* Non si può avere il concetto di topic, perchè un context che si sottoscrive a 2 broker, quando fa un emit lo invia per forza ad entrambi(?), non so manco se si può avere più topic per stesso contesto
+
+Problema 3:
+* emit quindi eventi, ma se fatto ad MQTT e si sottoscrivono tutti, ogni attore riceve QUALSIASI evento che arriva da MQTT
+
+
+> qak e distribuzione
+
+Perchè non è stato messo la rule di aggiungere i pl nel file build.gradle??????
+
+
+>
+
+    distributions {
+       main {
+           contents {
+               from './ledqak22.pl'
+               from './sysRules.pl'
+           }
+       }
+   }
+
