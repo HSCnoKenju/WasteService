@@ -29,8 +29,8 @@ Reply dopathfail   : dopathfail( ARG ) 	// 	ARG = PathStillToDo
  
 Context ctxbasicrobot ip [host="localhost" port=8020]  
 
-CodedQActor datacleaner    context ctxbasicrobot className "rx.dataCleaner"
-CodedQActor distancefilter context ctxbasicrobot className "rx.distanceFilter"
+// CodedQActor datacleaner    context ctxbasicrobot className "rx.dataCleaner"
+// CodedQActor distancefilter context ctxbasicrobot className "rx.distanceFilter"
  
 QActor basicrobot context ctxbasicrobot{
 [#
@@ -214,7 +214,7 @@ QActor pathexec context ctxbasicrobot{
 		//printCurrentMessage
 		forward basicrobot -m cmd : cmd($CurMoveTodo) //asynch !!!		
 	}
-	Transition t0 whenTime 345 ->  nextMove  //wait for move done ...
+	Transition t0 whenTime 345  ->  nextMove  //wait for move done ...
   
  	State doMoveW{
 		//printCurrentMessage
