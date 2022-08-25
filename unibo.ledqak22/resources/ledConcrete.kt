@@ -11,39 +11,42 @@ class ledConcrete (name: String) : ActorBasic(name) {
 
     override suspend fun actorBody(msg: IApplMessage) {
 
-        println("$tt $name | received  $msg "  )  //RICEVE GLI EVENTI!!!
+		
+		
+       // println("$tt $name | received  $msg "  )  //RICEVE GLI EVENTI!!!
 
-        if(msg.msgId() == "ledon") {
+        if(!msg.isEvent()) {
+
+            if (msg.msgId() == "ledon") {
 
 
-            try {
-                Runtime.getRuntime().exec("sudo bash led25GpioTurnOn.sh")
+                try {
+                    Runtime.getRuntime().exec("sudo bash led25GpioTurnOn.sh")
 
-            }catch (e : Exception){
-                println("WARNING: ledConcrete does not find led25GpioTurnOn.sh")
+                } catch (e: Exception) {
+                    println("WARNING: ledConcrete does not find led25GpioTurnOn.sh")
+                }
+
+
+            } else if (msg.msgId() == "ledblink") {
+
+                try {
+                    Runtime.getRuntime().exec("sudo bash led25GpioBlink.sh")
+
+                } catch (e: Exception) {
+                    println("WARNING: ledConcrete does not find led25GpioBlink.sh")
+                }
+
+            } else /* led off*/ {
+
+                try {
+                    Runtime.getRuntime().exec("sudo bash led25GpioTurnOff.sh")
+
+                } catch (e: Exception) {
+                    println("WARNING: ledConcrete does not find led25GpioTurnOff.sh")
+                }
+
             }
-
-
-        } else if (msg.msgId() == "ledblink") {
-
-            try {
-                Runtime.getRuntime().exec("sudo bash led25GpioBlink.sh")
-
-            }catch (e : Exception){
-                println("WARNING: ledConcrete does not find led25GpioBlink.sh")
-            }
-
         }
-        else /* led off*/ {
-
-            try {
-                Runtime.getRuntime().exec("sudo bash led25GpioTurnOff.sh")
-
-            }catch (e : Exception){
-                println("WARNING: ledConcrete does not find led25GpioTurnOff.sh")
-            }
-
-        }
-
     }
 }

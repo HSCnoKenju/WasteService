@@ -4,7 +4,6 @@ mqttBroker "broker.hivemq.com" : 1883  eventTopic "unibo/hu/waste"
 // Event  sonardata       : distance( V )   //for the application level
 // Event  thrill          : info(CMD)
 
-
 Event ledtrigger : led(CMD) // on - off - blink
 
 Dispatch ledon : info(on)
@@ -13,60 +12,111 @@ Dispatch ledblink : info(blink)
 
 Context ctxledqak22 ip [host="localhost" port=8065] 
 
-CodedQActor ledSimulator context ctxledqak22 className "ledSimulator"
+CodedQActor ledsimulator context ctxledqak22 className "Ledsimulatorfsm"
 
-CodedQActor ledConcrete context ctxledqak22 className "ledConcrete"
+CodedQActor ledconcrete context ctxledqak22 className "Ledconcretefsm"
 
 
 QActor ledqak22 context ctxledqak22{
 	
-	[# val simulate = true #]
+	[# val simulate = DomainSystemConfig.isSimulation() #]
 	
 	
  	State s0 initial {
 		println("$name STARTS")
 	}
-	Transition t0  whenEvent ledtrigger -> handleTrigger
+	Transition t0  whenEvent ledtrigger -> interpreterTrigger
 	
-	State handleTrigger{
+	State interpreterTrigger{
+		
+		printCurrentMessage
 		onMsg( ledtrigger : led(CMD) ){
 			[# var Cmd = payloadArg(0) #]
+			
+		//	println("payload0 $Cmd")
 			if [# Cmd=="on" #]{
 				
+			//	println("on true")
 				/* orribile ma forward accetta solo qactor come parametro*/
 				
 				if [# simulate#] {
-					forward ledSimulator -m ledon : info(on)
+					
+				//	println("simulate true")
+					forward ledsimulator -m ledon : info(on)
 				}else {
-					forward ledConcrete -m ledon : info(on)
+					forward ledconcrete -m ledon : info(on)
 				}
 				 
+				 
+				 updateResource [#"led(on)"#]
 								
 			}else {
 			
 			if [# Cmd=="blink"#] {
+				
+				//println("blink true")
 					
 				if [# simulate#] {
-					forward ledSimulator -m ledblink : info(blink)
+					forward ledsimulator -m ledblink : info(blink)
 				}else {
-					forward ledConcrete -m ledblink : info(blink)
+					forward ledconcrete -m ledblink : info(blink)
 				}
 			
+			
+				 updateResource [#"led(blink)"#]
 				
 			} else /*off*/ { 
 						
 				if [# simulate#] {
-					forward ledSimulator -m ledoff : info(off)
+					forward ledsimulator -m ledoff : info(off)
 				}else {
-					forward ledConcrete -m ledoff : info(off)
+					forward ledconcrete -m ledoff : info(off)
 				}
 			
+			
+				 updateResource [#"led(off)"#]
 					
 				}
 			}
 			
 		}	 
 	}
-	Transition t0 whenEvent ledtrigger -> handleTrigger
+	Transition t0 whenEvent ledtrigger -> interpreterTrigger
 }
 
+/* 
+QActor ledsimulatorfsm context ctxledqak22 { 
+	
+	State s0 initial {
+		
+		println("$name | STARTS")
+		
+	}
+	
+	Goto waiting
+	
+	
+	
+	State waiting {
+		
+	}
+	Transition t0 whenMsg ledon -> on
+	whenMsg ledoff -> off
+	whenMsg ledblink -> blink
+	
+	
+	State on {
+		
+	}
+	Goto waiting
+	State off {
+		
+	}
+	Goto waiting
+	State blink {
+		
+	}
+	Goto waiting
+}
+
+*/
