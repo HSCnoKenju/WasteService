@@ -16,6 +16,7 @@ QActor trolleyanalyzer context ctxwaste {
 	
 	
 	
+
 	State s0 initial {
 		println("		TROLLEY_ANALYZER | STARTED")	
 	}
@@ -78,14 +79,14 @@ QActor trolleyanalyzer context ctxwaste {
 QActor trolleymock context ctxwaste{
 	
 	State s0 initial{
-		println("TROLLEY_MOCK | ON")
+		println("$name | START")
 	}
-	Goto generate
+	Goto stop
 	
 	State generate {
 		
 	
-		println("TROLLEY_MOCK | ON")
+		println("$name | ON")
 		
         	[#
 		
@@ -96,13 +97,12 @@ QActor trolleymock context ctxwaste{
 		emit robotState : info(false,true,false,$CurTimestamp)
 		
 	}
-	Transition t9 whenTime 1000 -> idle
+	Transition t9 whenTime 10000 -> idle
 	
 	State idle {
 		
-			
 	
-		println("TROLLEY_MOCK | IDLE")
+		println("$name | IDLE")
 		
         	[#
 		
@@ -113,11 +113,11 @@ QActor trolleymock context ctxwaste{
 		emit robotState : info(true,false,false,$CurTimestamp)
 		
 	}
-	Transition t9 whenTime 1000 -> stop
+	//Transition t9 whenTime 1000 -> stop
 	
 	State stop {
 		
-			println("TROLLEY_MOCK | IDLE")
+			println("$name | STOP")
 		
         	[#
 		
@@ -128,5 +128,5 @@ QActor trolleymock context ctxwaste{
 		emit robotState : info(false,false,true,$CurTimestamp)
 	}
 	
-	Transition t9 whenTime 1000 -> generate
+	Transition t9 whenTime 3000 -> generate
 }
