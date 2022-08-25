@@ -115,4 +115,17 @@ application {
     manifest {
         attributes 'Main-Class': "$mainClassName"
     }
+
+distributions {
+       main {
+           contents {
+               from './DomainSystemConfig.json'
+               from './raspcode/led25GpioBlink.sh'
+               from './raspcode/led25GpioTurnOff.sh'
+               from './raspcode/led25GpioTurnOn.sh'
+               from './ledqak22.pl'
+               from './sysRules.pl'
+           }
+       }
+   }
 }
