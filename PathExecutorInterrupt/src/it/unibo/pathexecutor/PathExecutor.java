@@ -10,6 +10,9 @@ import unibo.robot.*;
 import alice.tuprolog.Term;
 import alice.tuprolog.Struct;
 import utils.pathut;
+import utils.timestamputil;
+
+
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -81,6 +84,12 @@ public class PathExecutor extends QakActor22FsmAnnot {
     @Transition(state = "doMoveTurn", guard = "notAheadMove")
     @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void doMove(IApplMessage msg) {
+
+        // Event robotState : info(ATHOME,MOVING,STOPPED,TIMESTAMP)
+
+        String payload = String.format("info(false,true,false,%s)", timestamputil.INSTANCE.TimestampNow());
+        emit(PathExecutorMessages.robotstate(payload));
+
         CommUtils.delay(300);
     }
 
@@ -128,10 +137,9 @@ public class PathExecutor extends QakActor22FsmAnnot {
     @State( name = "stopped" )
     @Transition( state = "resume",  msgId= PathExecutorMessages.ID_resume  )
     protected void stopped( IApplMessage msg ) {
-
         ColorsOut.outappl(this.getName() + "/" + "STOPPED" + " | " + msg, ColorsOut.ANSI_PURPLE);
         // Event robotState : info(ATHOME,MOVING,STOPPED,TIMESTAMP)
-        String payload = String.format("info(false,false,true,%s)", Timestamp.from(Instant.now()).toString());
+        String payload = String.format("info(false,false,true,%s)", timestamputil.INSTANCE.TimestampNow());
         emit(PathExecutorMessages.robotstate(payload));
     }
 
