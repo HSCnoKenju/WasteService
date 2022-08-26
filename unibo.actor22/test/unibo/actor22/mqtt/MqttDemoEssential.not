@@ -4,8 +4,9 @@ import it.unibo.kactor.ApplMessage;
 import it.unibo.kactor.IApplMessage;
 import unibo.comm22.mqtt.MqttAnswerHandler;
 import unibo.comm22.mqtt.MqttConnection;
-import unibo.comm22.utils.ColorsOut;
-import unibo.comm22.utils.CommUtils;
+
+import unibo.actor22comm.utils.ColorsOut;
+import unibo.actor22comm.utils.CommUtils;
  
 public class MqttDemoEssential {
 private String demotopic  = "uniboDemo";

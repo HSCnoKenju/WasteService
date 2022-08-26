@@ -2,8 +2,8 @@ package unibo.actor22.common;
  
 import it.unibo.kactor.IApplMessage;
 import unibo.actor22.*;
-import unibo.comm22.utils.ColorsOut;
-import unibo.comm22.utils.CommUtils;
+import unibo.actor22comm.utils.ColorsOut;
+import unibo.actor22comm.utils.CommUtils;
 
 /*
  * Il controller conosce SOLO I NOMI dei dispositivi 

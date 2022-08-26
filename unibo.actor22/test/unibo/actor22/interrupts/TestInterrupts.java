@@ -4,7 +4,7 @@ import it.unibo.kactor.IApplMessage;
 import unibo.actor22.QakActor22FsmAnnot;
 import unibo.actor22.annotations.*;
 import unibo.actor22comm.SystemData;
-import unibo.comm22.utils.CommUtils;
+import unibo.actor22comm.utils.CommUtils;
 
 public class TestInterrupts extends QakActor22FsmAnnot{
 private  int n = 0;
@@ -43,7 +43,7 @@ private  int limit = 3 ;
 	}
 	
 	//Stato di risposta a interruzione. Al termine faccio resume e torno alle stesse
-	//transizioni di s1, così gestisco demoSysId dopo avere fatto s1_interrupted
+	//transizioni di s1, cosi' gestisco demoSysId dopo avere fatto s1_interrupted
 	@State( name = "s1_interrupted" )
 	protected void end( IApplMessage msg ) {
 		outInfo(""+msg + " stateWithInterrupt=" +  stateWithInterrupt  );

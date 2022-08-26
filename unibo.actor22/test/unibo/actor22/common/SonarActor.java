@@ -5,8 +5,8 @@ import it.unibo.kactor.MsgUtil;
 import it.unibo.radarSystem22.domain.DeviceFactory;
 import it.unibo.radarSystem22.domain.interfaces.*;
 import unibo.actor22.QakActor22;
-import unibo.comm22.utils.ColorsOut;
-import unibo.comm22.utils.CommUtils;
+import unibo.actor22comm.utils.ColorsOut;
+import unibo.actor22comm.utils.CommUtils;
 
 
 public class SonarActor extends QakActor22{

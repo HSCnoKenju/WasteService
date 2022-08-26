@@ -12,13 +12,13 @@ import unibo.actor22.Qak22Util;
 import unibo.actor22.QakActor22;
 import unibo.actor22.common.ApplData;
 import unibo.actor22.common.RadarSystemConfig;
-import unibo.comm22.utils.ColorsOut;
-import unibo.comm22.utils.CommUtils;
+import unibo.actor22comm.utils.ColorsOut;
+import unibo.actor22comm.utils.CommUtils;
 
 
 /*
  * Il SonarActor22 NON riusa gli oggetti del dominio
- * ma ridefinisce l'entità come RISORSA proattiva e reattiva
+ * ma ridefinisce l'entita' come RISORSA proattiva e reattiva
  */
 public class SonarActor22 extends QakActor22{
 	private IDistance curVal ;	 

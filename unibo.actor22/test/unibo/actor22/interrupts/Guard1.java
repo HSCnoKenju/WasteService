@@ -2,7 +2,7 @@ package unibo.actor22.interrupts;
 
  
 import unibo.actor22.interfaces.IGuard;
-import unibo.comm22.utils.ColorsOut;
+import unibo.actor22comm.utils.ColorsOut;
 
 public class Guard1 implements IGuard{
 	protected static int vn ;

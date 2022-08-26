@@ -80,7 +80,7 @@ public class WsConnection extends WebSocketListener implements Interaction2021, 
 
 	@Override
 	public void reply(String msgJson) throws Exception {
-		//myWs.send(msgJson); //non faccio sendALine perchè non interessa la durata
+		//myWs.send(msgJson); //non faccio sendALine perche' non interessa la durata
 		sendALine(msgJson);
 	}
 

@@ -8,11 +8,11 @@ TODO. eliminate the communication details from this level
 package unibo.actor22.ws;
 
 import unibo.actor22.common.ApplData;
-import unibo.comm22.interfaces.IObserver;
-import unibo.comm22.interfaces.Interaction2021;
-import unibo.comm22.utils.ColorsOut;
-import unibo.comm22.utils.CommUtils;
-import unibo.comm22.ws.*;
+import unibo.actor22comm.interfaces.IObserver;
+import unibo.actor22comm.interfaces.Interaction2021;
+import unibo.actor22comm.utils.ColorsOut;
+import unibo.actor22comm.utils.CommUtils;
+import unibo.actor22comm.ws.*;
 import java.util.Observable;
 
 public class ClientUsingWs implements IObserver{

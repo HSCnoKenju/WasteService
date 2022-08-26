@@ -8,8 +8,8 @@ import java.io.Reader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import unibo.comm22.ProtocolType;
-import unibo.comm22.utils.ColorsOut;
+import unibo.actor22comm.ProtocolType;
+import unibo.actor22comm.utils.ColorsOut;
 
 
 
@@ -36,7 +36,7 @@ public class RadarSystemConfig {
 	}
 	
 	public static void setTheConfiguration( String resourceName ) {
-		//Nella distribuzione resourceName è in una dir che include la bin  
+		//Nella distribuzione resourceName e' in una dir che include la bin
 		FileInputStream fis = null;
 		try {
 			ColorsOut.out("%%% setTheConfiguration from file:" + resourceName);
