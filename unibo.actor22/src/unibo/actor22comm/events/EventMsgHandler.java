@@ -1,9 +1,7 @@
 package unibo.actor22comm.events;
 
-import java.util.HashMap;
 import java.util.Vector;
 
-import it.unibo.kactor.ApplMessage;
 import it.unibo.kactor.IApplMessage;
 import kotlin.Pair;
 import unibo.actor22.*;
@@ -48,7 +46,8 @@ protected Vector<Pair<String,String>> eventObservers = new Vector<Pair<String,St
 		}else if( msg.isDispatch() && msg.msgId().equals(Qak22Context.unregisterForEvent)) {
 			unregister(msg.msgSender(), msg.msgContent());
 		}else if( msg.isEvent() ) {
- 			updateTheObservers( msg );
+ 				updateTheObservers( msg );
+			 	propagateRemoteContext(msg);
 		}else {
 			ColorsOut.outerr(myName + " msg unknown");
 		}
@@ -63,6 +62,17 @@ protected Vector<Pair<String,String>> eventObservers = new Vector<Pair<String,St
 		ColorsOut.out(myName + " unregister:" + actorName + " for "+ eventId, ColorsOut.MAGENTA);
 		eventObservers.removeElement( new Pair( actorName , eventId ) );		
 	}
+
+
+	protected void propagateRemoteContext( IApplMessage msg) {
+
+		ColorsOut.out("propagateRemoteContext:" + msg + " distinct proxyAsClient:" + Qak22Context.getAllProxy().stream().distinct().count(), ColorsOut.ANSI_YELLOW);
+
+		Qak22Context.getAllProxy().stream().distinct().forEach(e -> ColorsOut.out(e.getName(),ColorsOut.ANSI_YELLOW));
+		Qak22Context.getAllProxy().stream().distinct().forEach(proxyAsClient -> proxyAsClient.sendMsgOnConnection(msg.toString()));
+	}
+
+
 	protected void updateTheObservers(IApplMessage msg) {
 		ColorsOut.out("updateTheObservers:" + msg + " eventObservers:" + eventObservers.size(), ColorsOut.MAGENTA); 
 		eventObservers.forEach(

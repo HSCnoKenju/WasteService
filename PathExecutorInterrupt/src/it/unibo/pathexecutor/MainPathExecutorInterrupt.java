@@ -1,6 +1,7 @@
 package it.unibo.pathexecutor;
 
 
+import org.checkerframework.checker.units.qual.A;
 import unibo.actor22.Qak22Context;
 import unibo.actor22.Qak22Util;
 import unibo.actor22.annotations.Actor22;
@@ -15,6 +16,7 @@ import unibo.actor22comm.utils.CommUtils;
 @Context22(name = "ctxwaste", host = "127.0.0.1", port = "8033")
 @Actor22(name = PathExecutorMessages.actorName, contextName = "ctxpathexec", implement = PathExecutor.class)
 @Actor22(name=PathExecutorMessages.basicRobotName, contextName = "ctxbasicrobot")
+@Actor22(name= "eventdummy", contextName = "ctxwaste" )
 public class MainPathExecutorInterrupt{
 
 

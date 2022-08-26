@@ -2,6 +2,7 @@ package unibo.actor22;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import unibo.actor22.annotations.Actor22;
@@ -10,15 +11,12 @@ import unibo.actor22.annotations.ActorRemote;
 import unibo.actor22.annotations.Context22;
 import unibo.actor22comm.ProtocolInfo;
 import unibo.actor22comm.ProtocolType;
-import unibo.actor22comm.SystemData;
 import unibo.actor22comm.coap.CoapApplServer;
 import unibo.actor22comm.context.EnablerContextForActors;
 import unibo.actor22comm.events.EventMsgHandler;
 import unibo.actor22comm.proxy.ProxyAsClient;
 import unibo.actor22comm.utils.ColorsOut;
-import unibo.actor22comm.utils.CommUtils;
 
- 
 
 public class Qak22Context {
 	private static HashMap<String,QakActor22> ctxMap      = new HashMap<String,QakActor22>();
@@ -33,11 +31,11 @@ public class Qak22Context {
     public static void setActorAsRemote(String actorName, 
     				String entry, String host, ProtocolType protocol ) {
 			ColorsOut.out("Qak22Context | setActorAsRemote entry=" + entry+ " at " + host + " since:" + actorName, ColorsOut.MAGENTA);
-    	    ProxyAsClient pxy = proxyMap.get(host+"Pxy");
+    	    ProxyAsClient pxy = proxyMap.get(host+"_"+entry+"_Pxy");
      		if( pxy == null ) { //un solo proxy per contesto remoto
-	    		pxy = new ProxyAsClient(host+"Pxy", host, entry, protocol);
+	    		pxy = new ProxyAsClient(host+"_"+entry+"_Pxy", host, entry, protocol);
 	    		ColorsOut.out("Qak22Context | CREATED proxy for " + host + " since:" + actorName, ColorsOut.MAGENTA);
-	    		proxyMap.put(host+"Pxy", pxy);
+	    		proxyMap.put(host+"_"+entry+"_Pxy", pxy);
     		}else {
 	    		ColorsOut.out("Qak22Context | EXISTS proxy for " + host + " since:" + actorName, ColorsOut.MAGENTA);  			
     		}
@@ -45,6 +43,13 @@ public class Qak22Context {
     }
     
 
+    public static Collection<QakActor22> getAllContext (){
+
+        return  ctxMap.values();
+    }
+    public static Collection<ProxyAsClient> getAllProxy(){
+        return  proxyMap.values();
+    }
 	public static void addActor( QakActor22 a ) {	
         ctxMap.put(a.getName(), a );
     }
