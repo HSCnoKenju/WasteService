@@ -3,8 +3,9 @@
  * Usa MQTT
  */
 
+
 System /*-trace*/ sonarqak22
-mqttBroker "broker.hivemq.com" : 1883  eventTopic "unibo/nat/radar"
+mqttBroker "broker.hivemq.com" : 1883  eventTopic "unibo/hu/radar"
  
 Dispatch sonaractivate   : info(ARG)
 Dispatch sonardeactivate : info(ARG)

@@ -13,12 +13,12 @@ import kotlinx.coroutines.runBlocking
  */
 
 class sonarSimulator ( name : String ) : ActorBasic( name ) {
-	var goon = true
-	val data = sequence<Int>{
+	private var goon = true
+	private val data = sequence<Int>{
 		var v0 = 80
 		yield(v0)
 		while(true){
-			v0 = v0 - 5
+			v0 -= 3
 			yield( v0 )
 		}
 	}
@@ -29,18 +29,23 @@ class sonarSimulator ( name : String ) : ActorBasic( name ) {
 		if( msg.msgId() == "sonardeactivate") goon=false
 	}
 
-	suspend fun startDataReadSimulation(    ){
-  			var i = 0
-			while( i < 10 && goon ){
- 	 			val m1 = "distance( ${data.elementAt(i*2)} )"
+	private suspend fun startDataReadSimulation(    ){
+
+		while(goon){
+
+			var i = 0
+			while( i < 10  ){
+				val m1 = "distance( ${data.elementAt(i*2)} )"
 				i++
- 				val event = MsgUtil.buildEvent( name,"sonar",m1)								
-  				emitLocalStreamEvent( event )
- 				//println("$tt $name | generates $event")
- 				//emit(event)  //APPROPRIATE ONLY IF NOT INCLUDED IN A PIPE
- 				delay( 500 )
-  			}			
-			terminate()
+				val event = MsgUtil.buildEvent( name,"sonar",m1)
+				emitLocalStreamEvent( event )
+				//println("$tt $name | generates $event")
+				//emit(event)  //APPROPRIATE ONLY IF NOT INCLUDED IN A PIPE
+				delay( 500 )
+			}
+
+		}
+  			terminate()
 	}
 
 } 
