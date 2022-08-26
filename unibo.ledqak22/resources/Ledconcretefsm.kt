@@ -10,6 +10,8 @@ import java.lang.Exception
 
 class Ledconcretefsm (name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope ){
 
+	private var ledstate  = 0  // 0 off 1 blink 2 on
+
 	override fun getInitialState() : String{
 		return "s0"
 	}
@@ -29,16 +31,19 @@ class Ledconcretefsm (name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 					transition(edgeName="t04",targetState="blink",cond=whenDispatch("ledblink"))
 				}	 
 				state("on") { //this:State
+
+
 					action { //it:State
 						try {
 							Runtime.getRuntime().exec("sudo bash led25GpioTurnOn.sh")
 
 						} catch (e: Exception) {
 							println("WARNING: ledConcrete does not find led25GpioTurnOn.sh")
-
 						}
+						ledstate = 2
+					}
 					 transition( edgeName="goto",targetState="waiting", cond=doswitch() )
-				}
+
 
 				}
 				state("off") { //this:State
@@ -50,19 +55,25 @@ class Ledconcretefsm (name: String, scope: CoroutineScope  ) : ActorBasicFsm( na
 						} catch (e: Exception) {
 							println("WARNING: ledConcrete does not find led25GpioTurnOff.sh")
 						}
-
+						ledstate = 0
 					}
+
 					 transition( edgeName="goto",targetState="waiting", cond=doswitch() )
 				}	 
 				state("blink") { //this:State
 					action { //it:State
-						try {
-							Runtime.getRuntime().exec("sudo bash led25GpioBlink.sh")
 
-						} catch (e: Exception) {
-							println("WARNING: ledConcrete does not find led25GpioBlink.sh")
+						if (ledstate != 1) { /*only if is not already blinking*/
+							try {
+								Runtime.getRuntime().exec("sudo bash led25GpioBlink.sh")
+
+							} catch (e: Exception) {
+								println("WARNING: ledConcrete does not find led25GpioBlink.sh")
+							}
+							ledstate = 1
 						}
 					}
+
 					 transition( edgeName="goto",targetState="waiting", cond=doswitch() )
 				}	 
 			}
