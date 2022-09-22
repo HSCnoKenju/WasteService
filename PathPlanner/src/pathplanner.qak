@@ -18,7 +18,7 @@ Dispatch cmd       : cmd(MOVE)
 Request step       : step( TIME )	
 Reply   stepdone   : stepdone(V)  
 Reply   stepfail   : stepfail(DURATION, CAUSE)
-Event alarm        : alarm(X)
+//Event alarm        : alarm(X)
 
 /* =============       WASTE SERVICE         ============================= */
 
