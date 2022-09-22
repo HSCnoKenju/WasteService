@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+
+@Author Antonio Hu
+-->
+<link rel="stylesheet" href="css/basic.css">
+<link rel="stylesheet" href="css/presentation.css">
+    
+<head>
+   
+    <title>Waste Service: Analisi di progetto</title></head>
+        
+    <body>
+    <div id="top">
+    <h1>LABORATORIO DI INGEGNERIA DEI SISTEMI SOFTWARE <font size="5"></font> </h1>
+    </div>  
+    
+    <div class="body"> 
+    <h1>Introduction</h1>
+     
+    <p>Tema finale corso di studio <b>Ingegneria dei sistemi software</b>, Laurea Magistrale Università di Bologna </p> 
+    
+ 
+ 
+<h1>Requirements</h1>
+
+ 
+<div class="remark">
+    <p>The <cite>WasteService</cite> must create a <span class="blue">WasteServiceStatusGUI</span> that shows to the <em>Service-manager</em>:</p>
+    <ul>
+    <li><p>the current state of the <cite>transport trolley</cite> and it position in the room</p></li>
+    <li><p>the current weigth of the material stored in the two waste-containers</p></li>
+    <li><p>the current state of the <cite>Led</cite></p></li>
+    </ul>
+</div>
+
+ 
+
+<h1>Requirement analysis</h1>
+
+ 
+<div class="remark">
+    
+    <p>The <cite>WasteService</cite> must create a <span class="blue">WasteServiceStatusGUI</span> that <b class="red">shows to the Service-manager</b></p>
+   
+    <ul><li> <span class="red">visibilità</span>: la gui è dedicata al Service-manager?, altri utenti hanno possibilità di accedere a queste informazioni?  </li></ul>
+
+    <p>the current <span class="red"> state of the <cite>transport trolley</cite>  </span>  and it <span class="red">position</span>  in the room</p>
+    <ul>
+        <li> <b class="red">state-precision(trolley)</b>  : cosa si intende per stato del trolley? Esecuzione, Stopped e Home (Idle)?</li>
+        <li><b class="red">position-precision</b> : fino che precisione arriva la posizione? Devo comunicare esattamente le cordinate? Devo comunciare il "luogo" (Home,Plastic,Glass,Indoor)?</li>
+    </ul>
+
+    <p>the current <span class="red">state of the <cite>Led</cite></span> </p>
+
+    <ul><li> <b class="red">state-precision(led)</b>  : cosa si intende per stato del led? la funzione che sta eseguendo in questo momento(on, off, blink)?
+    </li></ul>
+
+    <p>the  <span class="blue"> current weigth of the material</span>  stored in the two waste-containers</p>
+
+    <ul><li> <span class="blue">weight</span> : l'utente deve conoscere il peso attuale, non la capacità rimanente</li>
+    </ul>
+
+
+
+    <h4>Modello dei requisiti</h4>
+
+    <p>Non c'è nessuna interazione dettata da requisiti, so solo che interagirà con il sistema un componente di nome <span class="blue">WasteServiceStatusGUI</span> la quale può essere acceduta sicuramente da un utente nominato Service-manager</p>
+
+</div>
+    
+ 
+
+
+
+<h1>Problem analysis</h1>
+
+ 
+<div class="remark">
+   
+
+    <h4>visibilità</h4>
+
+    <p>Se la GUI di per sè espone contenuti sensibili, della quale solamente il Service-manager può avere accesso, allora è necessario aggiungere strumenti di autenticazione ed identificazione di Service-manager rispetto agli altri utenti.</p>
+    <p>In caso contrario, ovvero che viene richiesto che la GUI possa essere vista anche dal Service-manager, il Service-manager non subisce nessuna distinzione rispetto ad altri utenti che arrivano alla GUI</p>
+
+
+    <h4>state-precision(trolley)</h4>
+
+    <p>Ragionando sull'utilità dei possibili domini di precisione, rispetto al titolo dell'utente citato nei requisiti, l'analista pensa che siano necessari informazioni di alto livello quali il trolley funzioni (RUNNING), sia a riposo ( HOME) oppure è temporaneamente fuori servizio (STOP)</p>
+    
+    <h4>position-precision</h4>
+
+    <p> stesso ragionamento di state-precision(trolley), all'utente target l'analista pensa che gli interessi solo ad alto livello dove è situato il trolley, e non la coordinata esatta all'interno dello spazio</p>
+    
+    <h4>state-precision(led)</h4>
+    
+    <p>stesso ragionamento di state-precision(trolley), led on, off e blink</p>
+    
+    <h3>polling vs push</h3>
+    <p> Un punto non citato dai requisiti ma di spontanea riflessione, la GUI da progettare è un componente passivo, ovvero che non deve modificare nessun dato e deve inviare dati alle altre parti del sistema attorno progettato negli sprint scorsi, quindi la GUI deve solo ricevere gli aggiornamenti inviati da altre parti del sistema, senza richiederli (tranne informazioni di keep-alive).</p>
+    
+</div>
+<h1>Test plans</h1> 
+
+ 
+<div class="remark">
+    
+
+    <h4>state-trolley</h4>
+
+    <p>on an uninterrupted route, the state of trolley is HOME-RUNNING-HOME</p>
+
+    <p>repeat the last test, simulate and interruptiong; the state of trolley should evolve like HOME-RUNNING-STOP-RUNNING-HOME</p>
+
+
+    <h4>trolley-position</h4>
+    <p></p>
+
+    <h4>state-led</h4>
+    <p>play with led with an sequence of operation, and let the GUI reproduce the same sequence</p>
+
+
+
+    <h4>weight</h4>
+    <p>make one request, when the request is finished on the UI the weight must be added on the total weight</p>
+
+    </div>
+    
+
+<h1>Project</h1> 
+
+ 
+<div class="remark">
+    <p>Se sfruttiamo l'equivalenza tra attori(qak) e risorse osservabili il terzo sprint viene enormemente semplificato.</p>
+    <p>La GUI da progettare osserva appositi attori come risorse, dato che sono loro a modificare la risorsa(quindi l'informazione) interessata. </p>
+    <p>Nello specifico:</p>
+
+
+    <ul>
+        <li>info : attore</li>
+        <li>weight : waste_service </li>
+        <li>position : trolley_facade</li>
+        <li>trolley-state : trolley_analyzer</li>
+        <li>led_state : ledqak</li>
+    </ul>
+    </div>
+     
+
+<h1>Testing</h1> 
+
+ 
+<div class="remark">
+    Copy here the EXACT text fiven by the customer.
+    </div>
+     
+
+<h1>Deployment</h1> 
+
+ 
+<div class="remark">
+    Copy here the EXACT text fiven by the customer.
+    </div>
+    
+ 
+<h1>Maintenance</h1> 
+
+ 
+<div class="remark">
+    Copy here the EXACT text fiven by the customer.
+    </div>
+     
+<!-- USEFUL
+<table style="width:100%" border="1">
+<tr>
+@Author Antonio Hu
+<td style="width:50%">
+</td>
+<td></td>
+</tr>
+</table>
+-->
+	
+
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+By student Name Antonio Hu email: antonio.hu@studio.unibo.it  <br>
+github:
+<img src="./img/emiglio.png" alt="mbot" width="15%" height="15%">
+</div> 
+</body>
+</html>
