@@ -29,9 +29,10 @@ CodedQActor datacleaner    context ctxsonarqak22 className "dataCleaner"
 
 
 QActor sonarqak22 context ctxsonarqak22{
-	[# val simulate       = true
-	   val sonarActorName = "sonarqak22"
-	   val usingDomain    = false
+	[# 
+		val simulate       = DomainSystemConfig.isSimulation()
+	   	val sonarActorName = "sonarqak22"
+	   	val usingDomain    = false
 	#]
 	State s0 initial {
 		//printCurrentMessage
@@ -76,9 +77,15 @@ QActor sonarqak22 context ctxsonarqak22{
 }
 
 QActor sonarmastermock context ctxsonarqak22{
+	
+	[#
+	
+		val SonarTimeout =	DomainSystemConfig.getSonarTimeout()
+	#
+	]
 	State s0 initial {
 		forward sonarqak22 -m sonaractivate : info(ok)
-		delay 10000 
+		delayVar SonarTimeout
 		forward sonarqak22 -m sonardeactivate : info(ok)
 	}
 } 
