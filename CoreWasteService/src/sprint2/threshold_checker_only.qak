@@ -46,7 +46,7 @@ QActor thresholdchecker context ctxwaste {
 			
 			
 			[#
-				
+			
 				var Distance = payloadArg(0).toInt()
 				
 				HigherThanLimit = (Distance >= DLIMIT) 
