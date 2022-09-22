@@ -310,7 +310,7 @@ cd CoreWasteService ; ./gradlew test
         </tbody>
         </table>
 
-        <p>I componenti che hanno più senso di essere sensibili ad stop/resume sono PATH_EXECUTOR oppure basicrobot; l'analista nota che la <b> procedura di recupero </b> per la parte di mossa non terminata può essere arbitrariamente <b> complessa </b> .</p>
+        <p>I componenti che hanno più senso di essere sensibili ad stop/resume sono PATH_EXECUTOR oppure basicrobot; l'analista nota che la <b> procedura di recupero </b> per la <span class="red"> parte di mossa non terminata </span> può essere arbitrariamente <b> complessa</b>. (preferisce rendere interrompibile il path_executor invece che il basicrobot) </p>
 
 
     <h5> <k> ledMultipleSources </k> </h5>
@@ -350,6 +350,60 @@ cd CoreWasteService ; ./gradlew test
     
     <p>L'argomento in gioco è la coordinazione tra processi interagenti distribuiti; una soluzione possibile consiste nell'addottamento di un ordinamento tramite tempo (fisico o logico); sarebbe che il ricevente (in questo caso il traduttore trolley -> led) si salva il timestamp (o equivalente) dell'ultimo messaggio tradotto, ed ignora i messaggi successivi con timestamp inferiore.</p>
 
+    <table>
+      <thead>
+        <tr>
+          <th>PROBLEMA</th>
+          <th>soluzione adottata</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>distance- modalità </td>
+          <td> pattern observer</td>
+        </tr>
+        <tr>
+          <td>distance- interazione</td>
+          <td>evento; il singolo messaggio non è importante perchè quello successivo è simile</td>
+        </tr>
+        <tr>
+          <td>threshold</td>
+          <td>componente stand-alone da sonar e trolley</td>
+        </tr>
+        <tr>
+          <td>threshold- contesto</td>
+          <td> contesto trolley, il contesto del sonar è indipendente dall'applicazione </td>
+        </tr>
+        <tr>
+          <td>threshold- interazione</td>
+          <td> evento; "eredito" la caratteristica della distanza misurata dal sonar (la singola informazione non è importante) </td>
+        </tr>
+        
+        <tr>
+          <td>interrupt- component </td>
+          <td>PATH_EXECUTOR con possibilità di interruzione, la singola mossa in esecuzione viene terminata</td>
+        </tr>
+        <tr>
+          <td>led- frequenza </td>
+          <td>HOME ed STOPPED vengono inviati "una volta" e non ri-trasmessi, MOVING viene inviato ad ogni effettivo movimento </td>
+        </tr>
+        
+        <tr>
+          <td>led- interazione </td>
+          <td>evento (?) sicuro per il blink (singolo messaggio non importante), ma <b> non tanto sicuro per HOME e STOPPED</b> </td>
+        </tr>
+        <tr>
+          <td>led- componente</td>
+          <td>componente stand-alone, che raccoglie da tutte le fonte ed è l'unico ad emettere trigger per il led</td>
+        </tr>
+
+        <tr>
+          <td>led- coerenza ed ordinamento</td>
+          <td>logica del ignorare messaggi che sono stati inviati prima (timestamp inferiore) dell'ultimo ricevuto</td>
+        </tr>
+      </tbody>
+      </table>
+
 </div>
      
 
@@ -357,16 +411,68 @@ cd CoreWasteService ; ./gradlew test
 
  
 <div class="remark">
-    Copy here the EXACT text fiven by the customer.
-    </div>
+  <h3>alarm</h3>
+
+  <h4>led-regime</h4>
+  <p> Eseguire un percorso intero (home-indoor-glass/plastic-home), verificare che per tutto il tragitto il led lampeggia, mentre quando è nella posizione HOME il led si spegne</p>
+
+  <h4>interrupt-happen</h4>
+  <p>Eseguire un percorso intero con due interruzioni-resume di delay arbitrario e verificare che effettivamente il trolley è fermo in quell'arco di tempo</p>
+  
+  <h4>interrupt-led</h4>
+  <p>Ripetere <b>interrupt-happen</b>, inserendo il led all'interno del sistema testato da <b>led-regime</b> verificare che oltre al comportamento a regime, quando il led è acceso il trolley è effettivamente fermo</p>
+
+  <h4>sonar-source</h4>
+  <p>Inserire il componente sonar-mock in stile alternato, verificare che le traduzioni siano corrette e poi far partire il sistema comprensivo di led</p>
+
+  <h4>sonar-real</h4>
+  <p>Inserire il componente sonar reale</p>
+</div>
     
 
 <h1>Project</h1> 
 
  
 <div class="remark">
-    Copy here the EXACT text fiven by the customer.
-    </div>
+    
+
+  <h3>qak and interrupt ?</h3>
+
+  <p>Nel qak attuale (1.2.6) gli attori auto-generati non predispongono del supporto per la semantica di messaggi-interruzione; il progettista si ricorda durante lo svolgimento di altri progetti una implementazione già fatta per il supporto di interrupt per attori come macchine a stati finiti. </p>
+
+  <p>La versione java, wrapper per kactor implementa il concetto di interruzione tramite un meccanismo di salvataggio della tabella delle transizioni dello stato interrotto; siamo quindi dinanzi a due possibilità.</p>
+
+
+  <h4>priorità qak</h4>
+  <p> una idea di implementazione possibile per mantenere tutto all'interno del mondo qak è di creare stati stop-resume per <b class="red"> ognuno degli stati </b> delle FSM interrompibili, questi stati-dummy di resume hanno tutti lo stesso corpo, ma copiano la tabella delle transizione dello stato sospeso. </p>
+    
+  <h4>priorità interrupt</h4>
+
+  <p> l'altra idea di implementazione che ci evita la riscrittura di questi stati dummy (alla peggio una copia di tutti i stati della FSM interrompibile), è appunto di esternare le FSM interrompibili dal mondo qak, e implementarli in java come istanze di <b class="blue"> unibo.actor22.QakActor22FsmAnnot </b>, questo significa però che perdiamo la snellità e l'<b class="red"> alto livello del meta-modello qak</b> creato per questi componenti, quindi la semplicità di definire il sistema interessato al componente, i messaggi ad esso rilevanti etc etc. </p>
+
+  <p>Inoltre bisogna verificare se effettivamente si riesce a far comunicare i due mondi.</p>
+
+
+  <p><b>Scelta del progettista</b> è di dare priorità all'interrupt, quindi di utilizzare l'implementazione java, per i seguenti due motivi:</p>
+
+  <ul>
+    <li>Poca scalabilità dell'altra soluzione, appunto ci sarebbe una proliferazione di stati interni dei componenti interrompibili</li>
+    <li>Il concetto interruzione è già stato implementato, il lavoro è principalmente di integrazione dei due mondi e non dello sviluppo in sè della funzionalità</li>
+  </ul>
+
+  <h3> integration problems</h3>
+
+  <ul>
+    <li>la versione Java non supporta la semantica di messaggio  <b>evento esterno</b>, un non attore non può interagire tramite evento con il sistema </li>
+    <li>gli eventi emessi dal contesto non vengono propagati ai contesti remoti associati</li>
+    <li>non è presente il supporto al protocollo MQTT, di per se non sarebbe un problema ma i contesti qak che supportano MQTT, inviamo esclusivamente messaggi MQTT anche se il ricevente non supporta tale protocollo, facendo sì che dato che PathExecutor non può ricevere MQTT, wasteService non può lavorare con MQTT e di conseguenza con lo stesso pensiero nessun altro contesto</li>
+  </ul>
+
+  <h3>componenti digital Twins</h3>
+
+  <p>Led e sonar vengono copiati e leggermente modificati rispettivamente da unibo.ledqak22 ed unibo.sonarqak22, essendo componenti sviluppati precedentemente dalla software house e messi a disposizione</p>
+  <p>Per facilità di testing ogni componente segue una versione simulata, e la scelta tra quali delle due attivare è data da un file di configurazione esterno</p>
+</div>
      
 
 <h1>Testing</h1> 
@@ -381,7 +487,11 @@ cd CoreWasteService ; ./gradlew test
 
  
 <div class="remark">
-    Copy here the EXACT text fiven by the customer.
+    
+  <p>i file gradle contengono in generale anche il deploy della conoscenza del sistema (file pl)</p>
+  <p> inoltre per alcuni specifici il deploy può includere scripts oppure file json</p>
+
+
     </div>
     
  
