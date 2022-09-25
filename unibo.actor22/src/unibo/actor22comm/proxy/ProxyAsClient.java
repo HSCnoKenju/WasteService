@@ -41,7 +41,7 @@ protected ProtocolType protocol ;
 			case tcp : {
 				int port = Integer.parseInt(entry);
 				//conn = new TcpConnection( new Socket( host, port ) ) ; //non fa attempts
-				conn = TcpClientSupport.connect(host,  port, 10); //10 = num of attempts
+				conn = TcpClientSupport.connect(host,  port, 100); //100 = num of attempts
 				ColorsOut.out(name + " |  setConnection "  + conn, ColorsOut.BLUE );		
 				break;
 			}
@@ -56,7 +56,7 @@ protected ProtocolType protocol ;
 			}
 			case mqtt : {
 				//La connessione col Broker viene stabilita in fase di configurazione
-				//La entry � quella definita per ricevere risposte;
+				//La entry e' quella definita per ricevere risposte;
 				//ColorsOut.out(name+"  | ProxyAsClient connect MQTT entry=" + entry );
 				//conn = MqttConnection.getSupport();					
  				break;

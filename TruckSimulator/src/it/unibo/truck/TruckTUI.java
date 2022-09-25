@@ -164,7 +164,7 @@ public class TruckTUI {
                      String   reply_1 = connTcp.request(wasteRequestStr_1);
                         System.out.println("esito prima richiesta :" + reply_1);
                         String   reply_2 = connTcp.request(wasteRequestStr_2);
-                        System.out.println("esito prima richiesta :" + reply_2);
+                        System.out.println("esito seconda richiesta :" + reply_2);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }

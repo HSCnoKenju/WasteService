@@ -12,7 +12,8 @@ Dispatch sonardeactivate : info(ARG)
 Event    sonar           : distance( V )   //emitted by sonarSimulator or sonardatasource	
 Event    sonardata       : distance( V )   //for the application level
 
-Context ctxsonarqak22 ip [host="localhost" port=8080] 
+Context ctxwaste ip [ host="127.0.0.1" port=8033]
+Context ctxsonarqak22 ip [host="localhost" port=8061] 
 
 //DATA SOURCES
 CodedQActor sonarsimulator  context ctxsonarqak22 className "sonarSimulator"  
@@ -63,7 +64,7 @@ QActor sonarqak22 context ctxsonarqak22{
   	State handleSonarData{
   		 onMsg( sonar : distance(D) ){
    		 	[# val D = payloadArg(0) #]  
-  		    //println("%%%%%%%%%%%%%%%%%%%%%%%%%%% emit %%%%%%%%%%%%%%% ${D}")
+  		    println("%%%%%%%%%%%%%%%%%%%%%%%%%%% emit %%%%%%%%%%%%%%% ${D}")
   		 	emit sonardata : distance($D) //for the application
   		 }
   	}
@@ -81,12 +82,18 @@ QActor sonarmastermock context ctxsonarqak22{
 	[#
 	
 		val SonarTimeout =	DomainSystemConfig.getSonarTimeout()
+		
+		val SonarEndless = DomainSystemConfig.isSonarEndless()
 	#
 	]
 	State s0 initial {
 		forward sonarqak22 -m sonaractivate : info(ok)
+		
+		if [# !SonarEndless#]{
+		
 		delayVar SonarTimeout
 		forward sonarqak22 -m sonardeactivate : info(ok)
+	}
 	}
 } 
 

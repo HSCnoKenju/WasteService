@@ -55,164 +55,123 @@ Event robotState : info(ATHOME,MOVING,STOPPED,TIMESTAMP)
 
 Context ctxpathexec ip [host="127.0.0.1" port=8049]
 Context ctxpathplanner   ip [host="127.0.0.1" port=8078]
-Context ctx_rpi ip [ host= "127.0.0.1" port= 8099]
+Context ctxledqak22 ip [host="127.0.0.1" port=8065] 
 Context ctxwaste ip [ host="localhost" port=8033]
 
 ExternalQActor pathplanner context ctxpathplanner
 
 
 
-
-QActor trolley_analyzer context ctxwaste {
-	
+QActor trolleyanalyzer context ctxwaste {
 	[# 
 		var LastStatusTimestamp = timestamputil.TimestampMin() 
 		var stopped = true
 		var continuos = false
-		
-		#
-	]
+	#]
 	
+
+	
+	
+
 	State s0 initial {
-		println("		TROLLEY_ANALYZER | STARTED")	
+		// println("		TROLLEY_ANALYZER | STARTED")	
 	}
 	Goto accept
 	
-	
 	State accept {
-		println("		TROLLEY_ANALYZER | ACCPEPTING")	
+		// println("		TROLLEY_ANALYZER | ACCPEPTING")	
 	}
-	
 	Transition t0 whenEvent robotState ->  check_stopped
 	
-	
 	State check_stopped {
-		println("		TROLLEY_ANALYZER | CHECK_STOPPED")	
-		printCurrentMessage
-		
+		//println("		TROLLEY_ANALYZER | CHECK_STOPPED")	
+		//printCurrentMessage
 		onMsg ( robotState : info(ATHOME,MOVING,STOPPED,TIMESTAMP)) {
 			[#
-				
 				var CurrentTimestamp = payloadArg(3)
-				
-				
-			 	// controllo messaggio più nuovo
-			 	
-			if	(timestamputil.TimestampBefore(LastStatusTimestamp,CurrentTimestamp)) {
-			 	
 			 	var Ahomeinput = payloadArg(0).toBoolean()
-			 	
 			 	var Movinginput = payloadArg(1).toBoolean()
 			 	var Stoppedinput = payloadArg(2).toBoolean()
-			 	
-			 	
 			 	#]
-			 	
-			 	
 			 	println("CurrentTimestamp=$CurrentTimestamp Ahomeinput=$Ahomeinput Movinginput=$Movinginput  Stoppedinput=$Stoppedinput ")
-			 	
 			 	[#
-			 	
-			 	
 			 	if (Ahomeinput && !Movinginput  && !Stoppedinput ){
 			 		stopped = false
 			 		continuos = true
 #]
-
+					
+					updateResource [#"trolleyState(idle)"#]
 					emit ledtrigger : led(off) // on - off - blink
 [#			 		
 			 	} else if (!Ahomeinput && Movinginput && !Stoppedinput ){
-			 		
 			 		stopped = false 
 			 		continuos = false
 #]
+					updateResource [#"trolleyState(working)"#]
 					emit ledtrigger : led(blink) // on - off - blink
-
 [#
 			 	} else if (!Ahomeinput && !Movinginput && Stoppedinput ) {
-			 		
 			 		stopped = true 
 			 		continuos = false
-			 		
 #]
-
+					updateResource [#"trolleyState(stopped)"#]
 					emit ledtrigger : led(on) // on - off - blink
 [#
 			 	}
-			 	
 			 	else {
-			 		
 			 		// msg format error
-			 		
 			 		#]
-			 		
 			 		println("TROLLEY_ANALYZER	|	MSG FORMAT ERROE")
 			 		[#
 			 	}
-			 	
-			 	
 			 	LastStatusTimestamp =  CurrentTimestamp
-			 	
-			 	
-			  }else {
-			 	
-			 	// TimeStamp old 
-			 #]
-			 	
-			 		println("TROLLEY_ANALYZER	|	TIMESTAMP TOO OLD")
-			 		
-			 	[#
-			 }
+			
+			
 			
 			#]
 		}
-		
 	}
 	Transition t0 whenEvent robotState ->  check_stopped
-	
-	
-	
-	
-	
-	
-	
-}
+	}
 
 
-QActor threshold_checker context ctxwaste {
+QActor thresholdchecker context ctxwaste {
 	
 	
 	[#
 	
-	val DLIMIT = 15
+	val DLIMIT = 40
 	
 	var HigherThanLimit = false
 		
 	#]
 	
 	State s0 initial {
-		println("		THRESHOLD_CHECKER | STARTED")	
+		//println("		THRESHOLD_CHECKER | STARTED")	
 	}
 	Goto accept
 	
 	
 	State accept {
 		
-		println(" THRESHOLD_CHECKER | ACCEPTING")
+		//println(" THRESHOLD_CHECKER | ACCEPTING")
 	}
 	Transition t0 whenEvent sonardata -> check
 	
 	
 	State check{
-		onMsg(sonardata : sonardata(DISTANCE)){
+		
+		//printCurrentMessage
+		
+		onMsg(sonardata : distance(DISTANCE)){
 			
 			
 			[#
-				
+			
 				var Distance = payloadArg(0).toInt()
 				
 				HigherThanLimit = (Distance >= DLIMIT) 
-				
+			
 				
 			#]
 		}
@@ -296,7 +255,12 @@ QActor transporttrolley context ctxwaste { // trolley_facade
 	
 	State accepting {
 		
-		[# resourceappender.initResource()	#]
+		[# resourceappender.initResource()
+			
+			resourceappender.add("position(")
+			
+			#
+		]
 		
 		printCurrentMessage
 		println("		TRANSPORT TROLLEY | NEW WORK")	
@@ -307,7 +271,7 @@ QActor transporttrolley context ctxwaste { // trolley_facade
 	State goingIndoor {
 		
 		[#resourceappender.add("ACCEPTED")#]	
-		updateResource[#"resourceappender.getStr()"#]
+		updateResource[#resourceappender.getStr()+")"#]
 		
 		onMsg ( goal : destination(CONTAINER) ){
 			[#
@@ -332,7 +296,7 @@ QActor transporttrolley context ctxwaste { // trolley_facade
 	
 		
 			[#resourceappender.add("INDOOR")#]		
-		updateResource[#"resourceappender.getStr()"#]
+		updateResource[#resourceappender.getStr()+")"#]
 			
 			
 		
@@ -358,7 +322,7 @@ QActor transporttrolley context ctxwaste { // trolley_facade
 	
 	State arriveContainer {
 		[#resourceappender.add("$CurrentType")#]
-		updateResource[#"resourceappender.getStr()"#]
+		updateResource[#resourceappender.getStr()+")"#]
 		
 		replyTo goal with workdone : info(done)
 	 	println("		TRANSPORT TROLLEY | $CurrentType")	
@@ -388,7 +352,7 @@ QActor transporttrolley context ctxwaste { // trolley_facade
 	
 	State arriveHome{
 		[#resourceappender.add("HOME")#]
-		updateResource[#"resourceappender.getStr()"#]
+		updateResource[#resourceappender.getStr()+")"#]
 		
 		[#
 		
@@ -405,13 +369,13 @@ QActor transporttrolley context ctxwaste { // trolley_facade
 	
 }
 
-
+/* 
 QActor waste_truck_mock context ctxwaste {
 	
 	State s0 initial {
 		println("		WASTE_TRUCK GENERATOR | STARTED")
 	}
-	/*Goto newLoad*/
+	//Goto newLoad
 	
 	State newLoad{
 			println("		WASTE_TRUCK GENERATOR | NEW REQUEST")
@@ -439,6 +403,7 @@ QActor waste_truck_mock context ctxwaste {
 	
 }
 
+*/
 
 
 
@@ -487,6 +452,8 @@ QActor waste_service context ctxwaste {
 		}
 	Transition t0 whenRequest waste -> check_availability
 				  whenMsg 	reset -> reset_weights
+				  whenReply workdone -> lost_pickup 
+				  whenEvent pickup -> updateWeights		
 				  
 	
 	
@@ -504,7 +471,7 @@ QActor waste_service context ctxwaste {
 		#]
 
 
-		updateResource[#"Glass=$Available_Glass Plastic=$Available_Plastic "#]
+		updateResource[#"weights(Glass=$Available_Glass Plastic=$Available_Plastic)"#]
 	}
 	Goto accepting
 	
@@ -532,7 +499,7 @@ QActor waste_service context ctxwaste {
 			if [# (Available)#] {
 			//replyTo waste with  loadAccept : info(ok)
 			} else {
-			updateResource [# "Glass=$Available_Glass Plastic=$Available_Plastic"#]
+				updateResource[#"weights(Glass=$Available_Glass Plastic=$Available_Plastic)"#]
 			replyTo waste with  loadRejected : info(rip)
 			}			
 		}
@@ -564,7 +531,7 @@ QActor waste_service context ctxwaste {
 					}
 	
 		#]
-		updateResource [# "Glass=$Available_Glass Plastic=$Available_Plastic"#]
+			updateResource[#"weights(Glass=$Available_Glass Plastic=$Available_Plastic)"#]
 		replyTo waste with loadAccept : 	info(ok)
 		
 	}
@@ -581,14 +548,14 @@ QActor waste_service context ctxwaste {
 						Available_Plastic -= RequestedWeight 
 					}
 			else 
-					{	
+					{
 						println("WASTE_SERVICE | ERROR UPDATE WEIGHTS")
 
 					}
 	
 			#]
 			
-		updateResource [# "Glass=$Available_Glass Plastic=$Available_Plastic"#]
+			updateResource[#"weights(Glass=$Available_Glass Plastic=$Available_Plastic)"#]
 		replyTo waste with loadAccept : info(ok)
 	}
 	Goto acceptBusy
@@ -614,7 +581,7 @@ QActor waste_service context ctxwaste {
 		
 			
 		#]
-		updateResource[# "Glass=$Available_Glass Plastic=$Available_Plastic"#]
+			updateResource[#"weights(Glass=$Available_Glass Plastic=$Available_Plastic)"#]
 	}
 	Goto acceptBusy
 	
@@ -645,7 +612,7 @@ QActor waste_service context ctxwaste {
 			if [# (Available)#] {
 			//replyTo waste with  loadAccept : info(ok)
 			} else {
-			updateResource [# "Glass=$Available_Glass Plastic=$Available_Plastic"#]
+				updateResource[#"weights(Glass=$Available_Glass Plastic=$Available_Plastic)"#]
 			replyTo waste with  loadRejected : info(rip)
 			}			
 		}

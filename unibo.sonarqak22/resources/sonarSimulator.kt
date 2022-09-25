@@ -41,7 +41,7 @@ class sonarSimulator ( name : String ) : ActorBasic( name ) {
 				emitLocalStreamEvent( event )
 				//println("$tt $name | generates $event")
 				//emit(event)  //APPROPRIATE ONLY IF NOT INCLUDED IN A PIPE
-				delay( 500 )
+				delay( 800 )
 			}
 
 		}

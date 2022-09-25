@@ -112,3 +112,9 @@ Perchè non è stato messo la rule di aggiungere i pl nel file build.gradle?????
 > MQTT e canali bidirezionali non configurabili
 
 Come detto, quando mi scrivo ad un topic ci scrivo sopra e ci ascolto per forza, nanidafuc
+
+
+
+> TCP and events propagation
+
+Provo a fare il sonar che emette tramite TCP (unico protocollo possibile dato il problema con MQTT) ma dopo un tot mi blocca gli emit remoti, penso abbia raggiunto qualche cap di trasmissione ma non ho le conoscienze per debuggarlo

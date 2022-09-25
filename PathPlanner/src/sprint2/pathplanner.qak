@@ -32,7 +32,6 @@ Reply arrived : info(done)
 
 
 
-
 Context ctxbasicrobot  ip [host="127.0.0.1" port=8020]  
 //Context ctxPathexecutor  ip [host="127.0.0.1" port=8062]
 

@@ -6,6 +6,7 @@ object DomainSystemConfig {
 
      private var simulation : Boolean = true
      private var sonarTimeout : Long = 10000
+	 private var sonarEndless : Boolean = true
     init {
 
 
@@ -14,6 +15,8 @@ object DomainSystemConfig {
             val jsonObject   = JSONObject( config )
             simulation= jsonObject.getBoolean("simulation")
             sonarTimeout = jsonObject.getLong("sonarTimeout")
+		
+            sonarEndless= jsonObject.getBoolean("sonarEndless")
         } catch (e : Exception) {
             println(" ${this.javaClass.name}  | ${e.localizedMessage}, activate simulation by default")
         }
@@ -28,6 +31,10 @@ object DomainSystemConfig {
 
     fun isSimulation() : Boolean{
         return simulation
+    }
+	
+	 fun isSonarEndless() : Boolean{
+        return sonarEndless
     }
 
     fun getSonarTimeout() : Long {

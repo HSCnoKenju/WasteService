@@ -90,7 +90,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
         String payload = String.format("info(false,true,false,%s)", timestamputil.INSTANCE.TimestampNow());
         emit(PathExecutorMessages.robotstate(payload));
 
-        CommUtils.delay(300);
+        CommUtils.delay(Integer.parseInt(StepTime));
     }
 
 
@@ -100,7 +100,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
     protected void doMoveTurn(IApplMessage msg) {
         String payload = String.format("cmd(%s)",CurMoveToDo);
         forward(PathExecutorMessages.cmd(payload,PathExecutorMessages.basicRobotName));
-        CommUtils.delay(300);
+       
     }
     @State(name="doMoveW")
     @Transition(state="endWorkKo", msgId = PathExecutorMessages.ID_alarm)
