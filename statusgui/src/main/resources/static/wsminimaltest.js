@@ -1,5 +1,5 @@
 /*
-wsminimal.js
+wsminimaltest.js
 */
 
     var socket;
@@ -32,12 +32,7 @@ wsminimal.js
             msg = event.data;
             //alert(`Got Message: ${msg}`);
             console.log("ws-status:" + msg);
-
-            if( msg.includes("trolleyState") ) setMessageToWindow(trolleyStateDisplay,msg);
-            else  if( msg.includes("ledState") ) setMessageToWindow(ledStateDisplay,msg);
-            else  if( msg.includes("position") ) setMessageToWindow(positionDisplay,msg);
-            else  if( msg.includes("weight") ) setMessageToWindow(weightDisplay,msg);
-            else setMessageToWindow(infoDisplay,msg); //""+`${event.data}`*/
+             setMessageToWindow(infoDisplay,msg); //""+`${event.data}`*/
          };
     }//connect
 

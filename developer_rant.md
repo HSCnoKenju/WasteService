@@ -106,3 +106,9 @@ Perchè non è stato messo la rule di aggiungere i pl nel file build.gradle?????
        }
    }
 
+
+
+
+> MQTT e canali bidirezionali non configurabili
+
+Come detto, quando mi scrivo ad un topic ci scrivo sopra e ci ascolto per forza, nanidafuc

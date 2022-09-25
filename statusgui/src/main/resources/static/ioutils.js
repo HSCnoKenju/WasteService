@@ -1,11 +1,21 @@
 /*
 ioutils.js
+
+
+<!-- trolleyStateDisplay -->
+<!-- ledStateDisplay -->
+<!-- positionDisplay -->
+<!-- weightDisplay -->
+<!-- infoDisplay -->
+
 */
 
-    const infoDisplay     = document.getElementById("display");
-    //const webcamip        = document.getElementById("webcamip");
-    const robotDisplay    = document.getElementById("robotDisplay");
-    const pathexecDisplay = document.getElementById("pathexecDisplay");
+    const infoDisplay     = document.getElementById("infoDisplay");
+    const weightDisplay     = document.getElementById("weightDisplay");
+    const positionDisplay     = document.getElementById("positionDisplay");
+    const ledStateDisplay     = document.getElementById("ledStateDisplay");
+    const trolleyStateDisplay     = document.getElementById("trolleyStateDisplay");
+
 
     function setMessageToWindow(outfield, message) {
          var output = message.replace("\n","<br/>")
