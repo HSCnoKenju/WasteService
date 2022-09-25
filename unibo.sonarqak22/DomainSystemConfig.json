@@ -1,7 +1,7 @@
 {
   "simulation"       : "true",
-  "sonarTimeout"      : "10000",
-
+  "sonarTimeout"      : "1000000",
+  "sonarEndless"	: "true" ,
 
   "webCam"           : "false",
   "sonarObservable"  : "false",
