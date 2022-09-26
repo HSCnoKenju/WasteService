@@ -41,7 +41,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
 
     @State(name ="s0", initial=true)
     @Transition( state = "doThePath",msgId = PathExecutorMessages.ID_dopath)
-    @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
+    //@Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void s0(IApplMessage msg) {
         CurMoveToDo = "";
         StepTime = robotSupport.INSTANCE.readStepTime();
@@ -51,7 +51,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
     // dopath( PATH )
     @State(name ="doThePath")
     @Transition(state = "nextMove")
-    @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
+    //@Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void doThePath(IApplMessage msg) {
 
        // if( checkMsgContent( Term.createTerm("step(TIME)"), Term.createTerm("step(T)"),
@@ -72,7 +72,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
     @State(name="nextMove")
     @Transition(state = "endWorkOk", guard = "emptyPathMove")
     @Transition(state = "doMove", guard = "notEmptyPathMove" )
-    @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
+    //@Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void nextMove(IApplMessage msg) {
         CurMoveToDo = pathut.INSTANCE.nextMove();
         System.out.println("CurMoveToDo "+ CurMoveToDo + " ; PathTodo " + pathut.INSTANCE.getPathTodo());
@@ -124,7 +124,7 @@ public class PathExecutor extends QakActor22FsmAnnot {
 
     @State(name="endWorkKo")
     @Transition(state="s0")
-    @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
+   // @Transition( state = "stopped",  msgId= PathExecutorMessages.ID_stop, interrupt = true  )
     protected void endWorkKo(IApplMessage msg) {
         System.out.println(msg);
         String PathStillTodo = pathut.INSTANCE.getPathTodo();
