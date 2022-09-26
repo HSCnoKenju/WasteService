@@ -13,7 +13,7 @@ Dispatch setMap   : setMap (MapStr )
 
 Request buildMap : build(FILEPATH)
 Reply mapCreated : info (FILEPATH)
-
+ 
 
 Dispatch cmd       : cmd(MOVE)  
 Request step       : step( TIME )	
@@ -221,7 +221,7 @@ QActor boundarymapbuilder context ctxpathplanner{
 					
 			#]
 			
-			
+			 
 		}
 	} Goto doAheadMove
 	

@@ -14,6 +14,7 @@ class Sonardata ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, 
 		return "s0"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+		val interruptedStateTransitions = mutableListOf<Transition>()
 		
 				
 				var Active = false
@@ -24,20 +25,32 @@ class Sonardata ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, 
 				state("s0") { //this:State
 					action { //it:State
 						println("SONAR | started ")
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="waitingMessages", cond=doswitch() )
 				}	 
 				state("waitingMessages") { //this:State
 					action { //it:State
 						println("SONAR | idle ; waiting")
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition(edgeName="t31",targetState="parseCmd",cond=whenDispatch("cmdSonar"))
 					transition(edgeName="t32",targetState="handleIsActive",cond=whenRequest("isActive"))
 				}	 
 				state("handleIsActive") { //this:State
 					action { //it:State
 						answer("isActive", "sonarActive", "sonarActive($Active)"   )  
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="emitDistance", cond=doswitchGuarded({ Active  
 					}) )
 					transition( edgeName="goto",targetState="waitingMessages", cond=doswitchGuarded({! ( Active  
@@ -60,7 +73,11 @@ class Sonardata ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, 
 												
 								println("SONAR | EXEC, CURRENT STATE = $Active")
 						}
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="emitDistance", cond=doswitchGuarded({ Active  
 					}) )
 					transition( edgeName="goto",targetState="waitingMessages", cond=doswitchGuarded({! ( Active  
@@ -79,9 +96,15 @@ class Sonardata ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, 
 						else
 						 { SimDistance = 90  
 						 }
-						stateTimer = TimerActor("timer_emitDistance", 
-							scope, context!!, "local_tout_sonardata_emitDistance", 5000.toLong() )
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+				 	 		//sysaction { //it:State
+				 	 		  stateTimer = TimerActor("timer_emitDistance", 
+				 	 			scope, context!!, "local_tout_sonardata_emitDistance", 5000.toLong() )
+				 	 		//}
+					}	 	 
 					 transition(edgeName="t33",targetState="emitDistance",cond=whenTimeout("local_tout_sonardata_emitDistance"))   
 					transition(edgeName="t34",targetState="parseCmd",cond=whenDispatch("cmdSonar"))
 					transition(edgeName="t35",targetState="handleIsActive",cond=whenRequest("isActive"))

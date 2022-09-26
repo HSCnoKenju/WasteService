@@ -14,18 +14,29 @@ class Sonarlatestart ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( n
 		return "s0"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+		val interruptedStateTransitions = mutableListOf<Transition>()
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						stateTimer = TimerActor("timer_s0", 
-							scope, context!!, "local_tout_sonarlatestart_s0", 8000.toLong() )
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+				 	 		//sysaction { //it:State
+				 	 		  stateTimer = TimerActor("timer_s0", 
+				 	 			scope, context!!, "local_tout_sonarlatestart_s0", 8000.toLong() )
+				 	 		//}
+					}	 	 
 					 transition(edgeName="t00",targetState="active",cond=whenTimeout("local_tout_sonarlatestart_s0"))   
 				}	 
 				state("active") { //this:State
 					action { //it:State
 						forward("cmdSonar", "cmd(activate)" ,"sonardata" ) 
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 				}	 
 			}
 		}

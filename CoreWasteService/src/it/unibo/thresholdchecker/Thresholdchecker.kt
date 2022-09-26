@@ -14,8 +14,10 @@ class Thresholdchecker ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 		return "s0"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+		val interruptedStateTransitions = mutableListOf<Transition>()
 		
 			
+			 
 			val DLIMIT = 40
 			
 			var HigherThanLimit = false
@@ -23,29 +25,35 @@ class Thresholdchecker ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("		THRESHOLD_CHECKER | STARTED")
+							CoapObserverSupport(myself, "127.0.0.1","8061","ctxsonarqak22","sonarqak22")
+					//genTimer( actor, state )
 					}
-					 transition( edgeName="goto",targetState="accept", cond=doswitch() )
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t02",targetState="handleUpdate",cond=whenDispatch("coapUpdate"))
 				}	 
-				state("accept") { //this:State
+				state("handleUpdate") { //this:State
 					action { //it:State
-						println(" THRESHOLD_CHECKER | ACCEPTING")
-					}
-					 transition(edgeName="t00",targetState="check",cond=whenEvent("sonardata"))
-				}	 
-				state("check") { //this:State
-					action { //it:State
-						if( checkMsgContent( Term.createTerm("distance(DISTANCE)"), Term.createTerm("distance(DISTANCE)"), 
+						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(RESOURCE,VALUE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 											
-												var Distance = payloadArg(0).toInt()
+												var Distance = payloadArg(1).toInt()
 												
 												HigherThanLimit = (Distance >= DLIMIT) 
 											
 												
 						}
+						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(RESOURCE,VALUE)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								 MsgUtil.outgreen("applobserver OBSERVES: ${payloadArg(1)} FROM ${payloadArg(0)} ")  
+						}
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="broadcastResume", cond=doswitchGuarded({ HigherThanLimit  
 					}) )
 					transition( edgeName="goto",targetState="broadcastStop", cond=doswitchGuarded({! ( HigherThanLimit  
@@ -54,14 +62,22 @@ class Thresholdchecker ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("broadcastStop") { //this:State
 					action { //it:State
 						emit("stop", "stop(stop)" ) 
+						//genTimer( actor, state )
 					}
-					 transition( edgeName="goto",targetState="accept", cond=doswitch() )
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t03",targetState="handleUpdate",cond=whenDispatch("coapUpdate"))
 				}	 
 				state("broadcastResume") { //this:State
 					action { //it:State
 						emit("resume", "resume(resume)" ) 
+						//genTimer( actor, state )
 					}
-					 transition( edgeName="goto",targetState="accept", cond=doswitch() )
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t04",targetState="handleUpdate",cond=whenDispatch("coapUpdate"))
 				}	 
 			}
 		}

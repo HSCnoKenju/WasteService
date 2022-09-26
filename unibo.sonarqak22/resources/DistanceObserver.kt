@@ -1,11 +1,11 @@
 import it.unibo.kactor.ActorBasic
 import it.unibo.kactor.MsgUtil
-import it.unibo.radarSystem22.domain.interfaces.IObserver
+//import it.unibo.radarSystem22.domain.interfaces.IObserver
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
-class DistanceObserver( val owner: ActorBasic) : IObserver {
-    override fun update(d: String?) {
+class DistanceObserver( val owner: ActorBasic)  {
+     fun update(d: String?) {
         //val v = d!!.toInt()
         println("DistanceObserver d=$d")
         val m1 = "distance( ${d} )"
@@ -16,7 +16,8 @@ class DistanceObserver( val owner: ActorBasic) : IObserver {
         }
     }
 
-    override fun update(o: Observable?, data: Any?) {
+ /*    fun update(o: Observable?, data: Any?) {
         update(data.toString() );
     }
+*/
 }

@@ -1,8 +1,6 @@
 %====================================================================================
 % sonarqak22 description   
 %====================================================================================
-mqttBroker("broker.hivemq.com", "1883", "unibo/hu/radar").
-context(ctxwaste, "127.0.0.1",  "TCP", "8033").
 context(ctxsonarqak22, "localhost",  "TCP", "8061").
  qactor( sonarsimulator, ctxsonarqak22, "sonarSimulator").
   qactor( sonardatasource, ctxsonarqak22, "sonarHCSR04Support2021").

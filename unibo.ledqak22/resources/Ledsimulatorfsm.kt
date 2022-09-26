@@ -30,16 +30,16 @@ class Ledsimulatorfsm ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 				state("on") { //this:State
 					action { //it:State
 
-						unibo.actor22comm.utils.ColorsOut.outappl(
-							"$name - on", unibo.actor22comm.utils.ColorsOut.MAGENTA
+						unibo.comm22.utils.ColorsOut.outappl(
+							"$name - on", unibo.comm22.utils.ColorsOut.MAGENTA
 						)
 					}
 					 transition( edgeName="goto",targetState="waiting", cond=doswitch() )
 				}	 
 				state("off") { //this:State
 					action { //it:State
-						unibo.actor22comm.utils.ColorsOut.outappl(
-							"$name - off", unibo.actor22comm.utils.ColorsOut.MAGENTA
+						unibo.comm22.utils.ColorsOut.outappl(
+							"$name - off", unibo.comm22.utils.ColorsOut.MAGENTA
 						)
 
 					}
@@ -48,8 +48,8 @@ class Ledsimulatorfsm ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 				state("blink") { //this:State
 					action { //it:State
 
-						unibo.actor22comm.utils.ColorsOut.outappl(
-							"$name - blink", unibo.actor22comm.utils.ColorsOut.MAGENTA
+						unibo.comm22.utils.ColorsOut.outappl(
+							"$name - blink", unibo.comm22.utils.ColorsOut.MAGENTA
 						)
 
 					}

@@ -14,6 +14,7 @@ class Pathplanner ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 		return "activate"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+		val interruptedStateTransitions = mutableListOf<Transition>()
 		 val Inmapname   = "xxx" //"map2019"  
 			   var PathTodo    =  ""  
 			   var CurGoalX    = 3
@@ -29,7 +30,11 @@ class Pathplanner ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 						else
 						 {request("buildMap", "build($Inmapname)" ,"boundarymapbuilder" )  
 						 }
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="readMap", cond=doswitchGuarded({ mapExist 
 					}) )
 					transition( edgeName="goto",targetState="dummy_wait_build", cond=doswitchGuarded({! ( mapExist 
@@ -37,7 +42,11 @@ class Pathplanner ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 				}	 
 				state("dummy_wait_build") { //this:State
 					action { //it:State
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition(edgeName="t00",targetState="readMap",cond=whenReply("mapCreated"))
 				}	 
 				state("readMap") { //this:State
@@ -45,13 +54,21 @@ class Pathplanner ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 						unibo.kotlin.planner22Util.createRoomMapFromTextfile( "$Inmapname.txt"  )
 						unibo.kotlin.planner22Util.initAI(  )
 						unibo.kotlin.planner22Util.showCurrentRobotState(  )
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="accepting", cond=doswitch() )
 				}	 
 				state("accepting") { //this:State
 					action { //it:State
 						println(" PATH PLANNER | ACCEPTING")
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition(edgeName="t01",targetState="findAPath",cond=whenRequest("destination"))
 				}	 
 				state("findAPath") { //this:State
@@ -80,7 +97,11 @@ class Pathplanner ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 						 ){println("WARNING: nessuna azione pianificata. Il piano vuoto viene comunque eseguito")
 						}
 						request("dopath", "dopath($PathTodo)" ,"pathexec" )  
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition(edgeName="t02",targetState="pathok",cond=whenReply("dopathdone"))
 					transition(edgeName="t03",targetState="pathko",cond=whenReply("dopathfail"))
 				}	 
@@ -91,7 +112,11 @@ class Pathplanner ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 						unibo.kotlin.planner22Util.showCurrentRobotState(  )
 						unibo.kotlin.planner22Util.saveRoomMap( "$Outmapname"  )
 						answer("destination", "arrived", "info(done)"   )  
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="accepting", cond=doswitch() )
 				}	 
 				state("pathko") { //this:State
@@ -112,7 +137,11 @@ class Pathplanner ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 						}
 						unibo.kotlin.planner22Util.showCurrentRobotState(  )
 						unibo.kotlin.planner22Util.saveRoomMap( "$Outmapname"  )
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="findAPath", cond=doswitch() )
 				}	 
 			}

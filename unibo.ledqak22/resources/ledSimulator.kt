@@ -13,21 +13,22 @@ class ledSimulator (name :String) : ActorBasic (name) {
         if (!msg.isEvent()) {
             if (msg.msgId() == "ledon") {
 
-                unibo.actor22comm.utils.ColorsOut.outappl(
-                    "$name - on", unibo.actor22comm.utils.ColorsOut.MAGENTA
+
+                unibo.comm22.utils.ColorsOut.outappl(
+                    "$name - on", unibo.comm22.utils.ColorsOut.MAGENTA
                 )
 
             } else if (msg.msgId() == "ledblink") {
 
-                unibo.actor22comm.utils.ColorsOut.outappl(
-                    "$name - blink", unibo.actor22comm.utils.ColorsOut.MAGENTA
+                unibo.comm22.utils.ColorsOut.outappl(
+                    "$name - blink", unibo.comm22.utils.ColorsOut.MAGENTA
                 )
 
 
             } else /* led off*/ {
 
-                unibo.actor22comm.utils.ColorsOut.outappl(
-                    "$name - off", unibo.actor22comm.utils.ColorsOut.MAGENTA
+                unibo.comm22.utils.ColorsOut.outappl(
+                    "$name - off", unibo.comm22.utils.ColorsOut.MAGENTA
                 )
 
 

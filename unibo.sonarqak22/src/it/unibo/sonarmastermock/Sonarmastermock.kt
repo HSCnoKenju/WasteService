@@ -14,6 +14,7 @@ class Sonarmastermock ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 		return "s0"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+		val interruptedStateTransitions = mutableListOf<Transition>()
 		
 			
 				val SonarTimeout =	DomainSystemConfig.getSonarTimeout()
@@ -27,7 +28,11 @@ class Sonarmastermock ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 						 ){delay(SonarTimeout)
 						forward("sonardeactivate", "info(ok)" ,"sonarqak22" ) 
 						}
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 				}	 
 			}
 		}

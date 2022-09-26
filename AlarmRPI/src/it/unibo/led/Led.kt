@@ -14,6 +14,7 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 		return "s0"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+		val interruptedStateTransitions = mutableListOf<Transition>()
 		
 				var Active = false	
 				
@@ -26,13 +27,21 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 				state("s0") { //this:State
 					action { //it:State
 						println("LED | START ")
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="waitingMessages", cond=doswitch() )
 				}	 
 				state("waitingMessages") { //this:State
 					action { //it:State
 						println("LED | waiting ")
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition(edgeName="t16",targetState="parseCmd",cond=whenDispatch("cmdLed"))
 					transition(edgeName="t17",targetState="handleGetState",cond=whenRequest("getState"))
 					transition(edgeName="t18",targetState="parseTrigger",cond=whenEvent("ledtrigger"))
@@ -40,7 +49,11 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 				state("handleGetState") { //this:State
 					action { //it:State
 						answer("getState", "ledState", "ledState($Active)"   )  
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="waitingMessages", cond=doswitch() )
 				}	 
 				state("parseCmd") { //this:State
@@ -71,7 +84,11 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 												
 								println("LED | EXEC, CURRENT STATE = $Active")
 						}
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="waitingMessages", cond=doswitch() )
 				}	 
 				state("parseTrigger") { //this:State
@@ -100,7 +117,11 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 												
 								println("LED | TRIGGER, CURRENT STATE ACTIVE = $Active CONTINUS = $Continus")
 						}
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="waitingMessages", cond=doswitch() )
 				}	 
 			}

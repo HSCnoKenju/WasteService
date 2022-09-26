@@ -3,10 +3,10 @@ package sonarConfig
 import DistanceObserver
 import it.unibo.kactor.ActorBasic
 import it.unibo.kactor.sysUtil
-import it.unibo.radarSystem22.domain.interfaces.ISonarForObs
+//import it.unibo.radarSystem22.domain.interfaces.ISonarForObs
 
 lateinit var firstActorInPipe : ActorBasic
-lateinit var Sonar : ISonarForObs
+//lateinit var Sonar : ISonarForObs
 
 fun createThePipe( simulate : Boolean, sonarActorName : String  ){
     if( simulate )  firstActorInPipe = sysUtil.getActor("sonarsimulator")!!  //generates simulated data
@@ -22,9 +22,9 @@ fun createThePipe( simulate : Boolean, sonarActorName : String  ){
 
 fun configureTheSonar(simulate : Boolean=true, sonarActorName : String = "sonar", usingDomain : Boolean=false){
     if( ! usingDomain ) createThePipe(simulate, sonarActorName)
-    else configureTheSonarUsingDomain(simulate, sonarActorName)
+  //  else configureTheSonarUsingDomain(simulate, sonarActorName)
 }
-
+/*
 fun configureTheSonarUsingDomain(simulate : Boolean, sonarActorName : String ){
     if( simulate ){
         `it.unibo`.radarSystem22.domain.utils.DomainSystemConfig.simulation       = true
@@ -42,4 +42,6 @@ fun configureTheSonarUsingDomain(simulate : Boolean, sonarActorName : String ){
 
 fun activateSonarSimulated(){
     Sonar.activate()
+
 }
+ */

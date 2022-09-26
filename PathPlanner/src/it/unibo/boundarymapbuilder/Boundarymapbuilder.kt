@@ -14,6 +14,7 @@ class Boundarymapbuilder ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 		return "s0"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+		val interruptedStateTransitions = mutableListOf<Transition>()
 		 var NumStep   = 0 
 				val StepLength = 350L
 				val DelayLength = 300L
@@ -25,13 +26,21 @@ class Boundarymapbuilder ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					action { //it:State
 						println("		MAPPER | START")
 						 unibo.kotlin.planner22Util.initAI()  
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="accepting", cond=doswitch() )
 				}	 
 				state("accepting") { //this:State
 					action { //it:State
 						println("		MAPPER | ACCEPTING")
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition(edgeName="t04",targetState="processRequest",cond=whenRequest("buildMap"))
 				}	 
 				state("processRequest") { //this:State
@@ -43,21 +52,33 @@ class Boundarymapbuilder ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 											MapFilePath = payloadArg(0)
 													
 						}
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="doAheadMove", cond=doswitch() )
 				}	 
 				state("doAheadMove") { //this:State
 					action { //it:State
 						delay(DelayLength)
 						request("step", "step($StepLength)" ,"basicrobot" )  
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition(edgeName="t05",targetState="continue",cond=whenReply("stepdone"))
 					transition(edgeName="t06",targetState="turn",cond=whenReply("stepfail"))
 				}	 
 				state("continue") { //this:State
 					action { //it:State
 						 unibo.kotlin.planner22Util.updateMap(  "w", "" )  
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="doAheadMove", cond=doswitch() )
 				}	 
 				state("turn") { //this:State
@@ -66,7 +87,11 @@ class Boundarymapbuilder ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						forward("cmd", "cmd(l)" ,"basicrobot" ) 
 						  unibo.kotlin.planner22Util.updateMap(  "l", "" ) 
 									unibo.kotlin.planner22Util.showMap()		 
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition( edgeName="goto",targetState="doAheadMove", cond=doswitchGuarded({ NumStep < 4  
 					}) )
 					transition( edgeName="goto",targetState="endwork", cond=doswitchGuarded({! ( NumStep < 4  
@@ -79,7 +104,11 @@ class Boundarymapbuilder ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						answer("buildMap", "mapCreated", "info(MapFilePath)"   )  
 						println("		MAPPER | START")
 						terminate(1)
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 				}	 
 			}
 		}

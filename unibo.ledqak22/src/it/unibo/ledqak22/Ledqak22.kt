@@ -14,12 +14,17 @@ class Ledqak22 ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, s
 		return "s0"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+		val interruptedStateTransitions = mutableListOf<Transition>()
 		 val simulate = DomainSystemConfig.isSimulation()  
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						println("$name STARTS")
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition(edgeName="t00",targetState="interpreterTrigger",cond=whenEvent("ledtrigger"))
 				}	 
 				state("interpreterTrigger") { //this:State
@@ -61,7 +66,11 @@ class Ledqak22 ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, s
 								  }
 								 }
 						}
+						//genTimer( actor, state )
 					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 					 transition(edgeName="t01",targetState="interpreterTrigger",cond=whenEvent("ledtrigger"))
 				}	 
 			}
