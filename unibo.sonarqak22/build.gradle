@@ -123,6 +123,7 @@ distributions {
             from './DomainSystemConfig.json'
             from './sonarqak22.pl'
             from './sysRules.pl'
+            from './raspcode/SonarAlone.c'
         }
     }
 }

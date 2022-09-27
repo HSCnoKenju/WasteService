@@ -189,8 +189,8 @@ QActor pathplanner context ctxpathplanner{
 
 QActor boundarymapbuilder context ctxpathplanner{    
 	[# var NumStep   = 0 
-		val StepLength = 350L
-		val DelayLength = 300L
+		val StepLength = 335L
+		val DelayLength = 335L
 		
 		
 		var MapFilePath = ""

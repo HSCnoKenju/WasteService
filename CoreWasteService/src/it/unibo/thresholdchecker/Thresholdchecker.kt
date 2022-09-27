@@ -25,7 +25,7 @@ class Thresholdchecker ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-							CoapObserverSupport(myself, "127.0.0.1","8061","ctxsonarqak22","sonarqak22")
+							CoapObserverSupport(myself, "192.168.126.33","8061","ctxsonarqak22","sonarqak22")
 					//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
