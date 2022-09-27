@@ -1,16 +1,10 @@
 package it.unibo.truck;
 
-import it.unibo.kactor.ActorBasic;
-import it.unibo.kactor.QakContext;
 import it.unibo.util.ConnTcp;
-import org.eclipse.californium.core.CoapClient;
-import unibo.comm22.SystemTimer;
-import unibo.comm22.callers.ConnQakTcp;
-import unibo.comm22.utils.ColorsOut;
 import unibo.comm22.utils.CommUtils;
+import utils.DomainSystemConfig;
 
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 public class TruckTUI {
 
@@ -106,9 +100,9 @@ public class TruckTUI {
 
         ConnTcp
 
-                connTcp = null;
+                connTcp;
         try {
-            connTcp = new ConnTcp("localhost", 8033);
+            connTcp = new ConnTcp(DomainSystemConfig.INSTANCE.getWasteServiceAddress(), DomainSystemConfig.INSTANCE.getWasteServicePort());
 
             connTcp.forward(initContainersStr);
             connTcp.forward(initPositionsStr);
@@ -201,6 +195,7 @@ public class TruckTUI {
 
 
     }
+    /*
     protected  static void waitForApplStarted(){
         ActorBasic wasteservice = QakContext.Companion.getActor("waste_service");
         while( wasteservice == null ){
@@ -208,5 +203,5 @@ public class TruckTUI {
             CommUtils.delay(200);
             wasteservice = QakContext.Companion.getActor("waste_service");
         }
-    }
+    }*/
 }
