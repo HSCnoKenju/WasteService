@@ -147,7 +147,7 @@ QActor thresholdchecker context ctxwaste { //ctxobserver ctxboundaryqak30{
 [#
 	
 	 
-	val DLIMIT = 40
+	val DLIMIT = DomainSystemConfig.getDLimit()
 	
 	var HigherThanLimit = false
 		
