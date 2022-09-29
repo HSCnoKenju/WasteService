@@ -118,3 +118,10 @@ Come detto, quando mi scrivo ad un topic ci scrivo sopra e ci ascolto per forza,
 > TCP and events propagation
 
 Provo a fare il sonar che emette tramite TCP (unico protocollo possibile dato il problema con MQTT) ma dopo un tot mi blocca gli emit remoti, penso abbia raggiunto qualche cap di trasmissione ma non ho le conoscienze per debuggarlo
+
+
+> 1.3.0 observable resource
+
+A scrittura non posso referenziale ExternalQaktor
+
+L'autogenerazione scrive direttamente dentro la classe 

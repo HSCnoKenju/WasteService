@@ -201,10 +201,17 @@ img {
 
     background-color: whitesmoke;
     padding: 10px;
+    max-height: 800px;
 }
 
 .container {
     display: flex; /* or inline-flex */
     flex-direction: row;
     justify-content :space-around
+  }
+
+.container-column {
+    display: flex; /* or inline-flex */
+    flex-direction: column;
+    justify-content :space-evenly;
   }

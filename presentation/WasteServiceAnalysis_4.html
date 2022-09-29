@@ -26,6 +26,7 @@
     <p>PRECEDENTI</p>
     <p><a href="WasteServiceAnalysis_1.html">analisi requisiti</a> </p>
     <p><a href="WasteServiceAnalysis_2.html">analisi problemi</a> </p>
+    <p><a href="WasteServiceAnalysis_3.html">analisi progetto</a> </p>
 
  
  
@@ -472,15 +473,26 @@ cd CoreWasteService ; ./gradlew test
 
   <p>Led e sonar vengono copiati e leggermente modificati rispettivamente da unibo.ledqak22 ed unibo.sonarqak22, essendo componenti sviluppati precedentemente dalla software house e messi a disposizione</p>
   <p>Per facilità di testing ogni componente segue una versione simulata, e la scelta tra quali delle due attivare è data da un file di configurazione esterno</p>
+
+  <h4>Led</h4>
+  <p>Componente stand alone il quale aspetta eventi <b class="blue">ledtrigger</b> e a seconda del payload pilota il led (virtuale o concreto) </p>
+  <p>Rispetto al componente originario della software house, esteso il comportamento per far <b> lampeggiare </b> il led, oltre ad accensione e spegnimento.</p>
+
+  <h4>Sonar</h4>
+  <p>Componente stand alone i quali <b class="blue"> osservatori </b> ottengono la distanza rilevata dal sonar (virtuale o concreto); è presente una pipe : sonardatasource --> datacleaner --> sonarqak, è possibile configurare inoltre se il sonar deve essere un demone continuo (Endless) oppure smettere di funzionare dopo un tempo deciso a deploy time (sonardelay). </p>
+  <div class="container">
+
+    <img src="../unibo.ledqak22/ledqak22arch.png" alt="" width="50%">
+    <img src="../unibo.sonarqak22/sonarqak22arch.png" alt="" width="50%">
+  
+  </div>
+
+  
+
+  <h3> Modello del Progetto</h3>
+  <img src="../CoreWasteService/waste_servicearch.png" alt="">
+
 </div>
-     
-
-<h1>Testing</h1> 
-
- 
-<div class="remark">
-    Copy here the EXACT text fiven by the customer.
-    </div>
      
 
 <h1>Deployment</h1> 
@@ -492,15 +504,112 @@ cd CoreWasteService ; ./gradlew test
   <p> inoltre per alcuni specifici il deploy può includere scripts oppure file json</p>
 
 
-    </div>
+  </div>
     
- 
-<h1>Maintenance</h1> 
 
- 
-<div class="remark">
-    Copy here the EXACT text fiven by the customer.
-    </div>
+
+  <h2>CHECKPOINT: INTERRUPT</h2>
+  <div class="remark">
+
+
+    <div class="container">
+
+      <div class="container-column"> 
+
+
+
+
+    <div>
+    <h4>Requisiti</h4>
+
+
+    <p>The <cite>Sonar</cite> is used as an ‘alarm device’: when it <b class="red"> measures a distance </b> less that a <b class="red"> prefixed value <strong>DLIMT</strong></b>,
+      the <cite class="green">transport trolley</cite>  must be <b class="red"> stopped.
+      It will be resumed </b> when <cite>Sonar</cite> detects again a distance higher than  <strong>DLIMT</strong>.</p>
+  
+
+    <p>a <span class="blue">Sonar</span> and a <span class="blue">Led</span>  connected to a RaspnerryPi. The <cite>Led</cite> is used as a <em>warning devices</em>,
+          according to the following scheme:</p>
+
+    <p> 3. <del>When the load is accepted, the <cite>transport trolley</cite> reaches the <cite>INDOOR</cite>, picks up the material, goes to the
+            proper container and settles the material.</del> During this activity, the <cite>WasteService</cite> <strong>blinks</strong> the <cite>Led</cite></p>
+         
+          </div> <!-- requisiti-->
+
+
+          <div>
+
+            <h4>Problemi</h4>
+
+           
+    <table>
+      <thead>
+        <tr>
+          <th>PROBLEMA</th>
+          <th>soluzione adottata</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>distance- modalità </td>
+          <td> pattern observer</td>
+        </tr>
+        <tr>
+          <td>distance- interazione</td>
+          <td>evento; il singolo messaggio non è importante perchè quello successivo è simile</td>
+        </tr>
+        <tr>
+          <td>threshold</td>
+          <td>componente stand-alone da sonar e trolley</td>
+        </tr>
+        <tr>
+          <td>threshold- contesto</td>
+          <td> contesto trolley, il contesto del sonar è indipendente dall'applicazione </td>
+        </tr>
+        <tr>
+          <td>threshold- interazione</td>
+          <td> evento; "eredito" la caratteristica della distanza misurata dal sonar (la singola informazione non è importante) </td>
+        </tr>
+        
+        <tr>
+          <td>interrupt- component </td>
+          <td>PATH_EXECUTOR con possibilità di interruzione, la singola mossa in esecuzione viene terminata</td>
+        </tr>
+        <tr>
+          <td>led- frequenza </td>
+          <td>HOME ed STOPPED vengono inviati "una volta" e non ri-trasmessi, MOVING viene inviato ad ogni effettivo movimento </td>
+        </tr>
+        
+        <tr>
+          <td>led- interazione </td>
+          <td>evento (?) sicuro per il blink (singolo messaggio non importante), ma <b> non tanto sicuro per HOME e STOPPED</b> </td>
+        </tr>
+        <tr>
+          <td>led- componente</td>
+          <td>componente stand-alone, che raccoglie da tutte le fonte ed è l'unico ad emettere trigger per il led</td>
+        </tr>
+
+        <tr>
+          <td>led- coerenza ed ordinamento</td>
+          <td>logica del ignorare messaggi che sono stati inviati prima (timestamp inferiore) dell'ultimo ricevuto</td>
+        </tr>
+      </tbody>
+      </table>
+          </div> <!-- problemi-->
+            
+         
+        </div> <!-- column container-->
+
+        <div>
+          <h3> Modello del Progetto</h3>
+          <img src="../CoreWasteService/waste_servicearch.png" alt="">
+        </div>
+      </div> <!-- modello progetto-->
+
+   
+
+  </div> <!-- container-->
+
      
 <!-- USEFUL
 <table style="width:100%" border="1">

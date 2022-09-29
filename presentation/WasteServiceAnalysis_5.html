@@ -23,7 +23,271 @@
      
     <p>Tema finale corso di studio <b>Ingegneria dei sistemi software</b>, Laurea Magistrale Università di Bologna </p> 
     
+
+    
+    <p>PRECEDENTI</p>
+    <p><a href="WasteServiceAnalysis_1.html">analisi requisiti</a> </p>
+    <p><a href="WasteServiceAnalysis_2.html">analisi problemi</a> </p>
+    <p><a href="WasteServiceAnalysis_3.html">analisi progetto</a> </p>
+
+    <p><a href="WasteServiceAnalysis_4.html">analisi sprint2, interruzione</a> </p>
+
  
+ 
+
+    <h2>CHECKPOINT : REQUISITI</h2>
+
+    <div class="remark">
+    
+        <h3>Modello dei requisiti</h3>
+        <ul>
+            <li><a href="../CoreWasteService/src/modello_requisiti.qakt" >modello_requisiti</a></li>
+            <li>path : CoreWasteService/src/modello_requisiti.qakt</li>
+            <li> <img src="img/architettura_requisiti.png" alt=""> </li> 
+        </ul>
+    
+        <p>Per eseguire il modello, rinominare il file in modello_requisiti.qak, eliminare le sorgenti generate e rigenerare il sistema</p>
+    
+    
+    
+        <h5 id="core-functionality">core-functionality - Punti aperti</h5>
+        
+        
+        <ol class="arabic simple">  
+            <li><p> <b class="red" > When the load is accepted </b>, the <cite>transport trolley</cite> reaches the <cite>INDOOR</cite>, <b class="red"> picks up the material </b>, goes to the
+            proper container and settles the material. <del> During this activity, the <cite>WasteService</cite> <strong>blinks</strong> the <cite>Led</cite></p> </del> </li>
+                <ul>
+                    <li> <b class="red">Problema</b>: innesco procedura proattiva di Transport_trolley <br>(denominato in seguito <b class="red">issue_trolley</b>)</li> 
+                    <li><b class="red">Problema</b>: comunicazione da parte del Transport_trolley della fine del prelievo dei materiali, il truck solo dopo il prelievo libera INDOOR ( <a href="#Q2">Q2</a> ) <br> (denominato in seguito <b class="red">pickup</b>)</li>
+                </ul>
+            
+            <li><p> <b class="red"> When the deposit action is terminated </b>, the <cite>transport trolley</cite> <b class="red"> excutes another deposit command  (if any) </b>
+            or returns to its <cite>HOME</cite>.</p></li>
+                <ul>
+    
+                    <li><b class="red">Problema</b>: comunicazione da parte del Transport_trolley della terminazione del lavoro assegnato<br>(denominato in seguito <b class="red">work_complete</b>)</li>
+                    <li><b class="red">Problema</b>: al Transport_trolley devono arrivare informazioni riguardanti l'incarico successivo <br>(denominato in seguito <b class="red">next_work</b>) </li>
+                </ul>
+        </ol>
+    
+    
+        <h5> alarm : non considerato</h5>
+        
+    
+        <h5> statusGUI : non considerato</h5>
+    </div>
+
+        
+    <h2>CHECKPOINT : PROBLEMA</h2>
+<div class="remark">
+<h3>Modello del problema</h3>
+
+<div class="container">
+    <ul>
+        <li><a href="../CoreWasteService/src/modello_problema_conoscenza.qakt" >modello_problema_conoscenza</a></li>
+        <li>path : CoreWasteService/src/modello_problema_conoscenza.qakt</li>
+        <li> <img src="img/architettura_problema.png" alt=""> </li> 
+    </ul>
+
+    <table>
+        <thead>
+          <tr>
+            <th>PROBLEMA</th>
+            <th>soluzione adottata</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>issue_trolley </td>
+            <td> request-response</td>
+          </tr>
+          <tr>
+            <td>informazione posizione containers</td>
+            <td>il payload é il nome del container</td>
+          </tr>
+          <tr>
+            <td>pickup : Trolley to Waste_Service</td>
+            <td>evento</td>
+          </tr>
+          <tr>
+            <td>pickup : Waste_Service to Waste_Truck</td>
+            <td> request-response, sfruttando R2 loadaccept </td>
+          </tr>
+          <tr>
+            <td>work_complete </td>
+            <td>request-response, sfruttando proposta response di issue_trolley</td>
+          </tr>
+          <tr>
+            <td>next_work : Waste_Service to Trolley </td>
+            <td>stesso di issue_trolley</td>
+          </tr>
+          <tr>
+            <td>next_work: produttore-consumatore</td>
+            <td>nuove richieste sono messe in coda al Transport_trolley</td>
+          </tr>
+        </tbody>
+        </table>
+</div>
+
+<h4>Esecuzione automatica dei test</h4>
+    
+<p> In caso si rigenerassero i sorgenti con l'interprete qak, aggiungere alla Classe : CoreWasteService/src/it/unibo/transporttrolley/Transporttrolley.kt il seguente import : </p>
+ <p> <b>import java.util.* </b></p>
+
+<h5>Comandi</h5>
+<p> Build: <b>gradle build -x test </b></p>
+<p> Testing: <b> gradle test </b></p>
+
+<h5>Risultati test</h5>
+<p> <b> ls build/reports/tests/test/ </b></p>
+<p> <b> ls build/test-results/test/ </b> </p>
+
+
+</div>
+
+<h2>CHECKPOINT: PROGETTAZIONE</h2>
+<div class="remark">
+    <h3>Modello del progetto</h3>
+
+    <ul>
+        <li><a href="../CoreWasteService/src/modello_progetto.qak" >modello_progetto : CoreWasteService</a></li>
+        <li>path : CoreWasteService/src/modello_progetto.qak</li>
+        <li><a href="../PathPlanner/src/pathplanner.qak" >modello_progetto : PathPlanner</a></li>
+        <li>path : PathPlanner/src/pathplanner.qak</li>
+        <li><a href="../BasicRobot/src/basicrobot.qak" >modello_progetto : BasicRobot</a></li>
+        <li>path : BasicRobot/src/basicrobot.qak</li>
+        <li> <a href="img/architettura_progetto.png"><img src="img/architettura_progetto.png" alt=""> </li></a>  
+    </ul>
+
+    <div class="container">
+ <pre>
+     <h4>Workflow Testing</h4>
+ <code>
+## In WasteService
+cd BasicRobot ; ./gradlew build
+cd PathPlanner ; ./gradlew build
+cd CoreWasteService ; ./gradlew build -x test
+./launchall.sh
+firefox http://localhost:8090/
+cd CoreWasteService ; ./gradlew test        
+ </code>
+ </pre>
+
+<pre>
+<h4>Workflow utilizzo</h4>
+<code>
+    ## In WasteService
+    ./launchall.sh
+    firefox http://localhost:8090/
+    cd TruckSimulator ; ./gradlew -q tui
+</code>
+</pre>
+    </div>
+</div>
+ 
+
+
+<h2>CHECKPOINT: INTERRUPT</h2>
+<div class="remark">
+
+
+  <div class="container">
+
+    <div class="container-column"> 
+
+
+
+
+  <div>
+  <h4>Requisiti</h4>
+
+
+  <p>The <cite>Sonar</cite> is used as an ‘alarm device’: when it <b class="red"> measures a distance </b> less that a <b class="red"> prefixed value <strong>DLIMT</strong></b>,
+    the <cite class="green">transport trolley</cite>  must be <b class="red"> stopped.
+    It will be resumed </b> when <cite>Sonar</cite> detects again a distance higher than  <strong>DLIMT</strong>.</p>
+
+
+  <p>a <span class="blue">Sonar</span> and a <span class="blue">Led</span>  connected to a RaspnerryPi. The <cite>Led</cite> is used as a <em>warning devices</em>,
+        according to the following scheme:</p>
+
+  <p> 3. <del>When the load is accepted, the <cite>transport trolley</cite> reaches the <cite>INDOOR</cite>, picks up the material, goes to the
+          proper container and settles the material.</del> During this activity, the <cite>WasteService</cite> <strong>blinks</strong> the <cite>Led</cite></p>
+       
+        </div> <!-- requisiti-->
+
+
+        <div>
+
+          <h4>Problemi</h4>
+
+         
+  <table>
+    <thead>
+      <tr>
+        <th>PROBLEMA</th>
+        <th>soluzione adottata</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>distance- modalità </td>
+        <td> pattern observer</td>
+      </tr>
+      <tr>
+        <td>distance- interazione</td>
+        <td>evento; il singolo messaggio non è importante perchè quello successivo è simile</td>
+      </tr>
+      <tr>
+        <td>threshold</td>
+        <td>componente stand-alone da sonar e trolley</td>
+      </tr>
+      <tr>
+        <td>threshold- contesto</td>
+        <td> contesto trolley, il contesto del sonar è indipendente dall'applicazione </td>
+      </tr>
+      <tr>
+        <td>threshold- interazione</td>
+        <td> evento; "eredito" la caratteristica della distanza misurata dal sonar (la singola informazione non è importante) </td>
+      </tr>
+      
+      <tr>
+        <td>interrupt- component </td>
+        <td>PATH_EXECUTOR con possibilità di interruzione, la singola mossa in esecuzione viene terminata</td>
+      </tr>
+      <tr>
+        <td>led- frequenza </td>
+        <td>HOME ed STOPPED vengono inviati "una volta" e non ri-trasmessi, MOVING viene inviato ad ogni effettivo movimento </td>
+      </tr>
+      
+      <tr>
+        <td>led- interazione </td>
+        <td>evento (?) sicuro per il blink (singolo messaggio non importante), ma <b> non tanto sicuro per HOME e STOPPED</b> </td>
+      </tr>
+      <tr>
+        <td>led- componente</td>
+        <td>componente stand-alone, che raccoglie da tutte le fonte ed è l'unico ad emettere trigger per il led</td>
+      </tr>
+
+      <tr>
+        <td>led- coerenza ed ordinamento</td>
+        <td>logica del ignorare messaggi che sono stati inviati prima (timestamp inferiore) dell'ultimo ricevuto</td>
+      </tr>
+    </tbody>
+    </table>
+        </div> <!-- problemi-->
+          
+       
+      </div> <!-- column container-->
+
+      <div>
+        <h3> Modello del Progetto</h3>
+        <img src="../CoreWasteService/waste_servicearch.png" alt="">
+      </div>
+    </div> <!-- modello progetto-->
+
+ 
+
+</div> <!-- container-->
  
 <h1>Requirements</h1>
 
@@ -147,8 +411,55 @@
         <li>trolley-state : trolley_analyzer</li>
         <li>led_state : ledqak</li>
     </ul>
+
+    <img src="img/architettura_progetto_sprint3.png" alt="">
     </div>
      
+
+<h2>CHECKPOINT : StatusGUI</h2>
+<div class="remark">
+
+    <div class="container">
+
+         
+<div class="remark">
+    <h3>Requirement analysis</h3>
+    <p>The <cite>WasteService</cite> must create a <span class="blue">WasteServiceStatusGUI</span> that <b class="red">shows to the Service-manager</b></p>
+   
+    <ul><li> <span class="red">visibilità</span>: la gui è dedicata al Service-manager?, altri utenti hanno possibilità di accedere a queste informazioni?  </li></ul>
+
+    <p>the current <span class="red"> state of the <cite>transport trolley</cite>  </span>  and it <span class="red">position</span>  in the room</p>
+    <ul>
+        <li> <b class="red">state-precision(trolley)</b>  : cosa si intende per stato del trolley? Esecuzione, Stopped e Home (Idle)?</li>
+        <li><b class="red">position-precision</b> : fino che precisione arriva la posizione? Devo comunicare esattamente le cordinate? Devo comunciare il "luogo" (Home,Plastic,Glass,Indoor)?</li>
+    </ul>
+
+    <p>the current <span class="red">state of the <cite>Led</cite></span> </p>
+
+    <ul><li> <b class="red">state-precision(led)</b>  : cosa si intende per stato del led? la funzione che sta eseguendo in questo momento(on, off, blink)?
+    </li></ul>
+
+    <p>the  <span class="blue"> current weigth of the material</span>  stored in the two waste-containers</p>
+
+    <ul><li> <span class="blue">weight</span> : l'utente deve conoscere il peso attuale, non la capacità rimanente</li>
+    </ul>
+
+
+
+    <h4>Modello dei requisiti</h4>
+
+    <p>Non c'è nessuna interazione dettata da requisiti, so solo che interagirà con il sistema un componente di nome <span class="blue">WasteServiceStatusGUI</span> la quale può essere acceduta sicuramente da un utente nominato Service-manager</p>
+
+    <h3>polling vs push</h3>
+    <p> Un punto non citato dai requisiti ma di spontanea riflessione, la GUI da progettare è un componente passivo, ovvero che non deve modificare nessun dato e deve inviare dati alle altre parti del sistema attorno progettato negli sprint scorsi, quindi la GUI deve solo ricevere gli aggiornamenti inviati da altre parti del sistema, senza richiederli (tranne informazioni di keep-alive).</p>
+    
+</div>
+
+<img src="img/architettura_progetto_sprint3.png" alt="">
+    </div>
+
+</div>
+<!--
 
 <h1>Testing</h1> 
 
@@ -173,6 +484,7 @@
     Copy here the EXACT text fiven by the customer.
     </div>
      
+-->
 <!-- USEFUL
 <table style="width:100%" border="1">
 <tr>
