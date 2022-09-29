@@ -4,7 +4,7 @@ University of Bologna, software engineering final theme project.
 
 preview analisi e progettazione
 
-https://htmlpreview.github.io/?https://github.com/HSCnoKenju/WasteService/blob/main/presentation/WasteServiceAnalysis_v_1.html
+https://htmlpreview.github.io/?https://github.com/HSCnoKenju/WasteService/blob/main/presentation/WasteServiceAnalysis_v_6.html
 
 
 
@@ -44,6 +44,17 @@ Eseguire lo script
 
 Eseguire lo script
 * launchall_sprint3.sh
+* ! ATTENZIONE, apre 7 terminali per poter monitorare i singoli componenti
+
+## UTILIZZO
+
+Una volta attivato, aprire un browser
+* localhost:8090, visualizzare il robot virtuale
+* localhost:8084, visualizzare WasteServiceStatusGui
+
+Tra i terminali aperti dallo script, individuare quello nominato ***TruckSimulator***
+* una Textual User Interface per poter inviare richieste, simula l'interazione da parte di un furgone di rifiuti
+
 
 # ESECUZIONE DISTRIBUITA
 
@@ -72,6 +83,9 @@ Eseguire lo script
 
 Eseguire lo script
 * buildall.sh
+
+
+
 
 > distribuzione Led sul raspberry
 
@@ -150,3 +164,13 @@ Eseguire lo script
 
 Eseguire lo script
 * distribuited_test.sh
+* ! ATTENZIONE, apre 7 terminali per poter monitorare i singoli componenti
+
+## UTILIZZO
+
+Una volta attivato, aprire un browser
+* localhost:8090, visualizzare il robot virtuale
+* localhost:8084, visualizzare WasteServiceStatusGui
+
+Tra i terminali aperti dallo script, individuare quello nominato ***TruckSimulator***
+* una Textual User Interface per poter inviare richieste, simula l'interazione da parte di un furgone di rifiuti
