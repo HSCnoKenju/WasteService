@@ -1,0 +1,439 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+
+@Author Antonio Hu
+-->
+<link rel="stylesheet" href="css/basic.css">
+<link rel="stylesheet" href="css/presentation.css">
+    
+<head>
+   
+    <title>Waste Service: Sprint 2</title></head>
+        
+    <body>
+    <div id="top">
+    <h1>LABORATORIO DI INGEGNERIA DEI SISTEMI SOFTWARE <font size="5"></font> </h1>
+    </div>  
+    
+    <div class="body"> 
+    <h1>Introduction</h1>
+     
+    <p>Tema finale corso di studio <b>Ingegneria dei sistemi software</b>, Laurea Magistrale Università di Bologna </p> 
+    
+ 
+ 
+<h1>Precedente</h1>
+
+<div class="remark">
+    <a href="../sprint_0/requisiti.html">Requisiti committente</a>
+    <a href="../sprint_0/sprint_0.html">sprint 0</a>
+    <a href="../sprint_1/sprint_1.html">sprint 1</a>
+</div>
+
+ 
+
+<h1>CHECKPOINT SPRINT 1</h1>
+
+ 
+<div class="remark">
+    <img src="img/waste_servicearch_progetto_sprint_1.png" alt="img/waste_servicearch_progetto_sprint_1.png">
+    </div>
+    
+ 
+
+
+
+<h1>GOAL SPRINT 2</h1>
+
+ 
+<div class="remark">
+    <p><b> alarm </b>, il servizio interrompe momentaneamente la sua esecuzione all'avvistarsi di un ostacolo rilevato dal sonar; il funzionamento del trolley viene monitorato con un led, il quale si comporta in modo diverso a seconda che sia a HOME, venga interrotto dal sonar oppure stia lavorando ad una richiesta.</p>
+    </div>
+     
+ 
+
+<h1>Requirement analysis</h1>
+
+ 
+<div class="remark">
+    <h5> alarm </h5>
+    
+    <p>The <cite>Sonar</cite> is used as an ‘alarm device’: when it <b class="red"> measures a distance </b> less that a <b class="red"> prefixed value <strong>DLIMT</strong></b>,
+    the <cite class="green">transport trolley</cite>  must be <b class="red"> stopped.
+    It will be resumed </b> when <cite>Sonar</cite> detects again a distance higher than  <strong>DLIMT</strong>.</p>
+    <ul>
+        <li><b class="red">Problema</b> : Il sonar fa misurazioni continue di distanza e in qualche modo deve arrivare al transport trolley . (denominato in seguito <b class="red">distance</b>).</li>
+        <li> <b class="red">Problema</b>: Il transport trolley non reagisce direttamente ad una distanza misurata, ma se questa è o meno superiore ad una soglia (denominato in seguito <b class="red"> threshold </b>).</li>
+        <li> <b class="red">Problema</b>: Il transport trolley deve avere la capacità di bloccare l'esecuzione e riprendere da dove ha terminato(denominato in seguito <b class="red">interrupt</b>).</li>
+        <li> <b class="green">Problema</b>: Il 'transport trolley' ora sono più componenti, bisogna vedere quale di questi è coinvolto in ogni singolo problema (denominato in seguito <b class="green">abstractTrolley</b>).</li>
+    </ul>
+
+    <p>a <span class="blue">Sonar</span> and a <span class="blue">Led</span>  connected to a RaspnerryPi. The <cite>Led</cite> is used as a <em>warning devices</em>,
+        according to the following scheme:</p>
+        <ul class="simple">
+        <li><p>the <cite>Led</cite> is <strong>off</strong> when the  <cite>transport trolley</cite> is at <cite class="red">HOME</cite></p></li>
+        <li><p>the <cite>Led</cite> <strong>blinks</strong> while the <cite>transport trolley</cite> is <b class="red"> moving </b></p></li>
+        <li><p>the <cite>Led</cite> is <strong>on</strong> when <cite>transport trolley</cite> is <b class="red"> stopped </b>.</p></li>
+        </ul>
+
+        <ul>
+            <li><b class="blue">Requisito</b> : Sonar e Led sono in una macchina separata dal resto del progetto (denominato in seguito <b class="blue">distributed</b>).</li>
+            <li> <b class="green">Problema</b>: Il 'transport trolley' ora sono più componenti, bisogna vedere quale di questi è coinvolto in ogni singolo problema (denominato in seguito <b class="green">abstractTrolley</b>).</li>
+            <li> <b class="red">Problema</b>: le informazioni di home, moving e stopped sono potenzialmente in 3 componenti diversi, coordinazione e concorrenza tra i componenti per la pilotazione del led <b class="red">ledMultipleSources</b>).</li>
+            
+        </ul>
+
+        <h5> core-functionality, parte rimanente</h5>
+            <p> 3. <del>When the load is accepted, the <cite>transport trolley</cite> reaches the <cite>INDOOR</cite>, picks up the material, goes to the
+            proper container and settles the material.</del> During this activity, the <cite>WasteService</cite> <strong>blinks</strong> the <cite>Led</cite></p> </li>
+                 
+             <ul>
+            <li><b class="blue">Requisito</b> : Specifica più in dettaglio cosa significa <b class="red">  moving  </b> nel paragrafo precedente per il led. (denominato in seguito <b class="blue">movingExplain</b>).</li>
+            
+        </ul>
+
+
+        <h3>modello requisiti</h3>
+        <ul>
+            <li><a href="sprint_2_qak/src/modello_requisiti.qak" >modello_requisiti</a></li>
+            <li>path : sprint_2_qak/src/modello_requisiti.qak</li>
+            <li> <a href="img/waste_servicearch_requisiti.png"> <img src="img/waste_servicearch_requisiti.png" alt="img/waste_servicearch_requisiti.png"></a> </li> 
+        </ul>
+
+        <p> Metto in chiaro la presenza di un altro contesto separato da quelli già progettati, e due entità sonar e led. </p>
+    </div>
+    
+ 
+
+
+
+<h1>Problem analysis</h1>
+
+ 
+<div class="remark">
+    <h5> <k> distance </k> </h5>
+
+    <p>Il sonar è un dispositivo di input; l'uso di un dispositivo di input presenta due modalità principali: </p>
+
+    <ul>
+        <li>il componente interessato ai dati prodotti dal dispostivo di input, ne invoca un metodo ‘bloccante’ (ad esempio read()) che fornisce un dato non appena disponibile. <span class="green"> interazione a polling </span>;</li>
+        <li>il componente consumatore dei dati si relaziona con dispostivo di input secondo il <span class="green"> pattern observer</span>.</li>
+    </ul>
+
+    <p>Asseriamo inoltre che il sonar è un dispositivo che, una volta attivato, emette informazioni senza sapere a chi interessino, ha solo il compito che il messaggi venga inviato, ma non accettato dai interessati.</p>
+
+    <p>Di conseguenza a quanto detto sopra, l'interazione principale del sonar sarà ad <b> evento </b>, soddisfando la semantica di NON conoscenza del destinatario.</p>
+
+    <p>Dato che il sonar è una  <b> sorgente continua</b> di dati, a parte per applicazioni particolari mi posso permettere di perdere uno dei eventi generati, visto che quello successivo sarà un dato abbastanza simile.</p>
+
+    <h5> <k> threshold </k> </h5>
+
+    <p>Riconosciamo DLIMIT come un attributo di applicazione modificabile prima dell'esecuzione, e costante durante ogni utilizzo del sistema.</p>
+    <p>La "conversione" tra distanza e l'azione che deve fare il trolley può essere situata in 3 componenti</p>
+    <ul>
+        <li><b> SONAR </b>: mi accoppia il sonar generico ad una interfaccia di comandi specifica per questa applicazione  </li>
+        <li><b> TROLLEY </b>: mi accoppia i componenti del trolley ad una sorgente sonar-like che può fermare l'esecuzione.   </li>
+        <li><b> COMPONENTE STAND-ALONE </b>: mantengo la single responsability, sonar e trolley loose coupled tramite due messaggi distinti  </li>
+    </ul>
+
+    <p> se scegliamo di fare un componente STAND-ALONE, essendo il sistema distribuito devo pensare a dove mettere questo componente</p>
+    <ul>
+        <li>stesso contesto sonar (RPI), così posso "filtrare" le comunicazione prima di inviarle in remoto</li>
+        <li>stesso contesto trolley, il sonar fa un emit remoto ad ogni messaggio, ma l'intero contesto del sonar è indipendente dall'applicazione</li>
+    </ul>
+
+    <p>Sempre nel caso di componente STAND-ALONE, bisogna valutare se dopo la traduzione ogni volta invia il messaggio, oppure adotta determinate politiche; Es. trasmissione solo se il comando è diverso da quello precedente</p>
+
+    <h5> <k> interrupt </k>  && <span class="green"> abstractTrolley</span> && <span class="blue">movingExplain</span> </h5>
+
+    <p>Il trolley è composto dai seguenti 5 componenti, e questi sono i comportamenti se solo uno di loro è sensibile al messaggio di stop-resume (originato dal sonar), <b> quando il robot è già in movimento</b></p>
+
+    <p></p>
+
+    <table>
+        <thead>
+            <tr>
+              <th>COMPONENTE</th>
+              <th>CONSEGUENZA AD INTERRUPT <br> (robot già in movimento)</th>
+            </tr>
+          </thead>
+        <tbody>
+            <tr>
+                <td>WASTE_SERVICE</td>
+                <td>Termino il <b>percorso rimanente arrivando ad Home </b>, finché non ricevo resume non restituisco la risposta loadaccept se non l'ho già inviato prima dell'interruzione</td>
+              </tr>
+          <tr>
+            <td>TROLLEY_FACADE</td>
+            <td> Termino la parte di <b>tragitto corrente </b> (mi troverò in una delle seguenti posizioni: HOME, INDOOR, GLASS, PLASTIC), e attendo il resume prima di procedere al prossimo pezzo di percorso, oppure di rispondere al Waste_Service </td>
+        </tr>
+          <tr>
+            <td>PATH_PLANNER</td>
+            <td> Termino la parte di <b>tragitto corrente </b> (mi troverò in una delle seguenti posizioni: HOME, INDOOR, GLASS, PLASTIC), <b> oppure sono davanti ad un ostacolo</b> ; non ricalcolo il percorso (caso pathfailure) o rispondo al TROLLEY_FACADE (caso pathdone) fino al resume </td>
+          </tr>
+          <tr>
+            <td>MAPPER</td>
+            <td>Termino la <b> singola mossa che sto facendo per mappare  </b> la stanza, finchè non ho resume non rispondo al PATH_PLANNER oppure non eseguo la mossa successiva. Il MAPPER però viene chiamato solo nello startup del sistema, nel caso che PATH_PLANNER non abbia già a disposizione una mappa </td>
+          </tr>
+          <tr>
+            <td><b> PATH_EXECUTOR </b></td>
+            <td>Termino <b> la singola mossa </b>, ovvero quella in cima al path che mi passato il PATH_PLANNER, e aspetto il resume per continuare a decifrare il path, oppure rispondere al planner</td>
+          </tr>
+          <tr>
+            <td> <b> BASICROBOT </b></td>
+            <td>Termino la singola mossa, <b> potenzialmente </b> posso anche bloccare la mossa stessa in esecuzione, e nel resume recuperare la parte di movimento mancante.</td>
+          </tr>
+        </tbody>
+        </table>
+
+        <p>I componenti che hanno più senso di essere sensibili ad stop/resume sono PATH_EXECUTOR oppure basicrobot; l'analista nota che la <b> procedura di recupero </b> per la <span class="red"> parte di mossa non terminata </span> può essere arbitrariamente <b> complessa</b>. (preferisce rendere interrompibile il path_executor invece che il basicrobot) </p>
+
+
+    <h5> <k> ledMultipleSources </k> </h5>
+
+    <p> <b>Stesse considerazioni fatte dal sonar al core </b> valgono dal core al led, quindi si preferisce fare un componente  a parte che traduce lo stato del trolley in un comando per il led.</p>
+   
+    <p>Il problema è che le informazioni del trolley sono dati da componenti interni diversi</p>
+    <table>
+        <thead>
+          <tr>
+            <th>INFORMAZIONE</th>
+            <th>componente</th>
+            <th>altra possibilità</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>trolley a HOME</td>
+            <td> TROLLEY_FACADE</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>trolley in movimento</td>
+            <td>TROLLEY_FACADE <br> in movimento eccetto quando sono in home (evento one-shot per tutta la durata del percorso)</td>
+            <td>BASICROBOT <br> ogni comando eseguito notifico lo stato (in movimento) (un evento ogni movimento) </td>
+          </tr>
+          <tr>
+            <td>trolley STOPPED</td>
+            <td>PATH_EXECUTOR <br> dipende da come si sceglie di risolvere il problema <b class="red">interrupt </b></td>
+            <td>BASICROBOT <br> dipende da come si sceglie di risolvere il problema <b class="red">interrupt </b></td>
+          </tr>
+        </tbody>
+    </table>
+
+    <p>Essendo i componenti potenzialemente su contesti diversi, devo pensare al problema che l'ordine di arrivo dei messaggi al "translator" non sia l'ordine logico di generazioni di questi messaggi.</p>
+    <p>Es. basicrobot esegue l'ultimo movimento per portare ad HOME, emette l'informazione (in movimento), catena di risposte fino a TROLLEY_FACADE ed emette l'informazione (a home); <b> se (in movimento) arriva erroneamente dopo (a home) </b> il led si comporterà in modo sbagliato.</p>
+    
+    <p>L'argomento in gioco è la coordinazione tra processi interagenti distribuiti; una soluzione possibile consiste nell'addottamento di un ordinamento tramite tempo (fisico o logico); sarebbe che il ricevente (in questo caso il traduttore trolley -> led) si salva il timestamp (o equivalente) dell'ultimo messaggio tradotto, ed ignora i messaggi successivi con timestamp inferiore.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>PROBLEMA</th>
+          <th>soluzione adottata</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>distance- modalità </td>
+          <td> pattern observer</td>
+        </tr>
+        <tr>
+          <td>distance- interazione</td>
+          <td>evento; il singolo messaggio non è importante perchè quello successivo è simile</td>
+        </tr>
+        <tr>
+          <td>threshold</td>
+          <td>componente stand-alone da sonar e trolley</td>
+        </tr>
+        <tr>
+          <td>threshold- contesto</td>
+          <td> contesto trolley, il contesto del sonar è indipendente dall'applicazione </td>
+        </tr>
+        <tr>
+          <td>threshold- interazione</td>
+          <td> evento; "eredito" la caratteristica della distanza misurata dal sonar (la singola informazione non è importante) </td>
+        </tr>
+        
+        <tr>
+          <td>interrupt- component </td>
+          <td>PATH_EXECUTOR con possibilità di interruzione, la singola mossa in esecuzione viene terminata</td>
+        </tr>
+        <tr>
+          <td>led- frequenza </td>
+          <td>HOME ed STOPPED vengono inviati "una volta" e non ri-trasmessi, MOVING viene inviato ad ogni effettivo movimento </td>
+        </tr>
+        
+        <tr>
+          <td>led- interazione </td>
+          <td>evento (?) sicuro per il blink (singolo messaggio non importante), ma <b> non tanto sicuro per HOME e STOPPED</b> </td>
+        </tr>
+        <tr>
+          <td>led- componente</td>
+          <td>componente stand-alone, che raccoglie da tutte le fonte ed è l'unico ad emettere trigger per il led</td>
+        </tr>
+
+        <tr>
+          <td>led- coerenza ed ordinamento</td>
+          <td>logica del ignorare messaggi che sono stati inviati prima (timestamp inferiore) dell'ultimo ricevuto</td>
+        </tr>
+      </tbody>
+      </table>
+
+
+      <h3>modello problema</h3>
+      <ul>
+          <li><a href="sprint_2_qak/src/modello_problema.qak" >modello_problema</a></li>
+          <li>path : sprint_2_qak/src/modello_problema.qak</li>
+        </ul>
+
+        <a href="img/waste_servicearch_problema.png"> <img src="img/waste_servicearch_problema.png" alt="img/waste_servicearch_problema.png" width="60%"></a>
+      
+    </div>
+     
+
+<h1>Test plans</h1> 
+
+ 
+<div class="remark">
+    <h3>alarm</h3>
+
+  <h4>led-regime</h4>
+  <p> Eseguire un percorso intero (home-indoor-glass/plastic-home), verificare che per tutto il tragitto il led lampeggia, mentre quando è nella posizione HOME il led si spegne</p>
+
+  <h4>interrupt-happen</h4>
+  <p>Eseguire un percorso intero con due interruzioni-resume di delay arbitrario e verificare che effettivamente il trolley è fermo in quell'arco di tempo</p>
+  
+  <h4>interrupt-led</h4>
+  <p>Ripetere <b>interrupt-happen</b>, inserendo il led all'interno del sistema testato da <b>led-regime</b> verificare che oltre al comportamento a regime, quando il led è acceso il trolley è effettivamente fermo</p>
+
+  <h4>sonar-source</h4>
+  <p>Inserire il componente sonar-mock in stile alternato, verificare che le traduzioni siano corrette e poi far partire il sistema comprensivo di led</p>
+
+  <h4>sonar-real</h4>
+  <p>Inserire il componente sonar reale</p>
+    </div>
+    
+
+<h1>Project</h1> 
+
+ 
+<div class="remark">
+   
+  <h3>qak and interrupt ?</h3>
+
+  <p>Nel qak attuale (1.2.6) gli attori auto-generati non predispongono del supporto per la semantica di messaggi-interruzione; il progettista si ricorda durante lo svolgimento di altri progetti una implementazione già fatta per il supporto di interrupt per attori come macchine a stati finiti. </p>
+
+  <p>La versione java, wrapper per kactor implementa il concetto di interruzione tramite un meccanismo di salvataggio della tabella delle transizioni dello stato interrotto; siamo quindi dinanzi a due possibilità.</p>
+
+
+  <h4>priorità qak</h4>
+  <p> una idea di implementazione possibile per mantenere tutto all'interno del mondo qak è di creare stati stop-resume per <b class="red"> ognuno degli stati </b> delle FSM interrompibili, questi stati-dummy di resume hanno tutti lo stesso corpo, ma copiano la tabella delle transizione dello stato sospeso. </p>
+    
+  <h4>priorità interrupt</h4>
+
+  <p> l'altra idea di implementazione che ci evita la riscrittura di questi stati dummy (alla peggio una copia di tutti i stati della FSM interrompibile), è appunto di esternare le FSM interrompibili dal mondo qak, e implementarli in java come istanze di <b class="blue"> unibo.actor22.QakActor22FsmAnnot </b>, questo significa però che perdiamo la snellità e l'<b class="red"> alto livello del meta-modello qak</b> creato per questi componenti, quindi la semplicità di definire il sistema interessato al componente, i messaggi ad esso rilevanti etc etc. </p>
+
+  <p>Inoltre bisogna verificare se effettivamente si riesce a far comunicare i due mondi.</p>
+
+
+  <p><b>Scelta del progettista</b> è di dare priorità all'interrupt, quindi di utilizzare l'implementazione java, per i seguenti due motivi:</p>
+
+  <ul>
+    <li>Poca scalabilità dell'altra soluzione, appunto ci sarebbe una proliferazione di stati interni dei componenti interrompibili</li>
+    <li>Il concetto interruzione è già stato implementato, il lavoro è principalmente di integrazione dei due mondi e non dello sviluppo in sè della funzionalità</li>
+  </ul>
+
+  <h3> integration problems</h3>
+
+  <ul>
+    <li>la versione Java non supporta la semantica di messaggio  <b>evento esterno</b>, un non attore non può interagire tramite evento con il sistema </li>
+    <li>gli eventi emessi dal contesto non vengono propagati ai contesti remoti associati</li>
+    <li>non è presente il supporto al protocollo MQTT, di per se non sarebbe un problema ma i contesti qak che supportano MQTT, inviamo esclusivamente messaggi MQTT anche se il ricevente non supporta tale protocollo, facendo sì che dato che PathExecutor non può ricevere MQTT, wasteService non può lavorare con MQTT e di conseguenza con lo stesso pensiero nessun altro contesto</li>
+  </ul>
+
+  <h3>componenti digital Twins</h3>
+
+  <p>Led e sonar vengono copiati e leggermente modificati rispettivamente da unibo.ledqak22 ed unibo.sonarqak22, essendo componenti sviluppati precedentemente dalla software house e messi a disposizione</p>
+  <p>Per facilità di testing ogni componente segue una versione simulata, e la scelta tra quali delle due attivare è data da un file di configurazione esterno</p>
+
+  <h4>Led</h4>
+  <p>Componente stand alone il quale aspetta eventi <b class="blue">ledtrigger</b> e a seconda del payload pilota il led (virtuale o concreto) </p>
+  <p>Rispetto al componente originario della software house, esteso il comportamento per far <b> lampeggiare </b> il led, oltre ad accensione e spegnimento.</p>
+
+  <h4>Sonar</h4>
+  <p>Componente stand alone i quali <b class="blue"> osservatori </b> ottengono la distanza rilevata dal sonar (virtuale o concreto); è presente una pipe : sonardatasource --> datacleaner --> sonarqak, è possibile configurare inoltre se il sonar deve essere un demone continuo (Endless) oppure smettere di funzionare dopo un tempo deciso a deploy time (sonardelay). </p>
+  
+
+  
+
+  <h3> Modello del Progetto</h3>
+  
+
+  <a href="img/waste_servicearch_progetto.png"><img src="img/waste_servicearch_progetto.png" alt="img/waste_servicearch_progetto.png"></a>
+
+  <p>per facilità di lettura, ledTrigger è disegnato come un dispaccio, ma nel progetto è un evento: il sistema deve mantenersi funzionante anche se il led non è presente</p>
+  <p>zooming sui componenti Led e Sonar</p>
+  <div class="container">
+
+    <img src="../unibo.ledqak22/ledqak22arch.png" alt="" width="50%">
+    <img src="../unibo.sonarqak22/sonarqak22arch.png" alt="" width="50%">
+  
+  </div>
+    </div>
+     
+
+
+
+<h1>Deployment</h1> 
+
+ 
+<div class="remark">
+      
+  <p>i file gradle contengono in generale anche il deploy della conoscenza del sistema (file pl)</p>
+  <p> inoltre per alcuni specifici il deploy può includere scripts oppure file json</p>
+
+
+    </div>
+    
+ <h1>CHECKPOINT SPRINT 2</h1>
+
+ <div class="remark">
+
+
+  <h3> Modello del Progetto</h3>
+  
+
+  <a href="img/waste_servicearch_progetto.png"><img src="img/waste_servicearch_progetto.png" alt="img/waste_servicearch_progetto.png"></a>
+
+  <p>per facilità di lettura, ledTrigger è disegnato come un dispaccio, ma nel progetto è un evento: il sistema deve mantenersi funzionante anche se il led non è presente</p>
+  <p>zooming sui componenti Led e Sonar</p>
+  <div class="container">
+
+    <img src="../unibo.ledqak22/ledqak22arch.png" alt="" width="50%">
+    <img src="../unibo.sonarqak22/sonarqak22arch.png" alt="" width="50%">
+  
+  </div>
+ </div>
+     
+<!-- USEFUL
+<table style="width:100%" border="1">
+<tr>
+@Author Antonio Hu
+<td style="width:50%">
+</td>
+<td></td>
+</tr>
+</table>
+-->
+	
+
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+By student Name Antonio Hu email: antonio.hu@studio.unibo.it  <br>
+github:
+<img src="./img/emiglio.png" alt="mbot" width="15%" height="15%">
+</div> 
+</body>
+</html>
