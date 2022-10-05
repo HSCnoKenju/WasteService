@@ -1,0 +1,135 @@
+System sprint_0 
+
+
+Request waste : details(TYPE,TRUCKLOAD) // TYPE: Glass / Plastic
+Reply loadAccept : info(ok)  	// Reply loadAccepted : info(TYPE,WEIGHT,AVAILABLE_WEIGHT)   
+Reply loadRejected : info(rip)   // Reply loadRejected : info(TYPE,WEIGHT,AVAILABLE_WEIGHT)  
+
+
+Request goal : destination(CONTAINER) // Glass / Plastic
+Reply pickup : info(TYPE) // Glass / Plastic
+
+
+Request destination : dest(DESTX, DESTY)
+Reply arrived : info(done)
+
+Dispatch sonardata : sonardata(DISTANCE) 
+Dispatch ledtrigger : led(CMD) // on - off - blink
+
+Dispatch stop : stop(ARGS)
+Dispatch resume : resume(ARGS)
+
+
+Event weights : info(WEIGHT)
+Event robotState : info(ATHOME,MOVING,STOPPED,TIMESTAMP)
+
+Event ledState : info(STATE)
+
+Context ctxrpi ip [host="localhost" port= 8081]
+Context ctxwasteservice ip [host="localhost" port= 8080]
+Context ctxgui ip [host="localhost" port=8082]
+Context ctxtruck ip[host="localhsot" port=8083]
+
+QActor wastetruck context ctxtruck {
+	
+	State s0 initial{
+		
+		request wasteservice -m waste : details("Plastic",10)
+	}
+}
+
+QActor wasteservice context ctxwasteservice {
+	State s0 initial{
+		
+	}
+	Transition s0 whenRequest waste -> accept
+				 whenMsg sonardata -> handlesonar
+				 whenEvent robotState -> handlerobot
+	
+	
+	State accept {
+		
+		onMsg ( waste : details(TYPE,TRUCKLOAD) ) {
+			
+			replyTo waste with loadAccept : info(ok) 
+			emit weights : info(100)
+			
+			request trolley -m goal : destination("Plastic")
+			
+			
+		}
+	}
+	Goto s0
+	
+	State handlesonar {
+		
+		forward trolley -m stop : stop("stop")
+		forward trolley -m  resume : resume("resume")
+	}
+	Goto s0
+	
+	State handlerobot {
+		
+		forward led -m ledtrigger : led("blink")
+	}
+	Goto s0
+}
+
+QActor trolley context ctxwasteservice {
+	State s0 initial{
+		
+	}
+	Transition t0 whenRequest goal -> work 
+				  whenMsg stop -> handlestop
+				  whenMsg resume -> handleresume
+	
+	State work {
+		
+		emit robotState : info(false,true,false,0)
+		
+		replyTo goal with pickup : info(Platic)
+	}
+	Goto s0
+	
+	State handlestop {
+		
+		
+	}
+	Goto s0
+	
+	State handleresume {}
+	Goto s0
+	
+	
+}
+
+QActor sonar context ctxrpi {
+	
+	State s0 initial{
+		
+		forward wasteservice -m sonardata : sonardata(90)
+		
+		delay 3000
+	}
+	Goto s0
+}
+
+QActor led context ctxrpi{
+	State s0 initial{
+		
+		emit ledState : info("blink")
+	}
+	Transition t0 whenMsg ledtrigger -> s0
+}
+
+QActor gui context  ctxgui { 
+	
+	State s0 initial{
+		
+		printCurrentMessage
+	}
+	Transition s0 whenEvent ledState -> s0
+				  whenEvent robotState -> s0
+				  whenEvent weights -> s0	
+	
+}
