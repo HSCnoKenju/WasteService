@@ -1,0 +1,37 @@
+QAK
+1. Qactor, nome
+Per l'implementazione della primitiva WhenTime , l'attore che lo invoca non può avere caratteri speciali come parte del proprio nome
+
+2. CodedQactor, nome
+Nella scrittura del file qak, un codedQactor può avere lettere maiuscole, senza sollevare nessun errore sintattico; i messaggi aventi qual attore come destinatario, hanno nel campo destinatario il nome dell'attore tutto minuscolo , e tale messaggio non viene recapitato correttamente
+
+3. Formato messaggio
+I messaggi vengono dati in pasto ad un interprete tuprolog , il payload dei messaggi però non viene fatto escape dei caratteri utili per prolog, e questo potrebbe portare errore
+
+4. build.gradle, pl nella distribuzione
+Visto che vengono generato i file .pl, conoscenza del sistema in forma dichiarativa, che serve anche nella distribuzione, sarebbe opportuno aggiungere la seguente riga nel file di building auto-generato
+        
+
+            distributions {
+                main {
+                    contents {
+                         from './contextname.pl'  
+                        from './sysRules.pl'
+                    }
+                }
+            }
+        
+    
+5. MQTT
+Nell'implementazione attuale posso specificare solo un unico canale MQTT della quale sono sia publisher che subscriber; questo implica che per far comunicare il mio sistema tramite MQTT, tutti i contesti sono publisher ed subscriber dello stesso topic.
+Il problema esiste soprattutto per i messaggi di natura evento, i quali qak non fornisce primitive per emit esclusivamente locali , quindi usando MQTT l'application designer ha solo due opzioni
+1. Usare MQTT, tutti gli eventi vengono propagati a tutti i contesti del sistema
+2. non usare MQTT
+questo limita enormemente i scenari possibili di utilizzo di questo protocollo
+
+
+6. COAP OBSERVER
+nella scrittura del modello, observeResource accetta come parametro solo Qactor, non ExternalQactor
+Il codice generato inoltre scrive direttamente all'interno della classe l'indirizzo al momento di generazione
+rendendo presente una discrepanza di configurazione tra la dichiarazione di un attore esterno nel file .pl, e l'osservatoreCOAP
+L'application designer suggerisce che la locazione dell'indirizzo COAP della risorsa debba essere risolto a runtime, durante la fase di boostrap, leggendo dal file *.pl, in modo analogo alla creazione dei proxy per gli attori remoti quando si imposta il contesto locale
