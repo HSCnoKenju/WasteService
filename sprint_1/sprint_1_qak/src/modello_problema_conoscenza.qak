@@ -1,0 +1,409 @@
+System /*-trace*/ waste_service
+
+
+/* =================== MESSAGGI MODELLO ================== */
+
+Request waste : details(TYPE,TRUCKLOAD) // TYPE: Glass / Plastic
+Reply loadAccept : info(ok)  	// Reply loadAccepted : info(TYPE,WEIGHT,AVAILABLE_WEIGHT)   
+Reply loadRejected : info(rip)   // Reply loadRejected : info(TYPE,WEIGHT,AVAILABLE_WEIGHT) 
+
+
+
+/* =================== MESSAGGI PROBLEMA =============== */ 
+
+
+Request goal : destination(CONTAINER) // Glass / Plastic
+Event pickup : info(TYPE) // Glass / Plastic
+Reply workdone : info(done)
+
+
+
+/* =================== MESSAGGI CONFIGURAZIONE ==================== */
+
+Dispatch init_capacity : values(MAXGB,MAXPB)
+Dispatch all_position : coordinates(HOMEX,HOMEY,INDOORX,INDOORY,PLASTICX,PLASTICY,GLASSX,GLASSY)
+Dispatch start_position : coordinates(STARTX,STARTY)
+
+
+/*=================== TEST PURPOSE =============================== */
+
+Dispatch reset : info(ARGS)
+
+
+Context ctxconfig ip [host="localhost" port=8034]
+Context ctxtest ip [host="localhost" port=8035]
+Context ctxwaste ip [ host="localhost" port=8033]
+
+
+
+QActor configurer context ctxconfig {
+	
+	State s0 initial {
+		
+	}
+	
+	State send {
+		
+		forward waste_service -m init_capacity : values(30,30)
+		forward transporttrolley -m start_position  : coordinates(0,0)
+		forward transporttrolley -m all_position : coordinates(0,0,1,5,6,2,1,6)
+	}
+}
+
+QActor tester context ctxtest {
+	
+	State s0 initial {
+		
+	}
+	
+	State send {
+		
+		forward waste_service -m reset : info("reset")
+	}
+}
+
+
+
+
+QActor transporttrolley context ctxwaste {
+	
+	
+	[#
+		var PathStr = StringJoiner(" ")
+		var CurrentType = ""
+		var PositionsMap: Map<String, Pair<Int,Int>>
+		var CurrentPosition: Pair<Int,Int>
+	#]
+	
+	State s0 initial {
+		println("		TRANSPORT TROLLEY | STARTED")	
+	}
+	Goto accepting
+	/*Transition t1 whenMsg all_position ->  gotPositions*/
+	
+	
+	State gotPositions {
+		
+		printCurrentMessage
+		
+		onMsg (  all_position : coordinates(HOMEX,HOMEY,INDOORX,INDOORY,PLASTICX,PLASTICY,GLASSX,GLASSY) ) { 
+			
+			[#
+				PositionsMap = mapOf ("HOME" to Pair(payloadArg(0).toInt(),payloadArg(1).toInt()), "INDOOR" to Pair(payloadArg(2).toInt(),payloadArg(3).toInt()), "PLASTIC" to Pair(payloadArg(4).toInt(),payloadArg(5).toInt()), "GLASS" to Pair(payloadArg(6).toInt(),payloadArg(7).toInt())  )
+				
+			#]
+		}
+	}
+	Transition t1 whenMsg start_position -> setStart
+	
+	State setStart {
+		
+		
+		printCurrentMessage
+		
+		onMsg (start_position : coordinates(STARTX,STARTY)) {
+			
+			[#
+				CurrentPosition = Pair(payloadArg(0).toInt(),payloadArg(1).toInt())
+					
+			#]
+		}
+		
+	}
+	Goto accepting
+	
+	State accepting {
+		
+		[# PathStr = StringJoiner(" ")	#]
+		
+		printCurrentMessage
+		println("		TRANSPORT TROLLEY | NEW WORK")	
+	}
+	Transition t0 whenRequest goal -> arriveIndoor
+	
+	State arriveIndoor {
+	
+		[#PathStr.add("ACCEPTED")#]	
+		updateResource[#"$PathStr"#]
+		
+		onMsg ( goal : destination(CONTAINER) ){
+			[#
+			
+			CurrentType = payloadArg(0)
+				
+			#]
+			
+		[#PathStr.add("INDOOR")#]	
+		updateResource[#"$PathStr"#]
+			
+			
+		}
+		
+		emit pickup : info($CurrentType)
+		println("		TRANSPORT TROLLEY | INDOOR")	
+	
+	}
+	Goto arriveDestination
+	
+	
+	State arriveDestination {
+		
+		[#PathStr.add("$CurrentType")#]	
+		updateResource[#"$PathStr"#]
+		
+		replyTo goal with workdone : info(done)
+	 	println("		TRANSPORT TROLLEY | $CurrentType")	
+	
+	}
+	Transition t1  whenTime 10 -> goingHome 
+				   whenRequest goal -> arriveIndoor /*else Goto accepting*/
+				   
+	 			   
+	
+	State goingHome {
+		
+		[#PathStr.add("HOME")#]	
+		updateResource[#"$PathStr"#]
+		
+		println("		TRANSPORT TROLLEY | going HOME")	
+	}
+	Goto accepting
+	
+}
+
+
+QActor waste_truck_mock context ctxwaste {
+	
+	State s0 initial {
+		println("		WASTE_TRUCK GENERATOR | STARTED")
+	}
+	/*Goto newLoad*/
+	
+	State newLoad{
+			println("		WASTE_TRUCK GENERATOR | NEW REQUEST")
+			request waste_service -m waste : details(Glass,2)
+			//request waste_service -m waste : details(Plastic,11)
+	}
+	Transition t0 whenReply loadAccept -> accepted
+				  whenReply loadRejected -> rejected
+	
+	State accepted{
+		
+		printCurrentMessage
+	}
+	Goto end
+	
+	State rejected{
+		
+		printCurrentMessage
+	}
+	Goto end
+	
+	State end {
+		println("		WASTE_TRUCK GENERATOR | END")
+	}
+	
+}
+
+
+
+
+QActor waste_service context ctxwaste {
+	[#
+		var Available_Glass = 0
+		var Available_Plastic = 0
+		var RequestedType  = ""
+		var RequestedWeight = 0
+		var Available = true 
+		
+		var Init_Glass = 0
+		var Init_Plastic = 0
+	#]
+	
+	State s0 initial {
+			println("WASTE_SERVICE | STARTED")
+	}
+	Transition t1 whenMsg init_capacity  -> getWeights
+	/*Goto accepting*/
+	
+	
+	
+	State getWeights{
+		
+		printCurrentMessage
+		onMsg ( init_capacity : values(MAXGB,MAXPB)) {
+			
+			[#
+			
+				Available_Glass = payloadArg(0).toInt()
+				Available_Plastic = payloadArg(1).toInt()
+				Init_Glass = payloadArg(0).toInt()
+				Init_Plastic = payloadArg(1).toInt()
+				
+				
+			#]
+		}
+	}
+	Goto accepting
+	
+	
+	State accepting {
+			println("WASTE_SERVICE | ACCEPTING")
+		}
+	Transition t0 whenRequest waste -> check_availability
+				  whenMsg 	reset -> reset_weights
+				  
+	
+	
+	State reset_weights {
+		
+		println("WASTE_SERVICE | SHOULD ONLY BE IN TESTING, RESET WEIGHTS")
+	
+	
+		[#
+		
+		Available_Glass = Init_Glass
+		Available_Plastic = Init_Plastic
+		
+			
+		#]
+
+
+		updateResource[#"reset to Glass=$Available_Glass Plastic=$Available_Plastic "#]
+	}
+	Goto accepting
+	
+	State check_availability {
+		printCurrentMessage
+		println("WASTE_SERVICE | CHECK AVAILABILITY")	
+		onMsg ( waste : details(TYPE,TRUCKLOAD) ) {
+			[#
+				RequestedType = payloadArg(0)
+				RequestedWeight = payloadArg(1).toInt()
+
+					if (RequestedType == "Glass"){
+						Available = RequestedWeight <= Available_Glass
+					}
+					else if (RequestedType == "Plastic"){
+						Available = RequestedWeight <= Available_Plastic
+					}
+				else 
+					{	
+						println("WASTE_SERVICE | WRONG TYPE")
+						Available = false
+					}
+			#]
+			
+			if [# (Available)#] {
+			//replyTo waste with  loadAccept : info(ok)
+			} else {
+			updateResource [# "Glass=$Available_Glass Plastic=$Available_Plastic"#]
+			replyTo waste with  loadRejected : info(rip)
+			}			
+		}
+	}
+	Goto  issue_trolley if [#Available# ] else accepting
+	
+	State issue_trolley {
+		
+		println("WASTE_SERVICE | ISSUE TROLLEY")
+		request transporttrolley -m goal : destination($RequestedType)
+		
+	}
+	Transition t1 whenReply workdone -> lost_pickup 
+				  whenEvent pickup -> updateWeights	
+	
+	State lost_pickup{
+		
+		[#
+			
+			if (RequestedType == "Glass"){
+						Available_Glass -= RequestedWeight 
+					}
+			else if (RequestedType == "Plastic"){
+						Available_Plastic -= RequestedWeight 
+					}
+			else 
+					{	
+						println("WASTE_SERVICE | ERROR LOST PICKUP")
+					}
+	
+		#]
+		updateResource [# "Glass=$Available_Glass Plastic=$Available_Plastic"#]
+		replyTo waste with loadAccept : 	info(ok)
+		
+	}
+	Goto accepting
+	
+	
+	State updateWeights{
+			[#
+			
+			if (RequestedType == "Glass"){
+						Available_Glass -= RequestedWeight 
+					}
+			else if (RequestedType == "Plastic"){
+						Available_Plastic -= RequestedWeight 
+					}
+			else 
+					{	
+						println("WASTE_SERVICE | ERROR UPDATE WEIGHTS")
+
+					}
+	
+			#]
+			
+		updateResource [# "Glass=$Available_Glass Plastic=$Available_Plastic"#]
+		replyTo waste with loadAccept : info(ok)
+	}
+	Goto acceptBusy
+	
+	State acceptBusy{
+		
+		println("WASTE_SERVICE | ACCEPTING(BUSY)")
+	}
+	Transition t2 whenReply workdone -> accepting
+				  whenRequest waste -> checkWhenBusy
+	
+	
+	
+	
+	State checkWhenBusy{
+		printCurrentMessage
+		println("WASTE_SERVICE | CHECK AVAILABILITY")	
+		onMsg ( waste : details(TYPE,TRUCKLOAD) ) {
+			[#
+				RequestedType = payloadArg(0)
+				RequestedWeight = payloadArg(1).toInt()
+
+					if (RequestedType == "Glass"){
+						Available = RequestedWeight <= Available_Glass
+					}
+					else if (RequestedType == "Plastic"){
+						Available = RequestedWeight <= Available_Plastic
+					}
+				else 
+					{	
+						println("WASTE_SERVICE | WRONG TYPE")
+						Available = false
+					}
+			#]
+			
+			if [# (Available)#] {
+			//replyTo waste with  loadAccept : info(ok)
+			} else {
+			updateResource [# "Glass=$Available_Glass Plastic=$Available_Plastic"#]
+			replyTo waste with  loadRejected : info(rip)
+			}			
+		}
+	}
+	Goto addRequestToQueue if [# Available#] else acceptBusy
+	
+	State addRequestToQueue{
+		
+		println("WASTE_SERVICE | ISSUE TROLLEY TO QUEUE")
+		request transporttrolley -m goal : destination($RequestedType)
+		
+	}
+	Goto acceptBusy
+}

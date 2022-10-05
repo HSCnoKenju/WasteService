@@ -1,0 +1,735 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+
+@Author Antonio Hu
+-->
+<link rel="stylesheet" href="css/basic.css">
+<link rel="stylesheet" href="css/presentation.css">
+    
+<head>
+   
+    <title>Waste Service: Sprint 1</title></head>
+        
+    <body>
+    <div id="top">
+    <h1>LABORATORIO DI INGEGNERIA DEI SISTEMI SOFTWARE <font size="5"></font> </h1>
+    </div>  
+    
+    <div class="body"> 
+    <h1>Introduction</h1>
+     
+    <p>Tema finale corso di studio <b>Ingegneria dei sistemi software</b>, Laurea Magistrale Università di Bologna </p> 
+    
+ 
+ 
+<h1>Requirements</h1>
+
+ 
+<div class="remark">
+    <a href="../sprint_0/requisiti.html">Requisiti committente</a>
+    <a href="../sprint_0/sprint_0.html">sprint 0</a>
+</div>
+
+ 
+
+<h1>CHECKPOINT SPRINT 0</h1>
+
+ 
+<div class="remark">
+    <img src="img/waste_servicearch_requisiti.png" alt="img/waste_servicearch_requisiti.png">
+    </div>
+    
+ 
+
+
+
+<h1>GOAL SPRINT 1</h1>
+
+ 
+<div class="remark">
+    <p> <b> core-functionality </b>, Il servizio funziona stand-alone: a seconda della capienza dei contenitori, risponde in modo adeguato alle richieste dei wastetruck. Il trolley esegue il percorso più adeguato a seconda della presenza di ulteriori richieste.</p>
+    </div>
+     
+
+
+
+ 
+    <h1>Requirement analysis</h1>
+    <div class="remark">    
+    
+     <p>Dopo una prima analisi del testo dei requisiti, sono emersi alcuni punti non chiari 
+        dei quali è stato richiesto chiarimenti verso il committente. <br> Riportando in seguito 
+     </p>
+    <ol>
+    
+       <li id="Q1">Possono più WASTE_TRUCK arrivare nello stesso momento all'interno del sistema? oppure entra uno solo quando quello precedente ha liberato INDOOR? 
+        <ul>
+    
+            <li> r1: I truck possono arrivare uno solo alla volta e con loro anche i messaggi di richiesta.</li>
+            <li> r2: Però un messaggio di richiesta potrebbe arrivare mentre il Trolley sta scaricando</li>
+        </ul>
+        </li> 
+       
+        
+       <li id="Q2">In caso di load_accepted il WASTE_TRUCK libera INDOOR subito dopo che il TROLLEY ha prelevato il carico? 
+       
+       <ul>
+        <li>Si, per cui vale la r2
+        </li>
+       </ul>
+    </li>
+        <li>La WASTE-SERVICE considera il volume dei contenitori attualmente disponibili oppure è impossibile che il TROLLEY non compia il suo carico, quindi in caso di TROLLEY in transito, assieme al volume dei contenitori viene considerato anche il peso del carico in transito? 
+        
+        <ul>
+    
+            <li>
+                Per rispondere positivamente a una richiesta di deposito mentre il trolley sta scaricando, deve essere considerato anche il carico in transito,  come se fosse già stato depositato
+       
+            </li>
+        </ul>
+    </li>
+        
+       <li>LED che è accesso quando il TROLLEY È STOPPED : inteso quando fermato a causa del sonar? oppure anche davanti ai contenitori per scaricare il carico? 
+        
+       <ul>
+    
+        <li>
+            Solo a causa del sonar
+        </li>
+    </ul>
+    </li>
+       
+       
+    <li>
+        Se il trolley è in posizione HOME e il sonar rileva una distanza minore di DLIMIT, in che stato vuole che sia il LED?
+        <ul>
+            <li>
+                Il Led deve essere off. Deve diventare on se il Trolley deve muoversi ma il sonar rileva una distanza < DLIMT
+            </li>
+        </ul>
+    </li>
+    
+    </ol>
+    
+    
+    <p>Tramite la seguente tabella identifico in che stato deve essere il led </p>
+    
+    <table>
+        <thead>
+          <tr>
+            <th>TROLLEY \ SONAR</th>
+            <th>MINORE DLIMIT</th>
+            <th>MAGGIORE DLIMIT</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>HOME</td>
+            <td>LED OFF</td>
+            <td>LED OFF</td>
+          </tr>
+          <tr>
+            <td>WORKING</td>
+            <td>LED ON</td>
+            <td>LED BLINK</td>
+          </tr>
+        </tbody>
+        </table>
+    
+    
+        <h5 id="core-functionality">core-functionality</h5>
+    
+    
+        <ol class="arabic simple">
+            <li><p>The <b> <cite>Waste truck</cite> </b> driver approaches the <cite>INDOOR</cite> and <b> sends </b> (using a smart device) a <b> request </b> to store the load,
+            <b> by specifyng the <cite>type of  the material</cite> (plastic or glass) and its <cite>TruckLoad</cite> </b>.</p></li>
+            <li id="R2"><p>The <b> <cite>WasteService</cite> sends the answer   <em>loadaccept</em> </b> if the final content of proper container will not surpass the
+            maximum value allowed (<em>MAXPB</em> or <em>MAXGB</em>). <b> Otherwise, it sends the answer <em>loadrejecetd</em> </b> and the  <cite>Waste truck</cite>
+            leaves the <cite>INDOOR</cite> area.</p></li>
+            <ul>
+                <li class="green"> WasteService ha conoscenza di MAXPB e MAXGB, in modo da poter inviare le due risposte</li>
+            </ul>
+            
+            <li><p> <b class="red" > When the load is accepted </b>, the <cite>transport trolley</cite> reaches the <cite>INDOOR</cite>, <b class="red"> picks up the material </b>, goes to the
+            proper container and settles the material. <del> During this activity, the <cite>WasteService</cite> <strong>blinks</strong> the <cite>Led</cite></p> </del> </li>
+                <ul>
+                    <li> <b class="red">Problema</b>: innesco procedura proattiva di Transport_trolley <br>(denominato in seguito <b class="red">issue_trolley</b>)</li> 
+                    <li><b class="red">Problema</b>: comunicazione da parte del Transport_trolley della fine del prelievo dei materiali, il truck solo dopo il prelievo libera INDOOR ( <a href="#Q2">Q2</a> ) <br> (denominato in seguito <b class="red">pickup</b>)</li>
+                </ul>
+            
+            <li><p> <b class="red"> When the deposit action is terminated </b>, the <cite>transport trolley</cite> <b class="red"> excutes another deposit command  (if any) </b>
+            or returns to its <cite>HOME</cite>.</p></li>
+                <ul>
+    
+                    <li><b class="red">Problema</b>: comunicazione da parte del Transport_trolley della terminazione del lavoro assegnato<br>(denominato in seguito <b class="red">work_complete</b>)</li>
+                    <li><b class="red">Problema</b>: al Transport_trolley devono arrivare informazioni riguardanti l'incarico successivo <br>(denominato in seguito <b class="red">next_work</b>) </li>
+                </ul>
+        </ol>
+       
+    
+    
+        <h3>Modello dei requisiti</h3>
+    
+        <p> I requisti che non portano ad nessun problema (R1, R2) insieme definiscono il seguente modello dei requisiti</p>
+        
+        <ul>
+            <li><a href="sprint_1_qak/src/modello_requisiti.qak" >modello_requisiti</a></li>
+            <li>path : sprint_1_qak/src/modello_requisiti.qak</li>
+            <li> <img src="sprint_1_qak/waste_servicearch.png" alt=""> </li> 
+        </ul>
+    
+    
+        <p>WasteService è modellato logicamente come <b> attore </b> perchè lavora intrinsecamente a scambio di messaggi</p>
+            <ul>
+                <li> <b>Reattivo</b> sensibile alle richieste dei Waste_Truck</li>
+                <li> <b>Proattivo</b> Commissionare il Transport_trolley a seguito di valutazioni (riguardante alla capacità disponibile) e rispondere alla richiesta arrivata</li>
+            </ul>
+    
+        <p>WasteTruck è un POJO in quanto ente esterno dal sistema in progettazione</p>
+    
+        <h5> alarm </h5>
+        
+        <p> YAGNI, non è il centro del problema in questa fase</p>
+    
+        <h5> statusGUI</h5>
+        <p> YAGNI, non è il centro del problema in questa fase</p>
+    
+       </div>    
+
+
+       <h1>Problem Analysis</h1>
+
+       <div class="remark">
+       
+           <h2 id="issue_trolley_1" > <k> issue_trolley </k></h2>
+       
+           <p>La direzione della comunicazione è sicuramente DA Waste_Service VERSO Transport_trolley, Da requisiti R1 R2 Waste_Service ha l'informazione di quando un Waste_Truck invia una richiesta, questo verso garantisce una comunicazione <b>by-need</b>  in modello <b>push</b>. </p>
+       
+           <h5> proposta #1: evento</h5>
+       
+           <ul>
+       
+               <li> <b> PRO </b></li>
+       
+                   <ul>
+       
+                       <li> disaccoppiamento totale, Waste_Service non è a conoscenza dell'esistenza del Transport_trolley</li>
+                   </ul>
+               <li> <b> CONTRO </b></li>
+       
+                   <ul>
+                       <li> <b class="red"> non è reliable </b>, ogni incarico inviato dal Waste_Service dovrebbe venir gestito dal trolley</li>
+                       <li> per questo particolare problema tramite Q1 Q2, individuo che il Transport_trolley deve essere sensibile all'evento per tutto il percorso a parte il tratto da HOME ad INDOOR
+                       <li> Una possibile soluzione per forzare reliability potrebbe essere:  <br> inviare (dopo un timeout) una request al trolley per vedere se effettivamente sta effettuando l'incarico, ma in questo caso perdiamo il vantaggio del disacoppiamento totale. (Waste_Service deve conoscere Transport_trolley) </li>
+                   </ul>
+       
+           </ul>
+           <h5> proposta #2: dispaccio</h5>
+       
+           <ul>
+               <li> <b> PRO </b></li>
+               <ul>
+                   <li>La connessione è reliable, se il trolley non riceve l'incarico, l'infrastruttura genera una eccezione esplicita.</li>
+                   <li>Necessito comunque di un unico messaggio per questo problema.</li>
+               </ul>
+               <li> <b> CONTRO </b></li>
+       
+                   <ul>
+                       <li> Il Waste_Service deve essere a conoscenza del Transport_trolley.</li>
+                   </ul>
+           </ul>
+           <h5 id="issue_trolley_3"> proposta #3: request-response</h5>
+           <ul>
+               <li> <b> PRO </b></li>
+               <ul>
+                   <li>La connessione è reliable, se il trolley non riceve l'incarico, l'infrastruttura genera una eccezione esplicita.</li>
+                   
+               </ul>
+               <li> <b> CONTRO </b></li>
+                   <ul>
+                       <li>Necessito di <b class="red"> due messaggi </b>(request response) per soddisfare questo problema, inoltre non è chiara la semantica della risposta</li>
+                       <li>La semantica della risposta più straight-forward è che risponde subito così il Waste_Service sa che ha ricevuto il messaggio</li>
+                   </ul>
+           </ul>
+       
+           <img src="img/p_issue_trolley.jpg" alt="">
+       
+       
+           <h4 id="posizione"> <k> informazione posizione containers </k></h4>
+           
+           <p>Sorge il dilemma di quale entità (Waste_Service o Transport_trolley) deve essere a conoscenza dell'associazione NOME_CONTAINER ==> POSIZIONE NELLO SPAZIO</p>
+           <ul>
+               <li>Se questa informazione la possiede <b class="blue"> Waste_Service</b>: <br> il payload del messaggio di <b class="red">issue_trolley</b> sono le coordinate (oppure coppia di coordinate di vertici opposti se delimito un'area rettangolare) del container destinazione  </li>
+               <li>Se questa informazione la possiede <b class="blue"> Transport_trolley</b>:<br> il payload é semplicemente il <b>nome</b> del container destinazione </li>
+           </ul>
+       
+           <h2 > <k> pickup </k></h2>
+       
+           <p>La direzione della comunicazione è Da Transport_trolley VERSO Waste_Service e Waste_Truck</p>
+           <p>Notiamo subito che la comunicazione tra Transport_trolley verso il Waste_Truck deve essere intermediata da Waste_Service per non avere un ulteriore accoppiamento</p>
+       
+           <h4> Trolley to Waste_Service</h4>
+           <h5 id="pickup_1"> proposta #1: evento</h5>
+           <ul>
+               <li> <b> PRO </b></li>
+                   <ul>
+                       <li>disaccoppiamento, il Transport_trolley non conosce il Waste_Service. <br> Se possibile vorrei mantenere il Transport_trolley indipendente dal resto del sistema</li>
+                   </ul>
+       
+               <li> <b> CONTRO </b></li>
+       
+               <ul>
+                   <li> <b class="red">unreliability</b>   <br> ma è fatale che il Waste_Truck liberi INDOOR esattamente quando il Transport_trolley preleva il materiale? potrebbe liberare in un secondo momento?</li>
+               </ul>
+       
+           </ul>
+           <h5 id="pickup_2"> proposta #2: dispaccio</h5>
+           <ul>
+               <li> <b> PRO </b></li>
+                <ul>
+                   <li> reliable</li>
+                </ul>
+               <li> <b> CONTRO </b></li>
+       
+                   <ul>
+                       <li> dipendenza dal Transport_trolley verso Waste_Service</li>
+                   </ul>
+       
+           </ul>
+           
+           <h5> proposta #3: request-response standard</h5>
+           <p> È solo una complicazione del dispaccio, stesse considerazioni ma un CONTRO in più</p>
+           
+           <ul>
+               <li> <b> CONTRO </b></li>
+                   <ul><li> due messagggi per questo problema</li></ul>
+           </ul>
+       
+           <h5 id="pickup_4"> proposta #4: request-response, sfruttando <a href="#issue_trolley_3">proposta #3 di issue_trolley</a>  </h5>
+           
+           <p>La semantica del messaggio di risposta della richiesta goal per issue_trolley è aperta a rivalutazioni; possiamo pensare che il Transport_trolley risponde al termine del prelievo, e WasteService agisce di conseguenza notificando Waste_Truck </p>
+           <ul>
+               <li> <b> PRO </b></li>
+                <ul>
+                   <li>sfrutto un messaggio esistente</li>
+                   <li>connessione reliable</li>
+                   <li>Transport_trolley non ha bisogno di conoscere il Waste_Service, gli basta rispondere al messaggio (goal) arrivato</li>
+                </ul>
+               
+       
+               <li> <b> CONTRO </b></li>
+               <p>applicabile solo quando scelgo <a href="#issue_trolley_3">proposta #3 di issue_trolley</a>  </p>
+           </ul>
+           
+           <h4> Waste_Service to Waste_Truck</h4>
+       
+           
+           <h5> proposta #1: dispaccio</h5>
+           <h5> proposta #2: request-response, sfruttando <a href="#R2"> R2 loadaccept </a></h5>
+           
+           <p>Il ragionamento è uguale per il confronto di <a href="#pickup_2">proposta #2</a>  e <a href="#pickup_4">proposta #4</a>  di <b> <k>pickup</k> </b>, ma essendo la comunicazione Waste_Truck e Waste_Service request-response  <span class="blue"> definita dai requisiti</span>, la proposta #2, ovvero inviare la reply loadaccept dopo aver ricevuto pickup non ha drawback.   </p>
+       
+       
+           <h2 > <k> work_complete </k></h2>
+       
+           <p>La direzione della comunicazione è Da Transport_trolley VERSO Waste_Service. <br> Le possibili proposte di soluzione e le corrispettive considerazioni sono uguali al <a href="#pickup_1">problema pickup</a>, con la seguente piccola modifica </p>
+       
+           <h5 id="complete_4"> proposta #4: request-response, sfruttando <a href="#issue_trolley_3">proposta #3 di issue_trolley</a>  </h5>
+           
+           <p>La semantica del messaggio di risposta della richiesta goal per issue_trolley è aperta a rivalutazioni; possiamo pensare che il Transport_trolley risponde al <b class="blue"> termine del percorso </b>, e WasteService agisce di conseguenza.</p>
+         
+           <p>Ovviamente la <a href="#pickup_4">proposta #4 pickup</a>  e la <a href="#complete_4"> proposta #4 work_complete</a>  sono in <b class="red">conflitto</b> , non è possibile attribuire due semantiche allo stesso messaggio di risposta. </p>
+       
+           <p>Se come requisito di correttezza non è richiesto che Waste_Truck debba liberare INDOOR <b class="red"> esattamente</b> nell'istante in cui vengono prelevati i materiali; si può pensare di utilizzare la semantica ad evento per pickup, la semantica response per work_complete (che implicherebbe la semantica request per issue_trolley); work_complete nel caso in cui non sia arrivato l'evento pickup, all'arrivo di work_complete viene inviato loadaccept</p>
+       
+       
+           <h2> <k> next_work </k></h2>
+       
+           <p> Non riesco a stabilire a priori un verso di comunicazione, entrambi i versi possono avere senso (by need e non polling), ma preferisco in caso di accoppiamento di mantenere quelli presenti, quindi DA Waste_Service VERSO Transport_trolley.</p>
+           <p> Per <a href="#Q1">la domanda Q1</a>, so per dominio che mi possono arrivare altre richieste da nuovi Waste_Truck solo dopo che il trolley ha prelevato il carico </p>
+       
+       
+           <h4>Waste_Service to Trolley</h4>
+           <p> Waste_Service invia senza sapere a che stato si trova il Trolley</p>
+           <p> <b class="blue"> La scelta della soluzione per questo problema deve essere coerente con <a href="#issue_trolley_1">issue_trolley</a>, le due soluzioni devono avere lo stesso tipo di messaggi. </b> </p>
+           <h5> proposta #1: dispaccio</h5>
+           <h5> proposta #2: request-response</h5>
+           <h5> proposta #3: evento</h5>
+           <p> se un attore non è in attesa del evento, questo viene  <b class="red">perso</b>  (non entra nella coda dei messaggi in attesa)</p>
+       
+       
+       
+           <h4> <k> produttore-consumatore? </k></h4>
+           <p> Waste_Service può accodare il nuovo incarico al Transport_trolley? Oppure deve inviarglielo solo quando il trolley sta in effettiva attesa di un nuovo incarico?</p>
+       
+           <h4>Trolley to Waste_Service</h4>
+       
+           <p>Aggiungo una dipendenza in più tra i componenti, non valuto questa opzione.</p>
+       
+       
+           <h3>Modello del problema</h3>
+       
+           <p>Il modello dei requisiti ci impone una dipendenza tra Waste_Truck e Waste_Service (I Waste_Truck devono conoscere Waste_Service)</p>
+           <p>Il problema <a href="#issue_trolley_1">issue_trolley</a> ci suggerisce che ci può essere una dipendenza da Waste_Service verso Transport_trolley</p>
+           <p>Vogliamo di conseguenza provare ad rendere il Transport_trolley indipendente dagli altri componenti</p>
+           <p>Il seguente modello di problema mostra l'architettura logica completa per i requisiti <a href="#core-functionality">core-functionality </a> </p>
+       
+           <table>
+               <thead>
+                 <tr>
+                   <th>PROBLEMA</th>
+                   <th>soluzione adottata</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 <tr>
+                   <td>issue_trolley </td>
+                   <td> request-response</td>
+                 </tr>
+                 <tr>
+                   <td>informazione posizione containers</td>
+                   <td>il payload é il nome del container</td>
+                 </tr>
+                 <tr>
+                   <td>pickup : Trolley to Waste_Service</td>
+                   <td>evento</td>
+                 </tr>
+                 <tr>
+                   <td>pickup : Waste_Service to Waste_Truck</td>
+                   <td> request-response, sfruttando R2 loadaccept </td>
+                 </tr>
+                 <tr>
+                   <td>work_complete </td>
+                   <td>request-response, sfruttando proposta response di issue_trolley</td>
+                 </tr>
+                 <tr>
+                   <td>next_work : Waste_Service to Trolley </td>
+                   <td>stesso di issue_trolley</td>
+                 </tr>
+                 <tr>
+                   <td>next_work: produttore-consumatore</td>
+                   <td>nuove richieste sono messe in coda al Transport_trolley</td>
+                 </tr>
+               </tbody>
+               </table>
+       
+               <br>
+               <ul>
+                   <li><a href="sprint_1_qak/src/modello_problema.qak" >modello_problema</a></li>
+                   <li>path : sprint_1_qak/src/modello_problema.qak</li>
+                   <li> <img src="img/waste_servicearch_problema.png" alt="img/waste_servicearch_problema.png"> </li> 
+               </ul>
+   
+   
+               <h2> <k> conoscenza </k></h2>
+   
+               <p>Assieme a <a href="#posizione"> <k> informazione posizione containers </k></a> ci suggeriscono di capire quali informazioni sono presenti nel sistema e a chi attribuire la loro conoscenza </p>
+               <p>Una prima divisione può essere sulla possibilità di modifica di questi dati durante la vita del sistema, quindi</p>
+       
+               <p><b>Statici</b></p>
+       
+               <ul>
+                   <li>Capacità <b>iniziale</b> contenitori</li>
+                   <li>Coppia (Nome,Coordinate) per ognuno dei luoghi interessanti (HOME,INDOOR,CONTAINER_GLASS, )</li>
+                   <li>Stato e posizione <b> iniziale  </b> del trolley</li>
+               </ul>
+       
+       
+               <p><b>Dinamici</b>, modificabili durante l'esecuzione</p>
+       
+               <ul>
+                   <li> capacità <b>corrente</b> dei contenitori</li>
+                   <li> posizione attuale del trolley</li>
+                   <li> stato del trolley</li>
+               </ul>
+       
+               <p>Notiamo che le conoscenze dinamiche sono anche quelli da requisiti che identifichiamo come <b>Informazioni Osservabili</b> del sistema; questo ci suggerisce che devono essere mantenute all'interno degli Attori, per la corrispondenza tra Attori e COAP_Resource</p>
+       
+               <p>Waste_Service si terrà carico della capacità <b>corrente</b> dei contenitori, essendo l'ente accede a questa informazione e che lo aggiorna</p>
+               <p>stessa motivazione avremmo Transport_trolley che si terrà carico di posizione attuale del trolley e stato del trolley </p>
+       
+               <p>Le informazioni statiche mi identficano una <b> particolare istanza</b> del problema da risolvere, una base di conoscenza condivisa da tutti i contesti, dove i componenti del sistema gli possono fare richieste tipo <b> "get" </b> per ottenere informazioni necessarie, in questo modo c'è dipendenza dai attori di tutti i contesti verso il "configuratore", detenitore di tutte le informazioni statiche</p>
+               <p> Oppure è il "configuratore" che controlla la presenza dei vari componenti, ed invia a loro le informazioni necessarie; i vari componenti non partono senza ottenere le configurazioni giuste, oppure partono con una informazione di default, in questo modo i singoli componenti sono vincolati al massimo da un messaggio in ingresso.</p>
+       
+       
+               <h3>Modello del problema rivisitato</h3>
+               <ul>
+                   <li><a href="sprint_1_qak/src/modello_problema_conoscenza.qak" >modello_problema_conoscenza</a></li>
+                   <li>path : sprint_1_qak/src/modello_problema_conoscenza.qak</li>
+                   <li> <img src="img/waste_servicearch_problema_revisited.png" alt="img/waste_servicearch_problema_revisited.png"> </li> 
+               </ul>
+       
+       </div>       
+
+<h1>Test plans</h1> 
+
+ 
+<div class="remark">
+    
+    <h4>testing requisiti</h4>
+    <p> <b class="red">testLoadAccept</b> :  Un Truck si presenta con un carico di TruckLoad superiore allo spazio disponibile, Waste_Service deve rispondere con loadrejected</p>
+    <p> <b class="red">testLoadReject</b> : Un Truck si presenta con un carico di TruckLoad <span class="blue"> inferiore o uguale </span> allo spazio disponibile, Waste_Service deve aggiornare correttamente lo spazio residuo, e rispondere con loadaccept</p>
+    <ul>
+        <li><a href="../CoreWasteService/test/qak/TestCoreRequisiti.java">TestCoreRequisiti</a></li>
+        <li>path : CoreWasteService/test/qak/TestCoreRequisiti.java</li>
+    </ul>
+    <h4>testing problemi</h4>
+    <p> <b class="red">testSingleLoadAccepted</b> :  Waste_Service non accetta nessun altro incarico nel mentre che Transport_trolley sta eseguendo l'incarico corrente, al termine il Transport_trolley si dirige in HOME e rimane in attesa una volta arrivato</p>
+    <p> <b class="red">testConsecutiveLoadAccepted</b> : Waste_Service accetta un incarico prima che Transport_trolley termina l'incarico corrente; quando Transport_trolley termina l'incarico corrente, deve dirigersi ad INDOOR, senza passare da HOME</p>
+    <ul>
+        <li><a href="../CoreWasteService/test/qak/TestCoreProblema.java" >TestCoreProblema</a></li>
+        <li>path : CoreWasteService/test/qak/TestCoreProblema.java</li>
+    </ul>
+    
+    </div>
+    
+
+
+    <h2>Problem analysis (derivato dalla progettazione) </h2>
+
+ 
+    <div class="remark">
+        <h5>LEGGERE DOPO LA <a href="#project"> PROGETTAZIONE </a></h5> 
+    
+        <h2 id="percorso">  <k> percorso </k></h2>
+    
+        <p>La parte proattiva di un robot consiste spesso nell'esecuzione di una sequenza di movimenti che lo portano in una posizione desiderato dello spazio di lavoro (in questo caso lo spazio della stazione di Waste_Service).</p>
+        <p>Questa sequenza può essere: </p>
+    
+    
+        <ul>
+    
+            <li>cablata nel codice</li>
+            <li>generata dinamicamente
+    
+                <ul>
+                    <li>prodotta da una macchina a stati finiti</li>
+                    <li>algoritmi denominati di classe Path-Finding</li>
+                </ul>
+            </li>
+        </ul>
+        <p>Se lo spazio di lavoro è <b> immutabile </b> per tutte e le istanze su cui verrà eseguito l'applicazione (ed uguali tra loro), si potrebbe considerare di avere queste sequenze cablate, perchè deducibili a priori del tempo di esecuzione </p>
+    
+        <p>Se la logica dei percorsi è chiara e semplice (rispetto alle competenze algoritmiche logiche del programmatore), basta una macchina a stati finiti.</p>
+    
+        <p>In casi più complessi, si passano ad algoritmi di Path Finding.</p>
+    
+        <h2 id="mappa"> <k> mappa iniziale </k></h2>
+    
+        <p>Per poter costruire un percorso, la "mente" ha bisogno di informazioni riguardanti lo spazio di lavoro; NON è necessario avere conoscenza <b> totale </b> dello spazio disponibile, se il "corpo" informa la "mente" quando e quale parte del piano che esso ha creato non è andato a buon fine, e la mente aggiorna la sua base di conoscenza riguardante lo spazio circostante;
+        tuttavia non conviene neache partire da zero base di conoscenza dello spazio perchè c'è un tempo iniziale a partire dal momento di esecuzione nella quale la mente deve sbagliare molte volte, è necessaria quindi una fase di "esplorazione parziale" dello spazio circostante. 
+            
+    
+        <ul>
+    
+            <li>zero conoscenza</li>
+            <li>qualche base di conoscenza  <ul>
+    
+                <li>Solo i  bordi </li>
+                <p>È semplice da pensare al percorso (descrivibile tramite macchina a stati finiti con pochi stati) ed permette all'algoritmo poi più complesso di Path-Finding di notificare se la destinazione è fuori dall'area di lavoro con un rapido controllo, non fare tentativi aggiramenti di un muro continuo  </p>
+            </ul> </li>
+    
+            <li>conoscenza totale iniziale </li>
+    
+        </ul>
+        </p>
+    
+        <h2> <k> passaggio mappa </k></h2>
+    
+        <p>Si possono pensare a 3 modi di scambiare la mappa (un file testuale), con livello incrementale di disaccoppiamento e latenza</p>
+    
+        <ul>
+    
+            <li>pathname <b> relativo </b> : planner e mapper sono nello stesso progetto</li>
+            <li>pathname <b> assoluto </b> : planner e mapper sono nello stesso nodo fisico</li>
+            <li><b> trasferimento file </b> : planner e mapper possono stare anche su macchine diverse; se sono sulla stessa macchina servono piccoli accorgimenti per non trasferire (input e output) lo stesso file </li>
+        </ul>
+        <h2> <k> coerenza mapper planner </k></h2>
+    
+        <p>Il mapper per funzionare deve pilotare un robot che esegue i comandi aril, Il planner per funzionare pilota un pathexecutor che a sua volta pilota un robot. Pathexecutor e robot sono nello stesso contesto perchè sono fortemente accoppiati </p>
+        <p>Se mapper e planner sono distribuiti in contesti distinti, per <b> integrità </b> devo verificare che rispettivamente robot e pathexecutor sono la coppia corretta.</p>
+    
+        </div>
+         
+    
+
+
+<h1 id="project">Project</h1> 
+
+
+<div class="remark">
+
+    <h4>Transport_trolley</h4>
+
+    <p>Identifico diverse responsabilità assegnate all'unità astratta Trolley</p>
+
+    <ul>
+        <li>Trovare i percorsi che nel loro insieme compongono un <b> lavoro di  load </b>
+            <p>Possiamo dividire la mente dal corpo, quindi</p>
+            <ul>
+                <li>entità A : (nome_temp PATH_PLANNER) il quale decide il percorso conoscendo la posizione attuale e la posizione finale</li>
+                <li>entità B : (PATH_EXECUTOR) il quale prende il percorso elaborato dal "cervello" PATH_PLANNER, ed esegue i movimenti in ordine</li>
+            </ul>
+        </li>
+        <li> Effettivamente muovere il robot fisico/virtuale che si avrà a disposizione</li>
+            <ul>
+                <li>entità C : (ROBOT_MOVER)</li>
+                <li> ci sarà un'entità di ROBOT_MOVER per ogni robot supportato, queste entità mascherano le differenze di interazione tra una e l'altra, condividendo la stessa interfaccia/ insime di messaggi a cui possono reagire</li>
+            </ul>
+        <li>Mantenendo l'interfaccia (insieme di messaggi reagenti) attribuita in fase di analisi</li>
+        
+    </ul>
+
+    <p>All'interno della nostra software house sono già presenti componenti sviluppati che si occupano delle rispettive responsabilità</p>
+
+    <ul>
+        <li>entità A (PATH_PLANNER): unibo.robotappl1</li>
+        <li>entità B (PATH_EXECUTOR): unibo.basicrobot22 (QActor: pathexec)</li>
+        <li>entità C (ROBOT_MOVER): unibo.basicrobot22 (QActor: basicrobot)</li>
+        <li>entità D (TROLLEY_FACADE): CoreWasteService.transporttrolley </li>
+    </ul>
+
+
+    <p><b> GUARDARE ANALISI: <a href="#percorso"><span>PERCORSO</span></a>   E <a href="#mappa"><span>MAPPA INIZIALE</span></a></b></p>
+
+    <p>identifichiamo un una ulteriore entità in supporto all'entità A</p>
+    <ul>
+        <li>entità D (MAPPER): unibo.mapper</li>
+    </ul>
+
+
+    <h4>TROLLEY_FACADE</h4>
+
+    <p>Dipende dalla business logic, mantiene la logica della <b>successione di luoghi da visitare per un dato compito</b>, e pilota il pathplanner.</p>
+
+    <h4>PATH_PLANNER</h4>
+    <p>È un <b> attuatore </b> nei confronti di una qualsiasi <b> richiesta di calcolo di percorso  </b>, mantine ed aggiorna una mappa interna. Nel caso in cui la mappa non è aggiornata (il path calcolato non porta a destinazione), aggiorna le informazioni sulla mappa e calcola un percorso alternativo.</p>
+    
+    <h4>PATH_EXECUTOR</h4>
+    <p>È un <b> attuatore </b> nei confronti di una qualsiasi richiesta di <b>esecuzione </b>di percorso, notificando il percorso rimanente impossibile da eseguire in caso di ostacoli</p>
+
+
+    <h4>ROBOT_MOVER</h4>
+    <p>È un <b> attuatore </b> nei confronti di messaggi definiti dall'interfaccia aril (Abstract Robot Interaction Lanaguage).</p>
+
+    <h4>MAPPER(boundary)</h4>
+
+    <p>È un <b>attuatore</b> che trova il perimetro dello spazio circostante e restituisce la mappa creata. </p>
+    <p><b>GUARDARE ANALISI : PASSAGGIO MAPPA E COERENZA PLANNER-MAPPER </b></p>
+
+
+    <h2>COMMENTI</h2>
+    
+    <p>Si è ragionato su alcuni possibili estensioni del progetto</p>
+    
+    <p>I componenti che sono dipendenti dalla business logic sono WASTE_SERVICE e TROLLEY_FACADE</p>
+    
+    <h5>Modifiche possibili continuando ad usare modello qak</h5>
+    <ul>
+        <li>WASTE_SERVICE: Criterio di accettazione degli incarichi</li>
+        <li>TROLLEY_FACADE: Successione di luoghi intermedi che deve passare il robot per un singolo compito</li>
+        <li>WASTE_SERVICE e TROLLEY_FACADE: Politica di interazione a fronte di nuove richieste mentre il trolley è impegnato</li>
+    </ul>
+    <h5>Modifiche possibili solo al di fuori di qak</h5>
+    
+    <p>Non solo un container per GLASS e PLASTIC, ma dinamicamente aggiungere altri tipi di containers</p>
+    <p>I messaggi di configurazione dovrebbero accettare payload a lunghezza variabile, fuori dalle possibilità di qak</p>
+    <p>Il configuratore ottine per ogni container la posizione, il nome e la capienza, ha anche il compito di controllare l'integrità dei dati, in casi avanzati anche chiedere al mapper se le posizioni configurate sono esistenti nello spazio percorso.</p>
+   
+    <h2>WORKAROUND qak</h2>
+    <p>durante la progettazione alcuni componenti avevano bisogno di <b> importare librerie</b> non comprese nell'autogenerazione, quindi è stato pensato di aggiungere nelle rispettive cartelle <b>resources</b> dei compilati kotlin che racchiudono queste chiamate</p>
+    <h3>Modello del progetto</h3>
+
+    <ul>
+        <li><a href="sprint_1_qak/src/modello_progetto.qak" >modello_progetto</a></li>
+        <li>sprint_1_qak/src/modello_progetto.qak</li>
+        <li> <a href="img/waste_servicearch_progetto.png"><img src="img/waste_servicearch_progetto.png" alt="img/waste_servicearch_progetto.png"> </li></a>  
+    </ul>
+
+
+</div>
+     
+     
+
+
+<h1>Deployment</h1> 
+
+ 
+<div class="remark">
+    <p>Creato un <a href="../TruckSimulator/src/it/unibo/truck/TruckTUI.java"> <span>programma console</span></a>  per simulare le richieste di un Waste_Truck.</p>
+
+    
+    <pre>
+        <h4>Workflow utilizzo</h4>
+        <code>
+            ## In WasteService
+
+            ./launchall.sh
+            firefox http://localhost:8090/
+            cd TruckSimulator ; ./gradlew -q tui
+        </code>
+    </pre>
+    </div>
+    
+ 
+<h1>CHECKPOINT: PROGETTAZIONE</h1> 
+
+ 
+<div class="remark">
+
+
+<div class="container">
+
+    <div>
+    
+
+   
+     <a href="img/waste_servicearch_progetto.png"><img src="img/waste_servicearch_progetto.png" alt="img/waste_servicearch_progetto.png"></a>  
+    
+
+    </div>
+<!--
+    <div style="width : 80%">
+    
+        <h4>testing requisiti</h4>
+        <p> <b class="red">testLoadAccept</b> :  Un Truck si presenta con un carico di TruckLoad superiore allo spazio disponibile, Waste_Service deve rispondere con loadrejected</p>
+        <p> <b class="red">testLoadReject</b> : Un Truck si presenta con un carico di TruckLoad <span class="blue"> inferiore o uguale </span> allo spazio disponibile, Waste_Service deve aggiornare correttamente lo spazio residuo, e rispondere con loadaccept</p>
+        <ul>
+            <li><a href="../CoreWasteService/test/qak/TestCoreRequisiti.java">TestCoreRequisiti</a></li>
+            <li>path : CoreWasteService/test/qak/TestCoreRequisiti.java</li>
+        </ul>
+        <h4>testing problemi</h4>
+        <p> <b class="red">testSingleLoadAccepted</b> :  Waste_Service non accetta nessun altro incarico nel mentre che Transport_trolley sta eseguendo l'incarico corrente, al termine il Transport_trolley si dirige in HOME e rimane in attesa una volta arrivato</p>
+        <p> <b class="red">testConsecutiveLoadAccepted</b> : Waste_Service accetta un incarico prima che Transport_trolley termina l'incarico corrente; quando Transport_trolley termina l'incarico corrente, deve dirigersi ad INDOOR, senza passare da HOME</p>
+        <ul>
+            <li><a href="../CoreWasteService/test/qak/TestCoreProblema.java" >TestCoreProblema</a></li>
+            <li>path : CoreWasteService/test/qak/TestCoreProblema.java</li>
+        </ul>
+        
+        </div>
+    </div>
+-->
+</div>
+     
+<!-- USEFUL
+<table style="width:100%" border="1">
+<tr>
+@Author Antonio Hu
+<td style="width:50%">
+</td>
+<td></td>
+</tr>
+</table>
+-->
+	
+
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+By student Name Antonio Hu email: antonio.hu@studio.unibo.it  <br>
+github:
+<img src="./img/emiglio.png" alt="mbot" width="15%" height="15%">
+</div> 
+</body>
+</html>
