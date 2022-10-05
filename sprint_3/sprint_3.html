@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+
+@Author Antonio Hu
+-->
+<link rel="stylesheet" href="css/basic.css">
+<link rel="stylesheet" href="css/presentation.css">
+    
+<head>
+   
+    <title>Waste Service: Sprint 3</title></head>
+        
+    <body>
+    <div id="top">
+    <h1>LABORATORIO DI INGEGNERIA DEI SISTEMI SOFTWARE <font size="5"></font> </h1>
+    </div>  
+    
+    <div class="body"> 
+    <h1>Introduction</h1>
+     
+    <p>Tema finale corso di studio <b>Ingegneria dei sistemi software</b>, Laurea Magistrale Università di Bologna </p> 
+    
+ 
+ 
+<h1>Precedenti</h1>
+
+<div class="remark">
+    <a href="../sprint_0/requisiti.html">Requisiti committente</a>
+    <a href="../sprint_0/sprint_0.html">sprint 0</a>
+    <a href="../sprint_1/sprint_1.html">sprint 1</a>
+    <a href="../sprint_2/sprint_2.html">sprint 2</a>
+    
+</div>
+
+
+<h1>CHECKPOINT SPRINT 2</h1>
+
+<div class="remark">
+
+
+ <h3> Modello del Progetto</h3>
+ 
+
+ <a href="../sprint_2/img/waste_servicearch_progetto.png"><img src="../sprint_2/img/waste_servicearch_progetto.png" alt="../sprint_2/img/waste_servicearch_progetto.png"></a>
+
+ <p>per facilità di lettura, ledTrigger è disegnato come un dispaccio, ma nel progetto è un evento: il sistema deve mantenersi funzionante anche se il led non è presente</p>
+ <p>zooming sui componenti Led e Sonar</p>
+ <div class="container">
+
+   <img src="../unibo.ledqak22/ledqak22arch.png" alt="" width="50%">
+   <img src="../unibo.sonarqak22/sonarqak22arch.png" alt="" width="50%">
+ 
+ </div>
+</div>
+
+<h1>Requirement analysis</h1>
+
+ 
+<div class="remark">
+    <p>The <cite>WasteService</cite> must create a <span class="blue">WasteServiceStatusGUI</span> that <b class="red">shows to the Service-manager</b></p>
+   
+    <ul><li> <span class="red">visibilità</span>: la gui è dedicata al Service-manager?, altri utenti hanno possibilità di accedere a queste informazioni?  </li></ul>
+
+    <p>the current <span class="red"> state of the <cite>transport trolley</cite>  </span>  and it <span class="red">position</span>  in the room</p>
+    <ul>
+        <li> <b class="red">state-precision(trolley)</b>  : cosa si intende per stato del trolley? Esecuzione, Stopped e Home (Idle)?</li>
+        <li><b class="red">position-precision</b> : fino che precisione arriva la posizione? Devo comunicare esattamente le cordinate? Devo comunciare il "luogo" (Home,Plastic,Glass,Indoor)?</li>
+    </ul>
+
+    <p>the current <span class="red">state of the <cite>Led</cite></span> </p>
+
+    <ul><li> <b class="red">state-precision(led)</b>  : cosa si intende per stato del led? la funzione che sta eseguendo in questo momento(on, off, blink)?
+    </li></ul>
+
+    <p>the  <span class="blue"> current weigth of the material</span>  stored in the two waste-containers</p>
+
+    <ul><li> <span class="blue">weight</span> : l'utente deve conoscere il peso attuale, non la capacità rimanente</li>
+    </ul>
+
+
+
+    <h4>Modello dei requisiti</h4>
+
+    <a href="img/waste_servicearch_requisiti.png"> <img src="img/waste_servicearch_requisiti.png" alt="img/waste_servicearch_requisiti.png"> </a>
+    </div>
+    
+ 
+
+
+
+<h1>Problem analysis</h1>
+
+ 
+<div class="remark">
+    <h4>visibilità</h4>
+
+    <p>Se la GUI di per sè espone contenuti sensibili, della quale solamente il Service-manager può avere accesso, allora è necessario aggiungere strumenti di autenticazione ed identificazione di Service-manager rispetto agli altri utenti.</p>
+    <p>In caso contrario, ovvero che viene richiesto che la GUI possa essere vista anche dal Service-manager, il Service-manager non subisce nessuna distinzione rispetto ad altri utenti che arrivano alla GUI</p>
+
+
+    <h4>state-precision(trolley)</h4>
+
+    <p>Ragionando sull'utilità dei possibili domini di precisione, rispetto al titolo dell'utente citato nei requisiti, l'analista pensa che siano necessari informazioni di alto livello quali il trolley funzioni (RUNNING), sia a riposo ( HOME) oppure è temporaneamente fuori servizio (STOP)</p>
+    
+    <h4>position-precision</h4>
+
+    <p> stesso ragionamento di state-precision(trolley), all'utente target l'analista pensa che gli interessi solo ad alto livello dove è situato il trolley, e non la coordinata esatta all'interno dello spazio</p>
+    
+    <h4>state-precision(led)</h4>
+    
+    <p>stesso ragionamento di state-precision(trolley), led on, off e blink</p>
+    
+    <h3>polling vs push</h3>
+    <p> Un punto non citato dai requisiti ma di spontanea riflessione, la GUI da progettare è un componente passivo, ovvero che non deve modificare nessun dato e deve inviare dati alle altre parti del sistema attorno progettato negli sprint scorsi, quindi la GUI deve solo ricevere gli aggiornamenti inviati da altre parti del sistema, senza richiederli (tranne informazioni di keep-alive).</p>
+
+
+    <h4>Modello del problema</h4>
+
+    <a href="img/waste_servicearch_problema.png"> <img src="img/waste_servicearch_problema.png" alt="img/waste_servicearch_problema.png"> </a>
+    </div>
+    </div>
+     
+
+<h1>Test plans</h1> 
+
+ 
+<div class="remark">
+    <h4>state-trolley</h4>
+
+    <p>on an uninterrupted route, the state of trolley is HOME-RUNNING-HOME</p>
+
+    <p>repeat the last test, simulate and interruptiong; the state of trolley should evolve like HOME-RUNNING-STOP-RUNNING-HOME</p>
+
+
+    <h4>trolley-position</h4>
+    <p></p>
+
+    <h4>state-led</h4>
+    <p>play with led with an sequence of operation, and let the GUI reproduce the same sequence</p>
+
+
+
+    <h4>weight</h4>
+    <p>make one request, when the request is finished on the UI the weight must be added on the total weight</p>
+
+    </div>
+    
+
+<h1>Project</h1> 
+
+ 
+<div class="remark">
+    <p>Se sfruttiamo l'equivalenza tra attori(qak) e risorse osservabili il terzo sprint viene enormemente semplificato.</p>
+    <p>La GUI da progettare osserva appositi attori come risorse, dato che sono loro a modificare la risorsa(quindi l'informazione) interessata. </p>
+    <p>Nello specifico:</p>
+
+
+    <ul>
+        <li>info : attore</li>
+        <li>weight : waste_service </li>
+        <li>position : transporttrolley</li>
+        <li>trolley-state : trolleyanalyzer</li>
+        <li>led_state : ledqak</li>
+    </ul>
+
+
+    <h4>Modello del progetto</h4>
+
+    <a href="img/waste_servicearch_progetto.png"> <img src="img/waste_servicearch_progetto.png" alt="img/waste_servicearch_progetto"> </a>
+  
+    </div>
+     
+
+    <h1>Proposte di migliramento</h1>
+    <div class="remark">
+    
+        <h3>QAK</h3>
+    
+        <p> Qactor, nome</p>
+    
+        <ul>
+            <li>Per l'implementazione della primitiva <b> WhenTime </b>, l'attore che lo invoca non può avere caratteri speciali come parte del proprio nome</li> 
+        </ul>
+    
+        <p>CodedQactor, nome</p>
+        <ul>
+             <li>Nella scrittura del file qak, un codedQactor può avere lettere maiuscole, senza sollevare nessun errore sintattico; i messaggi aventi qual attore come destinatario, hanno nel campo destinatario <b> il nome dell'attore tutto minuscolo </b>, e tale messaggio non viene recapitato correttamente </li>
+        </ul>
+    
+        <p>Formato messaggio</p>
+    
+        <ul>
+            <li>I messaggi vengono dati in pasto ad un interprete <b> tuprolog </b> , il payload dei messaggi però non viene fatto escape dei caratteri utili per prolog, e questo potrebbe portare errore</li>
+        </ul>
+    
+        <p>build.gradle, pl nella distribuzione</p>
+    
+        <ul>
+            <li> Visto che vengono generato i file .pl, conoscenza del sistema in forma dichiarativa, che serve anche nella distribuzione, sarebbe opportuno aggiungere la seguente riga nel file di building auto-generato</li>
+        </ul>
+    
+        <pre>
+            <code>
+    
+                distributions {
+                    main {
+                        contents {
+                            <b><i> from './contextname.pl' </i> </b>
+                            from './sysRules.pl'
+                        }
+                    }
+                }
+            </code>
+        </pre>
+    
+        <p>MQTT</p>
+    
+        <ul> 
+            <li> Nell'implementazione attuale posso specificare solo un unico canale MQTT della quale sono sia publisher che subscriber; questo implica che per far comunicare il mio sistema tramite MQTT, tutti i contesti sono publisher ed subscriber dello stesso topic. </li>
+            <li> Il problema esiste soprattutto per i messaggi di natura <b> evento</b>, i quali qak non fornisce primitive per <b> emit esclusivamente locali </b>, quindi usando MQTT l'application designer ha solo due opzioni</li>
+            <li> 1. Usare MQTT, tutti gli eventi vengono propagati a tutti i contesti del sistema </li>
+            <li> 2. non usare MQTT</li>
+            <li> questo limita enormemente i scenari possibili di utilizzo di questo protocollo</li>
+        </ul>
+    
+    
+        <p>COAP OBSERVER</p>
+        <ul>
+            <li>nella scrittura del modello,  observeResource accetta come parametro solo Qactor, non ExternalQactor</li>
+            <li>Il codice generato inoltre scrive direttamente all'interno della classe l'indirizzo al momento di generazione</li>
+            <li>rendendo presente una discrepanza di configurazione tra la dichiarazione di un attore esterno nel file .pl, e l'osservatoreCOAP</li>
+            <li>L'application designer suggerisce che la locazione dell'indirizzo COAP della risorsa debba essere risolto a runtime, durante la fase di boostrap, leggendo dal file *.pl, in modo analogo alla creazione dei proxy per gli attori remoti quando si imposta il contesto locale</li>
+        </ul>
+        <h3>Wrapper Java</h3>
+    
+        <p>modifiche effettuate ad unibo.actor22, wrapper java delle funzionalità qactor sviluppato dalla software house</p>
+    
+        <p>Eventi</p>
+        <ul>
+          <li>Ricezione di eventi remoti </li>
+          <li>IDEA: Handler del contesto quando riceve un messaggio non solo fa distinzione tra richiesta o non richiesta, i quali secondi li tratta come dispaccio, ma verifica anche se siano eventi.</li>
+          <li><a href="../unibo.actor22/src/unibo/actor22comm/context/ContextMsgHandler.java">ContextMsgHandler.java riga 29 e riga 50-55</a></li>
+          <li>Propagazione di eventi locali a contesti remoti conosciuti</li>
+          <li>BUGFIX: la tabella dei contesti remoti identifica i proxy per indirizzo e non <b> indirizzo+porta </b>, questo crea problemi quando sulla stessa macchina ho più contesti </li>
+          <li>IDEA: quando viene generato un evento, EventMsgHandler non solo controlla gli attori locali, ma inoltra tale evento anche a tutti i contesti conosciuti</li>
+          <li>WORKAROUND IMPLEMENTATIVO: I proxy vengono effettivamente generati quando c'è almeno un attore conosciuto del contesto remoto; se voglio propagare ad un contesto remoto, devo per forza aggiungere un attore remoto (anche se non esiste), per generare il proxy</li>
+          <li>controllare storico modifiche git per dettagli sull'implementazione</li>
+          <li><a href="../unibo.actor22/src/unibo/actor22/Qak22Context.java">Qak22Context.java</a> </li>
+          <li><a href="../unibo.actor22/src/unibo/actor22comm/events/EventMsgHandler.java">EventMsgHandler.java</a></li>
+          <li><a href="../PathExecutorInterrupt/src/it/unibo/pathexecutor/MainPathExecutorInterrupt.java">esempio di utilizzo, riga 19 esempio di workaround</a> </li>
+    
+        </ul>
+    
+    
+    
+    </div>
+     
+
+
+    
+ 
+
+     
+<!-- USEFUL
+<table style="width:100%" border="1">
+<tr>
+@Author Antonio Hu
+<td style="width:50%">
+</td>
+<td></td>
+</tr>
+</table>
+-->
+	
+
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
+By student Name Antonio Hu email: antonio.hu@studio.unibo.it  <br>
+github:
+<img src="./img/emiglio.png" alt="mbot" width="15%" height="15%">
+</div> 
+</body>
+</html>
